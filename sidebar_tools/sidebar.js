@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const pathname = window.location.pathname;
         const filename = pathname.split('/').pop() || '';
 
-        // 更可靠的首頁判斷邏輯
+        // 更可靠的首頁判斷邏輯（不依賴特定目錄名稱）
         // 優先檢查檔名，因為這是最直接的方式
         // 檔名為 index.html 或 index_en.html 的頁面都視為首頁
         const isHomePage = pathname === '/' ||
@@ -17,8 +17,6 @@ document.addEventListener('DOMContentLoaded', function() {
                           filename === 'index_en.html' ||
                           pathname.endsWith('/index.html') ||
                           pathname.endsWith('/index_en.html') ||
-                          pathname.includes('/1141-gk2362k24/index.html') ||
-                          pathname.includes('/1141-gk2362k24/html_en/index_en.html') ||
                           // 檢查是否包含 html_en/index_en.html（更寬鬆的匹配，處理各種路徑格式）
                           (pathname.includes('html_en') && pathname.includes('index_en.html'));
 
@@ -34,9 +32,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const randomGroupText = isEnglish ? 'Random Grouping' : '隨機分組';
 
             // 根據當前路徑決定隨機分組工具的相對路徑
-            // 如果路徑包含 1141-gk2362k24/html_en 或 1141-gk2362k24/html，需要多上一層
+            // 如果路徑包含 html_en 或 html 目錄，通常需要多上一層（因為在子目錄中）
             let randomGroupLink = '../sidebar_tools/random_grouping.html';
-            if (pathname.includes('/1141-gk2362k24/html_en/') || pathname.includes('/1141-gk2362k24/html/')) {
+            // 檢查是否在 html 或 html_en 子目錄下（需要上兩層才能到根目錄）
+            if (pathname.includes('/html_en/') || pathname.includes('/html/')) {
                 randomGroupLink = '../../sidebar_tools/random_grouping.html';
             }
 
@@ -63,24 +62,26 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             // 其他頁面：只有回首頁按鈕
             const homeText = isEnglish ? 'Home' : '回首頁';
-            // 判斷當前頁面位置，決定回首頁的路徑
+            // 判斷當前頁面位置，決定回首頁的路徑（不依賴特定目錄名稱）
             let homeLink;
-            if (pathname.includes('/1141-gk2362k24/html/')) {
-                // 在 1141-gk2362k24/html/ 目錄下的中文頁面，回到課程首頁
+            if (pathname.includes('/html/')) {
+                // 在 html/ 目錄下的中文頁面，回到父層的 index.html（課程首頁）
                 homeLink = '../index.html';
-            } else if (pathname.includes('/1141-gk2362k24/html_en/')) {
-                // 在 1141-gk2362k24/html_en/ 目錄下的英文頁面，回到課程首頁（或未來可指向英文首頁）
-                homeLink = '../index.html';
-            } else if (pathname.includes('/html/') || pathname.includes('/html_en/')) {
-                // 舊的路徑結構（如果還有其他地方使用）
-                if (isEnglish) {
-                    homeLink = '../html_en/index_en.html';
-                } else {
-                    homeLink = '../1141-gk2362k24/index.html';
-                }
+            } else if (pathname.includes('/html_en/')) {
+                // 在 html_en/ 目錄下的英文頁面，回到父層的 index.html 或 index_en.html
+                homeLink = '../index.html';  // 可以改為 index_en.html 如果英文首頁在父層
             } else {
-                // 其他情況，預設回到課程首頁
-                homeLink = isEnglish ? '../html_en/index_en.html' : '../1141-gk2362k24/index.html';
+                // 其他情況，根據語言回到對應的首頁
+                // 嘗試找到同層或上層的 index 檔案
+                if (isEnglish) {
+                    homeLink = 'index_en.html';  // 嘗試同層
+                    // 如果不在 html_en 下，可能需要調整路徑
+                    if (!pathname.includes('/html_en/')) {
+                        homeLink = '../html_en/index_en.html';
+                    }
+                } else {
+                    homeLink = '../index.html';  // 回到上層的 index.html
+                }
             }
 
             sidebar.innerHTML = `
@@ -328,44 +329,44 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.preventDefault();
                 const currentPath = window.location.pathname;
 
-                // 判斷當前語言並切換
-                // 優先檢查課程路徑下的首頁
-                if (currentPath === '/1141-gk2362k24/index.html' || currentPath.endsWith('/1141-gk2362k24/index.html')) {
+                // 判斷當前語言並切換（不依賴特定目錄名稱）
+                const currentFile = currentPath.split('/').pop() || '';
+
+                // 處理首頁之間的語言切換
+                if (currentFile === 'index.html' || currentPath.endsWith('/index.html')) {
                     // 中文課程首頁 → 英文課程首頁
-                    window.location.href = 'html_en/index_en.html';
+                    // 檢查是否有 html_en 子目錄
+                    if (currentPath.includes('/html/') || currentPath.includes('/html_en/')) {
+                        // 在子目錄下，需要調整路徑
+                        window.location.href = '../html_en/index_en.html';
+                    } else {
+                        // 在根目錄或父目錄下
+                        window.location.href = 'html_en/index_en.html';
+                    }
                     return;
-                } else if (currentPath === '/1141-gk2362k24/html_en/index_en.html' || currentPath.endsWith('/1141-gk2362k24/html_en/index_en.html')) {
+                } else if (currentFile === 'index_en.html' || currentPath.endsWith('/index_en.html')) {
                     // 英文課程首頁 → 中文課程首頁
-                    window.location.href = '../index.html';
+                    if (currentPath.includes('/html_en/')) {
+                        window.location.href = '../index.html';
+                    } else {
+                        window.location.href = '../index.html';
+                    }
                     return;
-                } else if (currentPath.includes('/1141-gk2362k24/html_en/')) {
-                    // 當前是英文版（在課程路徑下），切換到中文版
+                } else if (currentPath.includes('/html_en/')) {
+                    // 當前是英文版頁面，切換到中文版
                     // 英文投影片頁面 → 中文投影片頁面
                     const chinesePath = currentPath.replace('/html_en/', '/html/').replace('_en.html', '.html');
                     window.location.href = chinesePath;
                     return;
-                } else if (currentPath.includes('/1141-gk2362k24/html/')) {
-                    // 當前是中文版（在課程路徑下），切換到英文版
+                } else if (currentPath.includes('/html/')) {
+                    // 當前是中文版頁面，切換到英文版
                     // 中文投影片頁面 → 英文投影片頁面
                     const englishPath = currentPath.replace('/html/', '/html_en/').replace('.html', '_en.html');
                     window.location.href = englishPath;
                     return;
-                } else if (currentPath.includes('/html_en/')) {
-                    // 舊的英文版路徑（如果還有其他地方使用）
-                    if (currentPath.endsWith('/index_en.html')) {
-                        window.location.href = '../index.html';
-                    } else if (currentPath.includes('_en.html')) {
-                        const chinesePath = currentPath.replace('/html_en/', '/html/').replace('_en.html', '.html');
-                        window.location.href = chinesePath;
-                    }
-                    return;
                 } else {
-                    // 其他情況（舊路徑或根目錄）
-                    if (currentPath.includes('/html/') && currentPath.includes('.html')) {
-                        const englishPath = currentPath.replace('/html/', '/html_en/').replace('.html', '_en.html');
-                        window.location.href = englishPath;
-                    } else if (currentPath.endsWith('/index.html') || currentPath === '/') {
-                        // 根目錄歡迎頁面不需要語言切換
+                    // 其他情況（根目錄歡迎頁面不需要語言切換）
+                    if (currentPath.endsWith('/index.html') || currentPath === '/') {
                         return;
                     }
                 }
