@@ -10,7 +10,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const isHomePage = pathname === '/' ||
                           pathname.endsWith('/index.html') ||
                           pathname.endsWith('/index_en.html') ||
-                          pathname.includes('/1141-gk2362k24/index.html');
+                          pathname.includes('/1141-gk2362k24/index.html') ||
+                          pathname === '/1141-gk2362k24/html_en/index_en.html' ||
+                          pathname.endsWith('/1141-gk2362k24/html_en/index_en.html');
         const isEnglish = pathname.includes('_en.html') ||
                          pathname.includes('/html_en/');
 
