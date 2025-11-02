@@ -7,20 +7,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 判斷是否為首頁和語言
         const pathname = window.location.pathname;
+        const filename = pathname.split('/').pop() || '';
+
+        // 更可靠的首頁判斷邏輯
+        // 優先檢查檔名，因為這是最直接的方式
+        // 檔名為 index.html 或 index_en.html 的頁面都視為首頁
         const isHomePage = pathname === '/' ||
+                          filename === 'index.html' ||
+                          filename === 'index_en.html' ||
                           pathname.endsWith('/index.html') ||
                           pathname.endsWith('/index_en.html') ||
                           pathname.includes('/1141-gk2362k24/index.html') ||
-                          pathname === '/1141-gk2362k24/html_en/index_en.html' ||
-                          pathname.endsWith('/1141-gk2362k24/html_en/index_en.html');
+                          pathname.includes('/1141-gk2362k24/html_en/index_en.html') ||
+                          // 檢查是否包含 html_en/index_en.html（更寬鬆的匹配，處理各種路徑格式）
+                          (pathname.includes('html_en') && pathname.includes('index_en.html'));
+
         const isEnglish = pathname.includes('_en.html') ||
-                         pathname.includes('/html_en/');
+                         pathname.includes('/html_en/') ||
+                         pathname.includes('html_en') ||
+                         filename.includes('_en.html');
 
         if (isHomePage) {
             // 首頁：完整側邊欄
             const menuTitle = isEnglish ? 'Tools Menu' : '工具選單';
             const languageText = isEnglish ? 'Switch Language' : '切換語言';
             const randomGroupText = isEnglish ? 'Random Grouping' : '隨機分組';
+
+            // 根據當前路徑決定隨機分組工具的相對路徑
+            // 如果路徑包含 1141-gk2362k24/html_en 或 1141-gk2362k24/html，需要多上一層
+            let randomGroupLink = '../sidebar_tools/random_grouping.html';
+            if (pathname.includes('/1141-gk2362k24/html_en/') || pathname.includes('/1141-gk2362k24/html/')) {
+                randomGroupLink = '../../sidebar_tools/random_grouping.html';
+            }
 
             sidebar.innerHTML = `
                 <div class="sidebar-toggle" id="sidebarToggle">
@@ -36,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <a href="#" class="sidebar-item" id="languageToggle">
                             <span class="sidebar-text">${languageText}</span>
                         </a>
-                        <a href="../sidebar_tools/random_grouping.html" class="sidebar-item" target="_blank">
+                        <a href="${randomGroupLink}" class="sidebar-item" target="_blank">
                             <span class="sidebar-text">${randomGroupText}</span>
                         </a>
                     </div>
