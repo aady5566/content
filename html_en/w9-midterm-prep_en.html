@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 9: AI Presentation Midterm Project Preparation</title>
+    <script src="../sidebar_tools/sidebar.js"></script>
+    <style>
+        :root {
+            --bg-color: #F4F2EF;
+            --text-color: #5a5a5a;
+            --accent-color: #78785b;
+            --line-color: #d1d1c2;
+            --highlight-color: #8c867b;
+            --font-family: 'Calibri', 'Noto Sans TC', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+        }
+
+        .slides-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: var(--bg-color);
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5vw;
+            box-sizing: border-box;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+            transform: scale(0.98);
+            text-align: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            font-size: 1.5rem;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            z-index: 1;
+        }
+
+        .slide.hidden {
+            display: none !important;
+        }
+
+        .slide.scrollable {
+            justify-content: flex-start;
+        }
+
+        h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+        }
+
+        h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 4vh;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 1rem;
+            width: 80%;
+            max-width: 800px;
+        }
+
+        h4 {
+            font-size: clamp(1.8rem, 3.3vw, 2.4rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 0.3rem;
+        }
+
+        h5 {
+            font-size: clamp(1rem, 1.8vw, 1.3rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.6rem;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            font-size: 1.5rem;
+            max-width: 80ch;
+        }
+
+        .slide-subtitle {
+            color: #888;
+            font-size: 1.8rem;
+            font-weight: 300;
+            margin-top: -1rem;
+        }
+
+        .nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 98%;
+            left: 1%;
+            display: flex;
+            justify-content: space-between;
+            z-index: 1002;
+            pointer-events: none;
+        }
+
+        .nav-btn {
+            pointer-events: all;
+            background: none;
+            border: 1px solid var(--line-color);
+            color: var(--accent-color);
+            font-size: 2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.4;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            opacity: 1;
+        }
+
+        /* Role card grid layout - 2x2 */
+        .role-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            width: 100%;
+            max-width: 1400px;
+            margin: 2rem auto;
+        }
+
+        .role-card {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            text-align: left;
+        }
+
+        .role-card h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .role-card h5 {
+            font-size: clamp(1.2rem, 2.2vw, 1.4rem);
+            font-weight: 500;
+            color: var(--highlight-color);
+            margin-bottom: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        .role-card p {
+            font-size: clamp(1rem, 1.8vw, 1.2rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.6rem;
+        }
+
+        .role-card ul {
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .role-card li {
+            font-size: clamp(0.95rem, 1.7vw, 1.1rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.4rem;
+        }
+
+        /* Topic selection container - scrollable */
+        .topic-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            padding: 1.5vh 2vw;
+            overflow-y: auto;
+            text-align: left;
+            height: 100%;
+            box-sizing: border-box;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .topic-section {
+            width: 100%;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+        }
+
+        .topic-section h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .topic-section p {
+            font-size: clamp(1rem, 1.8vw, 1.2rem);
+            line-height: 1.8;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .step-card {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            margin: 0 auto 1.5rem auto;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .step-card.text-left {
+            text-align: left;
+        }
+
+        .step-card h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .step-card p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        /* Goal list styles */
+        .goal-list {
+            text-align: left;
+            max-width: 800px;
+            margin: 2rem auto;
+        }
+
+        .goal-list h4 {
+            text-align: center;
+        }
+
+        .goal-list ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .goal-list li {
+            font-size: clamp(1.2rem, 2.2vw, 1.5rem);
+            line-height: 2;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+            position: relative;
+        }
+
+        .goal-list li:before {
+            content: "•";
+            color: var(--accent-color);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        /* Mobile optimization */
+        @media (max-width: 767px) {
+            .slide {
+                padding: 3vw;
+                overflow-y: auto;
+                justify-content: center;
+            }
+
+            .slide:first-child {
+                justify-content: center;
+                overflow-y: hidden;
+            }
+
+            .slide.scrollable {
+                justify-content: flex-start;
+            }
+
+            .nav {
+                width: 95%;
+                left: 2.5%;
+                z-index: 1002;
+            }
+
+            .nav-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 1.6rem;
+                opacity: 0.6;
+            }
+
+            h1 { font-size: clamp(2.5rem, 6vw, 3.5rem); }
+            h2 { font-size: clamp(2rem, 4.5vw, 2.5rem); margin-bottom: 0.8rem; }
+            h3 { width: 95%; font-size: clamp(1.6rem, 3.8vw, 2rem); }
+            h4 { font-size: clamp(1.3rem, 2.8vw, 1.6rem); }
+            h5 { font-size: clamp(1.1rem, 2.2vw, 1.3rem); }
+            p { font-size: clamp(1rem, 2vw, 1.2rem); }
+
+            .role-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                margin: 1rem auto;
+            }
+
+            .role-card {
+                padding: 1.5rem;
+            }
+
+            .topic-container {
+                padding: 2vh 3vw;
+            }
+
+            .topic-section {
+                padding: 1.2rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .goal-list li {
+                font-size: clamp(1rem, 2vw, 1.2rem);
+                padding-left: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="slides-container">
+        <!-- Slide 1: Title -->
+        <section class="slide active">
+            <h1>AI Presentation Midterm: Introduction</h1>
+            <h2 class="slide-subtitle">Week 9: Preparation Phase</h2>
+        </section>
+
+        <!-- Slide 2: [Goals] -->
+        <section class="slide">
+            <h2>Announcement: 11/11 Midterm Presentation Content</h2>
+            <p class="step-card text-left">Using the "Prompt Engineering" and "AI Presentation Tools (such as Canva)" learned in the previous semester, work in a team collaboration mode to complete a professional 10-minute presentation on a self-selected topic, followed by a 5-minute Q&A session with other groups.</p>
+        </section>
+
+        <!-- Slide 3: [This Week's Goals] -->
+        <section class="slide">
+            <h3>[This Week's Goals]</h3>
+            <div class="goal-list">
+                <ul>
+                    <li>Group formation and role introduction</li>
+                    <li>Topic selection and task division</li>
+                    <li>First team planning sprint</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Slide 4: [Roll Call, Initial Roles, Balanced Grouping] -->
+        <section class="slide scrollable">
+            <h3>[Roll Call, Initial Roles, Balanced Grouping]</h3>
+            <div class="role-grid">
+                <!-- Explorer -->
+                <div class="role-card">
+                    <h4>Explorer</h4>
+                    <h5>Core Positioning: Direction & Depth</h5>
+                    <p><strong>Specific Project Tasks:</strong></p>
+                    <ul>
+                        <li><strong>Define Research Direction:</strong> Determine the "unique perspective" the team will take on the topic.</li>
+                        <li><strong>In-Depth Data Mining:</strong> [Primary Responsibility] Find "academic cases and literature support."</li>
+                        <li><strong>Refine Core Questions:</strong> [Primary Responsibility] Design the "core concepts and key questions" to be presented at the end.</li>
+                        <li><strong>Draft the in-depth content for the "Detailed Introduction."</strong></li>
+                    </ul>
+                </div>
+
+                <!-- Implementer -->
+                <div class="role-card">
+                    <h4>Implementer</h4>
+                    <h5>Core Positioning: Output & Quality</h5>
+                    <p><strong>Specific Project Tasks:</strong></p>
+                    <ul>
+                        <li><strong>Presentation Visualization:</strong> [Primary Responsibility] Use tools like Canva to create all presentation slides.</li>
+                        <li><strong>Content Implementation:</strong> [Primary Responsibility] Transform the "text drafts" from the Explorer and Spokesperson into precise, easy-to-understand "detailed introduction" graphics and text.</li>
+                        <li><strong>Quality Control:</strong> Check for typos, layout consistency, and image resolution in the presentation.</li>
+                        <li><strong>Integrate all AI-generated content (text, images).</strong></li>
+                    </ul>
+                </div>
+
+                <!-- Spokesperson -->
+                <div class="role-card">
+                    <h4>Spokesperson</h4>
+                    <h5>Core Positioning: Packaging & Presentation</h5>
+                    <p><strong>Specific Project Tasks:</strong></p>
+                    <ul>
+                        <li><strong>Script Writing:</strong> [Primary Responsibility] Write the "Topic Introduction" and opening statements for "Why It Matters."</li>
+                        <li><strong>Storyline Packaging:</strong> Transform rigid data into an engaging storyline.</li>
+                        <li><strong>Presentation Practice & Delivery:</strong> [Primary Responsibility] Deliver the 10-minute oral presentation.</li>
+                        <li><strong>Serve as one of the primary responders in Q&A.</strong></li>
+                    </ul>
+                </div>
+
+                <!-- Navigator -->
+                <div class="role-card">
+                    <h4>Navigator</h4>
+                    <h5>Core Positioning: Process & Integration</h5>
+                    <p><strong>Specific Project Tasks:</strong></p>
+                    <ul>
+                        <li><strong>Develop timeline and progress control.</strong></li>
+                        <li><strong>Integrated Fact-Checking:</strong> [Primary Responsibility] Verify the accuracy of literature sources cited by the "Explorer" and key data proposed by the "Spokesperson."</li>
+                        <li><strong>Ensure Content Consistency:</strong> Check that the logic of the presentation's "opening (importance)," "middle section (details)," and "conclusion (core questions)" is coherent.</li>
+                        <li><strong>Moderate Q&A:</strong> Serve as the moderator, assigning questions to team members for response.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5: [Topic Selection] - scrollable -->
+        <section class="slide scrollable">
+            <h3>[Topic Selection]</h3>
+            <div class="topic-container">
+                <!-- A. Mental Health & Self-Growth -->
+                <div class="topic-section">
+                    <h4>A. Mental Health & Self-Growth</h4>
+                    <p>1. College Students' "Imposter Syndrome": Explore its causes and its impact on academic and social life, along with coping strategies.</p>
+                    <p>2. The Science of "Flow": How can AI tools (such as Pomodoro apps and focus software) help create the optimal personal learning and work experience?</p>
+                    <p>3. Sleep Science and Dreams: Explore how sleep quality affects college students' memory, emotional stability, and learning performance.</p>
+                    <p>4. How Cognitive Biases Control Your Decisions: Analyze 1-2 common biases (such as confirmation bias) and how they affect our interpretation of news or consumption behavior.</p>
+                    <p>5. "Self-Identity" in the Digital Age: The tension and anxiety between online personas and authentic selves.</p>
+                </div>
+
+                <!-- B. Social Care & Social Work -->
+                <div class="topic-section">
+                    <h4>B. Social Care & Social Work</h4>
+                    <p>6. How AI Assists Vulnerable Groups: Using "elderly" or "people with disabilities" as examples of smart care applications, explore their convenience and ethical implications.</p>
+                    <p>7. The Weight of "Social Stigma": Explore how stigmatization exacerbates the plight of people with mental illness or those in poverty.</p>
+                    <p>8. "Helpers'" Professional Burnout: Analyze sources of stress and self-care in professions such as social work, nursing, and counseling.</p>
+                    <p>9. What is "Community Building": Explore how local connections (such as community shared spaces and local NGOs) enhance residents' sense of well-being and belonging.</p>
+                    <p>10. Stray Animals' "TNR" and "Zero-Euthanasia" Policies: Explore the balance between social work (animal welfare) and public health.</p>
+                </div>
+
+                <!-- C. Healthy Eating & Nutrition Science -->
+                <div class="topic-section">
+                    <h4>C. Healthy Eating & Nutrition Science</h4>
+                    <p>11. The "Gut-Brain Axis": How does diet affect your emotions, stress, and mental health through gut bacteria?</p>
+                    <p>12. Scientific Validation of Popular Diets: Using "16:8 Intermittent Fasting" or "Ketogenic Diet" as examples, analyze their effectiveness and potential risks.</p>
+                    <p>13. The Battle Between "Plant-Based Meat" and "Cultured Meat": Are these really healthier, more sustainable future food choices?</p>
+                    <p>14. Marketing Traps of "Health Foods": Analyze how nutrition labels and advertising terminology (such as organic, low-fat, gluten-free) affect consumer perception.</p>
+                    <p>15. College Students' (Dining Out/Dormitory) "Dietary Poverty": How to practice a balanced diet with limited budget and choices?</p>
+                </div>
+
+                <!-- D. Gender & Interpersonal Relationships -->
+                <div class="topic-section">
+                    <h4>D. Gender & Interpersonal Relationships</h4>
+                    <p>16. The "Gamification" of Dating Apps: Does the swipe mechanism expand the social circle or deepen fast-food romance and loneliness?</p>
+                    <p>17. How Media Shapes Our "Romantic Scripts": Analyze how idol dramas or movies influence our expectations of ideal partners.</p>
+                    <p>18. "Emotional Labor": In intimate relationships, friendships, or service industries, who bears more invisible burden?</p>
+                    <p>19. "Friendship" in the Digital Age: Explore how online relationships (online friends, social media likes) impact and supplement real-life connections.</p>
+                    <p>20. Gender Communication Myths: Do men and women really communicate from different planets? (Explore stereotypes vs. socialization)</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 6: [First Planning Sprint] -->
+        <section class="slide">
+            <div class="step-card">
+                <h4>Roles Activated!</h4>
+                <p style="margin-top: 2rem; font-size: 1.3rem;">Begin task division, discuss topics, and develop an initial plan</p>
+            </div>
+        </section>
+    </div>
+
+    <div class="nav">
+        <button id="prev" class="nav-btn">&#8249;</button>
+        <button id="next" class="nav-btn">&#8250;</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = Array.from(document.querySelectorAll('.slide:not(.hidden)'));
+            const totalSlides = slides.length;
+            let currentSlide = 0;
+
+            function showSlide(index) {
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === index);
+                });
+            }
+
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            function prevSlide() {
+                currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            document.getElementById('next').addEventListener('click', nextSlide);
+            document.getElementById('prev').addEventListener('click', prevSlide);
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    nextSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    prevSlide();
+                }
+            });
+
+            // Touch support
+            let startX = 0;
+            let endX = 0;
+
+            document.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+            });
+
+            document.addEventListener('touchend', (e) => {
+                endX = e.changedTouches[0].clientX;
+                handleSwipe();
+            });
+
+            function handleSwipe() {
+                const threshold = 50;
+                const diff = startX - endX;
+
+                if (Math.abs(diff) > threshold) {
+                    if (diff > 0) {
+                        nextSlide();
+                    } else {
+                        prevSlide();
+                    }
+                }
+            }
+
+            showSlide(currentSlide);
+        });
+    </script>
+</body>
+</html>
+

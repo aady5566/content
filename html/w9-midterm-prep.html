@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 9: AI 簡報期中專案準備</title>
+    <script src="../sidebar_tools/sidebar.js"></script>
+    <style>
+        :root {
+            --bg-color: #F4F2EF;
+            --text-color: #5a5a5a;
+            --accent-color: #78785b;
+            --line-color: #d1d1c2;
+            --highlight-color: #8c867b;
+            --font-family: 'Calibri', 'Noto Sans TC', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+        }
+
+        .slides-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: var(--bg-color);
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5vw;
+            box-sizing: border-box;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+            transform: scale(0.98);
+            text-align: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            font-size: 1.5rem;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            z-index: 1;
+        }
+
+        .slide.hidden {
+            display: none !important;
+        }
+
+        .slide.scrollable {
+            justify-content: flex-start;
+        }
+
+        h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+        }
+
+        h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 4vh;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 1rem;
+            width: 80%;
+            max-width: 800px;
+        }
+
+        h4 {
+            font-size: clamp(1.8rem, 3.3vw, 2.4rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 0.3rem;
+        }
+
+        h5 {
+            font-size: clamp(1rem, 1.8vw, 1.3rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.6rem;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            font-size: 1.5rem;
+            max-width: 80ch;
+        }
+
+        .slide-subtitle {
+            color: #888;
+            font-size: 1.8rem;
+            font-weight: 300;
+            margin-top: -1rem;
+        }
+
+        .nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 98%;
+            left: 1%;
+            display: flex;
+            justify-content: space-between;
+            z-index: 1002;
+            pointer-events: none;
+        }
+
+        .nav-btn {
+            pointer-events: all;
+            background: none;
+            border: 1px solid var(--line-color);
+            color: var(--accent-color);
+            font-size: 2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.4;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            opacity: 1;
+        }
+
+        /* 角色卡片網格佈局 - 2x2 */
+        .role-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            width: 100%;
+            max-width: 1400px;
+            margin: 2rem auto;
+        }
+
+        .role-card {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            text-align: left;
+        }
+
+        .role-card h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .role-card h5 {
+            font-size: clamp(1.2rem, 2.2vw, 1.4rem);
+            font-weight: 500;
+            color: var(--highlight-color);
+            margin-bottom: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        .role-card p {
+            font-size: clamp(1rem, 1.8vw, 1.2rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.6rem;
+        }
+
+        .role-card ul {
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .role-card li {
+            font-size: clamp(0.95rem, 1.7vw, 1.1rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.4rem;
+        }
+
+        /* 主題選擇容器 - 可滾動 */
+        .topic-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            padding: 1.5vh 2vw;
+            overflow-y: auto;
+            text-align: left;
+            height: 100%;
+            box-sizing: border-box;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .topic-section {
+            width: 100%;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+        }
+
+        .topic-section h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .topic-section p {
+            font-size: clamp(1rem, 1.8vw, 1.2rem);
+            line-height: 1.8;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .step-card {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            margin: 0 auto 1.5rem auto;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .step-card.text-left {
+            text-align: left;
+        }
+
+        .step-card h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .step-card p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        /* 目標列表樣式 */
+        .goal-list {
+            text-align: left;
+            max-width: 800px;
+            margin: 2rem auto;
+        }
+
+        .goal-list h4 {
+            text-align: center;
+        }
+
+        .goal-list ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .goal-list li {
+            font-size: clamp(1.2rem, 2.2vw, 1.5rem);
+            line-height: 2;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+            position: relative;
+        }
+
+        .goal-list li:before {
+            content: "•";
+            color: var(--accent-color);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        /* 手機版優化 */
+        @media (max-width: 767px) {
+            .slide {
+                padding: 3vw;
+                overflow-y: auto;
+                justify-content: center;
+            }
+
+            .slide:first-child {
+                justify-content: center;
+                overflow-y: hidden;
+            }
+
+            .slide.scrollable {
+                justify-content: flex-start;
+            }
+
+            .nav {
+                width: 95%;
+                left: 2.5%;
+                z-index: 1002;
+            }
+
+            .nav-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 1.6rem;
+                opacity: 0.6;
+            }
+
+            h1 { font-size: clamp(2.5rem, 6vw, 3.5rem); }
+            h2 { font-size: clamp(2rem, 4.5vw, 2.5rem); margin-bottom: 0.8rem; }
+            h3 { width: 95%; font-size: clamp(1.6rem, 3.8vw, 2rem); }
+            h4 { font-size: clamp(1.3rem, 2.8vw, 1.6rem); }
+            h5 { font-size: clamp(1.1rem, 2.2vw, 1.3rem); }
+            p { font-size: clamp(1rem, 2vw, 1.2rem); }
+
+            .role-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                margin: 1rem auto;
+            }
+
+            .role-card {
+                padding: 1.5rem;
+            }
+
+            .topic-container {
+                padding: 2vh 3vw;
+            }
+
+            .topic-section {
+                padding: 1.2rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .goal-list li {
+                font-size: clamp(1rem, 2vw, 1.2rem);
+                padding-left: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="slides-container">
+        <!-- Slide 1: 標題 -->
+        <section class="slide active">
+            <h1>AI 簡報期中報告：前導</h1>
+            <h2 class="slide-subtitle">Week 9: 準備階段</h2>
+        </section>
+
+        <!-- Slide 2: [目標] -->
+        <section class="slide">
+            <h2>預告 11/11 期中考簡報內容</h2>
+            <p class="step-card text-left">運用上學期所學的「提示詞工程」與「AI 簡報工具（如 Canva）」，以的團隊協作模式，針對自選主題完成一場 10 分鐘的專業簡報，並與他組進行 5 分鐘的 Q&A。</p>
+        </section>
+
+        <!-- Slide 3: [本週目標] -->
+        <section class="slide">
+            <h3>[本週目標]</h3>
+            <div class="goal-list">
+                <ul>
+                    <li>分組、角色介紹</li>
+                    <li>主題篩選、分工</li>
+                    <li>第一次小組規劃衝刺</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Slide 4: [點名、初始角色、平衡分組] -->
+        <section class="slide scrollable">
+            <h3>[點名、初始角色、平衡分組]</h3>
+            <div class="role-grid">
+                <!-- 探險家 -->
+                <div class="role-card">
+                    <h4>探險家 (Explorer)</h4>
+                    <h5>核心定位：方向與深度</h5>
+                    <p><strong>專案具體任務：</strong></p>
+                    <ul>
+                        <li><strong>定義研究方向：</strong>決定小組要切入主題的「獨特視角」。</li>
+                        <li><strong>深度資料挖掘：</strong>[主要負責] 找出「學術案例與文獻支持」。</li>
+                        <li><strong>提煉核心問題：</strong>[主要負責] 設計最後提出的「核心概念與關鍵問題」。</li>
+                        <li><strong>撰寫「細節介紹」的深度內容初稿。</strong></li>
+                    </ul>
+                </div>
+
+                <!-- 實踐家 -->
+                <div class="role-card">
+                    <h4>實踐家 (Implementer)</h4>
+                    <h5>核心定位：產出與品質</h5>
+                    <p><strong>專案具體任務：</strong></p>
+                    <ul>
+                        <li><strong>簡報視覺化：</strong>[主要負責] 使用 Canva 等工具製作所有簡報頁面。</li>
+                        <li><strong>內容實作：</strong>[主要負責] 將探險家和代言人的「文字初稿」轉化為精確、易懂的「細節介紹」圖文。</li>
+                        <li><strong>品質控管：</strong>檢查簡報的錯字、排版一致性、圖片解析度。</li>
+                        <li><strong>整合所有 AI 生成的內容（文字、圖片）。</strong></li>
+                    </ul>
+                </div>
+
+                <!-- 代言人 -->
+                <div class="role-card">
+                    <h4>代言人 (Spokesperson)</h4>
+                    <h5>核心定位：包裝與呈現</h5>
+                    <p><strong>專案具體任務：</strong></p>
+                    <ul>
+                        <li><strong>撰寫講稿 (Scripting)：</strong>[主要負責] 撰寫「主題簡介」與「為什麼重要」的開場論述。</li>
+                        <li><strong>故事線包裝：</strong>將生硬的資料「包裝」成引人入勝的故事線。</li>
+                        <li><strong>簡報演練與呈現：</strong>[主要負責] 執行 10 分鐘的口頭簡報。</li>
+                        <li><strong>擔任 Q&A 的主要回覆者之一。</strong></li>
+                    </ul>
+                </div>
+
+                <!-- 舵手 -->
+                <div class="role-card">
+                    <h4>舵手 (Navigator)</h4>
+                    <h5>核心定位：流程與整合</h5>
+                    <p><strong>專案具體任務：</strong></p>
+                    <ul>
+                        <li><strong>制定時程與進度控管。</strong></li>
+                        <li><strong>整合性事實查核 (Fact-Checking)：</strong>[主要負責] 驗證「探險家」引用的文獻來源與「代言人」提出的關鍵數據是否準確。</li>
+                        <li><strong>確保內容一致性：</strong>檢查簡報的「開頭（重要性）」、「中段（細節）」和「結尾（核心問題）」邏輯是否連貫。</li>
+                        <li><strong>主持 Q&A：</strong>擔任主持人，分派問題給組員回答。</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5: [主題選擇] - scrollable -->
+        <section class="slide scrollable">
+            <h3>[主題選擇]</h3>
+            <div class="topic-container">
+                <!-- A. 心理健康與自我成長 -->
+                <div class="topic-section">
+                    <h4>A. 心理健康與自我成長 (Mental Health & Self-Growth)</h4>
+                    <p>1. 大學生的「冒名頂替症候群 (Imposter Syndrome)」：探討其成因，以及對學業、社交的影響與應對策略。</p>
+                    <p>2. 「心流 (Flow)」的科學：如何利用 AI 工具（如番茄鐘 App、專注軟體）打造個人的最佳學習與工作體驗？</p>
+                    <p>3. 睡眠科學與夢境：探討睡眠品質如何影響大學生的記憶力、情緒穩定與學習表現。</p>
+                    <p>4. 認知偏誤 (Cognitive Biases) 如何主導你的決策：分析 1-2 個常見偏誤（如：確認偏誤）如何影響我們的新聞解讀或消費行為。</p>
+                    <p>5. 數位時代的「自我認同」：網路人設 (Persona) 與真實自我之間的拉扯與焦慮。</p>
+                </div>
+
+                <!-- B. 社會關懷與社工實踐 -->
+                <div class="topic-section">
+                    <h4>B. 社會關懷與社工實踐 (Social Care & Social Work)</h4>
+                    <p>6. AI 如何輔助弱勢群體：以「高齡者」或「身心障礙者」的智慧照護應用為例，探討其便利與倫理。</p>
+                    <p>7. 「社會污名 (Stigma)」的重量：探討污名化如何加劇精神疾病患者或貧窮者的困境。</p>
+                    <p>8. 「助人者」的職業倦怠 (Burnout)：分析社工、護理、諮商等行業的壓力源與自我照顧。</p>
+                    <p>9. 什麼是「社區營造」：探討在地連結（如：社區共同空間、在地 NGO）如何提升居民的幸福感與歸屬感。</p>
+                    <p>10. 流浪動物的「TNR」與「零撲殺」政策：探討其在社工（動物福利）與公共衛生間的平衡。</p>
+                </div>
+
+                <!-- C. 健康飲食與營養科學 -->
+                <div class="topic-section">
+                    <h4>C. 健康飲食與營養科學 (Healthy Eating & Nutrition Science)</h4>
+                    <p>11. 「腸道-大腦軸 (Gut-Brain Axis)」：飲食如何透過腸道菌影響你的情緒、壓力與心理健康？</p>
+                    <p>12. 流行飲食法的科學驗證：以「168 斷食」或「生酮飲食」為例，分析其有效性與潛在風險。</p>
+                    <p>13. 「植物肉」與「培養肉」的戰爭：這真的是更健康、更永續的未來食物選擇嗎？</p>
+                    <p>14. 「健康食品」的行銷陷阱：分析營養標籤與廣告術語（如：有機、低脂、無麩質）如何影響消費者的認知。</p>
+                    <p>15. 大學生（外食/宿舍）的「飲食貧窮」：如何在有限的預算和選擇下實踐均衡飲食？</p>
+                </div>
+
+                <!-- D. 兩性與人際關係 -->
+                <div class="topic-section">
+                    <h4>D. 兩性與人際關係 (Gender & Interpersonal Relationships)</h4>
+                    <p>16. 交友軟體的「遊戲化 (Gamification)」：探討滑動 (Swipe) 機制是擴大了交友圈，還是加深了速食愛情與孤獨感？</p>
+                    <p>17. 影視作品如何形塑我們的「愛情腳本 (Romantic Scripts)」：分析偶像劇或電影如何影響我們對理想伴侶的期待。</p>
+                    <p>18. 「情緒勞動 (Emotional Labor)」：在親密關係、友誼或服務業中，誰承擔了更多的隱形付出？</p>
+                    <p>19. 數位時代的「友誼」：探討線上關係（網友、社群按讚）對線下真實連結的衝擊與補足。</p>
+                    <p>20. 性別溝通的迷思：男性和女性的溝通風格真的來自不同星球嗎？（探討刻板印象 vs. 社會化）</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 6: [第一次規劃衝刺] -->
+        <section class="slide">
+            <div class="step-card">
+                <h4>角色啟動！</h4>
+                <p style="margin-top: 2rem; font-size: 1.3rem;">開始分工，討論主題，制定初步計畫</p>
+            </div>
+        </section>
+    </div>
+
+    <div class="nav">
+        <button id="prev" class="nav-btn">&#8249;</button>
+        <button id="next" class="nav-btn">&#8250;</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = Array.from(document.querySelectorAll('.slide:not(.hidden)'));
+            const totalSlides = slides.length;
+            let currentSlide = 0;
+
+            function showSlide(index) {
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === index);
+                });
+            }
+
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            function prevSlide() {
+                currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            document.getElementById('next').addEventListener('click', nextSlide);
+            document.getElementById('prev').addEventListener('click', prevSlide);
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    nextSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    prevSlide();
+                }
+            });
+
+            // 觸控支援
+            let startX = 0;
+            let endX = 0;
+
+            document.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+            });
+
+            document.addEventListener('touchend', (e) => {
+                endX = e.changedTouches[0].clientX;
+                handleSwipe();
+            });
+
+            function handleSwipe() {
+                const threshold = 50;
+                const diff = startX - endX;
+
+                if (Math.abs(diff) > threshold) {
+                    if (diff > 0) {
+                        nextSlide();
+                    } else {
+                        prevSlide();
+                    }
+                }
+            }
+
+            showSlide(currentSlide);
+        });
+    </script>
+</body>
+</html>
+
