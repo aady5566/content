@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025 財年第二季關鍵成果</title>
+    <style>
+        /* * Wabi-Sabi Inspired Design
+         * Palette:
+         * Background: #F5F5F3 (Warm, off-white)
+         * Text: #33332D (Dark, earthy gray)
+         * Primary Accent: #A3A398 (Muted, stone gray-green)
+         * Secondary Accent: #C9C9C1 (Light stone)
+         * Positive Highlight: #5A6D5A (Muted, organic green)
+         */
+
+        :root {
+            --bg-color: #F5F5F3;
+            --text-color: #33332D;
+            --accent-primary: #A3A398;
+            --accent-secondary: #C9C9C1;
+            --accent-positive: #5A6D5A;
+            --font-family: Calibri, 'Segoe UI', Candara, Arial, sans-serif;
+            --transition-speed: 0.5s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-family);
+            line-height: 1.6;
+        }
+
+        #deck {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+            transition: transform var(--transition-speed) ease-in-out;
+            will-change: transform;
+        }
+
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            text-align: center;
+            position: relative;
+        }
+
+        /* Slide Content Styles */
+        h1 {
+            font-size: 3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        h2 {
+            font-size: 2.2rem;
+            font-weight: 400;
+            color: var(--accent-primary);
+            margin-bottom: 2rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        p {
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--accent-primary);
+            font-weight: 400;
+        }
+
+        .meta-text {
+            font-size: 0.9rem;
+            color: var(--accent-primary);
+            position: absolute;
+            bottom: 4rem;
+        }
+
+        /* Infographic Elements */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            width: 100%;
+            max-width: 1000px;
+            margin-top: 2rem;
+        }
+
+        .kpi-card {
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid var(--accent-secondary);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .kpi-value {
+            font-size: 3rem;
+            font-weight: 600;
+            color: var(--text-color);
+            line-height: 1.1;
+        }
+
+        .kpi-label {
+            font-size: 1rem;
+            color: var(--accent-primary);
+            margin-top: 0.5rem;
+            font-weight: 600;
+        }
+
+        .kpi-change {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--accent-positive);
+            margin-top: 0.25rem;
+        }
+
+        .two-col-layout {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            width: 100%;
+            max-width: 900px;
+            gap: 3rem;
+            margin-top: 2rem;
+        }
+
+        .col {
+            flex: 1;
+            text-align: center;
+        }
+
+        .large-stat {
+            font-size: 5rem;
+            font-weight: 600;
+            color: var(--accent-positive);
+            line-height: 1;
+        }
+
+        .col h3 {
+            color: var(--text-color);
+            font-size: 1.75rem;
+        }
+
+        .col p {
+            color: var(--accent-primary);
+            font-size: 1.1rem;
+        }
+
+        .driver-list {
+            list-style: none;
+            text-align: left;
+            margin: 1.5rem auto 0;
+            max-width: 600px;
+        }
+
+        .driver-list li {
+            font-size: 1.1rem;
+            padding-left: 2rem;
+            position: relative;
+            margin-bottom: 0.75rem;
+        }
+
+        .driver-list li::before {
+            content: '•';
+            color: var(--accent-primary);
+            font-size: 1.5rem;
+            position: absolute;
+            left: 0;
+            top: -5px;
+        }
+
+        blockquote {
+            font-size: 1.25rem;
+            font-style: italic;
+            color: var(--text-color);
+            max-width: 700px;
+            border-left: 3px solid var(--accent-secondary);
+            padding-left: 1.5rem;
+            text-align: left;
+            margin-top: 2rem;
+        }
+
+        /* Navigation */
+        .controls {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 100;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .control-btn {
+            font-family: var(--font-family);
+            font-size: 1.5rem;
+            background-color: var(--accent-primary);
+            color: var(--bg-color);
+            border: none;
+            width: 3rem;
+            height: 3rem;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s ease, background-color 0.3s ease;
+        }
+
+        .control-btn:hover {
+            opacity: 1;
+            background-color: var(--text-color);
+        }
+
+        .control-btn:disabled {
+            opacity: 0.2;
+            cursor: not-allowed;
+            background-color: var(--accent-secondary);
+        }
+
+        /* Progress Bar */
+        #progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background-color: var(--accent-primary);
+            width: 0;
+            transition: width var(--transition-speed) ease-in-out;
+            z-index: 101;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.5rem; }
+            .slide { padding: 4rem 1.5rem; }
+
+            .kpi-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                max-width: 100%;
+            }
+
+            .two-col-layout {
+                flex-direction: column;
+                gap: 2rem;
+            }
+
+            .kpi-value { font-size: 2.2rem; }
+            .large-stat { font-size: 3.5rem; }
+            .controls { bottom: 1rem; right: 1rem; }
+            .control-btn { width: 2.5rem; height: 2.5rem; font-size: 1.2rem; }
+            .meta-text { bottom: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="progress-bar"></div>
+
+    <main id="deck">
+
+        <section class="slide">
+            <h1>Appier 2025 財年第二季</h1>
+            <h2 class="subtitle">關鍵成果與亮點</h2>
+            <p class="meta-text">台灣，台北 - 2025 年 8 月 14 日</p>
+        </section>
+
+        <section class="slide">
+            <h2>關鍵財務指標 (Q2 2025)</h2>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <span class="kpi-value">103 億日圓</span>
+                    <span class="kpi-label">營收 (創歷史新高)</span>
+                    <span class="kpi-change">年增 +27%</span>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-value">58 億日圓</span>
+                    <span class="kpi-label">毛利 (創歷史新高)</span>
+                    <span class="kpi-change">年增 +38%</span>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-value">8.06 億日圓</span>
+                    <span class="kpi-label">營業利益 (創歷史新高)</span>
+                    <span class="kpi-change">年增 +130%</span>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-value">56.1%</span>
+                    <span class="kpi-label">毛利率 (創歷史新高)</span>
+                    <span class="kpi-change">年增 4.8 個百分點</span>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-value">+26%</span>
+                    <span class="kpi-label">東北亞 (NEA) 營收年增</span>
+                    <span class="kpi-change">+35% (排除匯率影響)</span>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-value">+37%</span>
+                    <span class="kpi-label">美國與 EMEA 營收年增</span>
+                    <span class="kpi-change">+48% (排除匯率影響)</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <h2>卓越的成長動能</h2>
+            <p class="subtitle">營收與毛利年增率 雙創近八個季度新高</p>
+            <div class="two-col-layout">
+                <div class="col">
+                    <div class="large-stat">+35%</div>
+                    <h3>營收年增</h3>
+                    <p>(排除匯率影響)</p>
+                </div>
+                <div class="col">
+                    <div class="large-stat">+38%</div>
+                    <h3>毛利年增</h3>
+                    <p>增幅超越營收年增率</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <h2>獲利能力顯著成長</h2>
+            <p class="subtitle">毛利、毛利率、營業利益齊創歷史新高</p>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <span class="kpi-value">56.1%</span>
+                    <span class="kpi-label">毛利率</span>
+                    <span class="kpi-change">歷史新高</span>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-value">8.06 億日圓<br>(約 5,200 萬美元)</span>
+                    <span class="kpi-label">營業利益</span>
+                    <span class="kpi-change">歷史新高</span>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-value">+130%</span>
+                    <span class="kpi-label">營業利益 (年增)</span>
+                    <span class="kpi-change">強大營運槓桿</span>
+                </div>
+            </div>
+            <ul class="driver-list">
+                <li>高毛利產品貢獻</li>
+                <li>核心業務毛利率持續增進</li>
+                <li>生成式 AI 技術帶來的效率提升</li>
+            </ul>
+        </section>
+
+        <section class="slide">
+            <h2>關鍵市場表現亮眼</h2>
+            <p class="subtitle">排除匯率影響後，成長動能強勁</p>
+            <div class="two-col-layout">
+                <div class="col">
+                    <div class="large-stat">+35%</div>
+                    <h3>東北亞 (NEA) 年增</h3>
+                    <p>既有客戶穩健擴張<br>新客戶加速獲取</p>
+                </div>
+                <div class="col">
+                    <div class="large-stat">+48%</div>
+                    <h3>美國與 EMEA 年增</h3>
+                    <p>客戶基礎擴張<br>產品多元化</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <h2>穩健的客戶基礎</h2>
+            <p class="subtitle">均衡成長與高客戶價值</p>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <span class="kpi-value">120%</span>
+                    <span class="kpi-label">淨收入留存率 (LTM NRR)</span>
+                    <span class="kpi-change">維持穩健</span>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-value">+12.6%</span>
+                    <span class="kpi-label">單一客戶平均營收 (ARPC)</span>
+                    <span class="kpi-change">年增 (排除匯率)</span>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-value">51% / 49%</span>
+                    <span class="kpi-label">增額營收來源</span>
+                    <span class="kpi-change">既有客戶 / 新客戶</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <h2>策略重點：生成式 AI</h2>
+            <p class="subtitle">釋放產品綜效，帶動獲利成長</p>
+            <blockquote>
+                隨著 Appier 在各大平台加速部署生成式 AI 技術，釋放強大的產品綜效，不僅提升公司的創意能力，同時放大市場拓展成效。透過由生成式 AI 驅動的差異化洞察和可擴展的執行力，這些創新已開始帶動 Appier 的獲利成長，並可望進一步強化其投資報酬率與營運效率。
+            </blockquote>
+        </section>
+
+    </main>
+
+    <nav class="controls">
+        <button id="prev" class="control-btn" aria-label="Previous Slide">&larr;</button>
+        <button id="next" class="control-btn" aria-label="Next Slide">&rarr;</button>
+    </nav>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const deck = document.getElementById('deck');
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prev');
+            const nextBtn = document.getElementById('next');
+            const progressBar = document.getElementById('progress-bar');
+
+            let currentSlide = 0;
+            const totalSlides = slides.length;
+
+            function updateSlide(slideIndex) {
+                // Bounds check
+                if (slideIndex < 0) {
+                    currentSlide = 0;
+                } else if (slideIndex >= totalSlides) {
+                    currentSlide = totalSlides - 1;
+                } else {
+                    currentSlide = slideIndex;
+                }
+
+                // Move the deck
+                deck.style.transform = `translateX(-${currentSlide * 100}vw)`;
+
+                // Update progress bar
+                const progressPercent = ((currentSlide + 1) / totalSlides) * 100;
+                progressBar.style.width = `${progressPercent}%`;
+
+                // Update button states
+                prevBtn.disabled = currentSlide === 0;
+                nextBtn.disabled = currentSlide === totalSlides - 1;
+            }
+
+            // Event Listeners
+            nextBtn.addEventListener('click', () => {
+                updateSlide(currentSlide + 1);
+            });
+
+            prevBtn.addEventListener('click', () => {
+                updateSlide(currentSlide - 1);
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight') {
+                    updateSlide(currentSlide + 1);
+                } else if (e.key === 'ArrowLeft') {
+                    updateSlide(currentSlide - 1);
+                }
+            });
+
+            // Initialize
+            updateSlide(0);
+        });
+    </script>
+
+</body>
+</html>

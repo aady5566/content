@@ -1,0 +1,177 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>3D Neural Network - Layer Enhanced</title>
+  <style>
+    body { margin:0; overflow:hidden; background:#F4F2EF; } /* 主背景色 #F4F2EF */
+    canvas { display:block; }
+  </style>
+</head>
+<body>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.110.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.110.0/examples/js/controls/OrbitControls.js"></script>
+
+<script>
+// === Setup ===
+var scene = new THREE.Scene();
+scene.background = new THREE.Color(0xF4F2EF); // 主背景色 #F4F2EF
+
+var camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 1, 1000);
+camera.position.set(30, 20, 100);
+var renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+var controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.05; // 阻尼係數，讓旋轉更平滑
+controls.target.set(0,0,0);
+// 自動旋轉設定
+controls.autoRotate = true;
+controls.autoRotateSpeed = 1.0; // 旋轉速度（可調整，數值越大轉越快）
+
+// === Background Particles ===
+var particles = new THREE.Geometry();
+for (var i=0; i<300; i++){
+  var v = new THREE.Vector3(
+    (Math.random()-0.5)*200,
+    (Math.random()-0.5)*200,
+    (Math.random()-0.5)*200
+  );
+  particles.vertices.push(v);
+}
+var matP = new THREE.PointsMaterial({color:0xd1d1c2, size:1.5, opacity:0.3, transparent:true}); // 邊框線色 #d1d1c2
+scene.add(new THREE.Points(particles, matP));
+
+// === Layers ===
+var layers = [
+  { count: 8, z: -60 },
+  { count: 14, z: -30 },
+  { count: 12, z: 0 },
+  { count: 10, z: 30 },
+  { count: 6, z: 60 }
+];
+
+var neuronSpheres=[], connections=[];
+
+// Optional: Layer panels
+layers.forEach(function(layer){
+  var panel = new THREE.Mesh(
+    new THREE.PlaneGeometry(50, 20),
+    new THREE.MeshBasicMaterial({color: 0x78785b, transparent:true, opacity:0.05, side: THREE.DoubleSide}) // 強調色 #78785b
+  );
+  panel.position.z = layer.z;
+  scene.add(panel);
+});
+
+// Layer labels
+var layerIndex = 1;
+layers.forEach(function(layer){
+  // Create canvas for text texture
+  var canvas = document.createElement('canvas');
+  var context = canvas.getContext('2d');
+  canvas.width = 256;
+  canvas.height = 128;
+
+  // Set font and style
+  context.font = '20px Arial';
+  context.fillStyle = 'rgba(120, 120, 91, 0.9)'; // 強調色 #78785b，提高不透明度確保可見
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+
+  // Draw text
+  context.fillText('Layer ' + layerIndex, canvas.width / 2, canvas.height / 2);
+
+  // Create texture from canvas
+  var texture = new THREE.CanvasTexture(canvas);
+  texture.needsUpdate = true;
+
+  // Create sprite material
+  var spriteMaterial = new THREE.SpriteMaterial({
+    map: texture,
+    transparent: true,
+    opacity: 0.9,
+    depthTest: false, // 禁用深度測試，確保始終顯示
+    depthWrite: false // 不寫入深度緩衝
+  });
+
+  // Create sprite
+  var sprite = new THREE.Sprite(spriteMaterial);
+  sprite.scale.set(15, 7.5, 1);
+  sprite.renderOrder = 999; // 確保最後渲染，總是在最上層
+
+  // Position sprite at top-right of each layer
+  // Position relative to layer center
+  var layerWidth = 50;
+  var layerHeight = 20;
+  sprite.position.set(layerWidth / 2 - 5, layerHeight / 2 - 3, layer.z); // Top-right corner
+
+  scene.add(sprite);
+  layerIndex++;
+});
+
+// Neurons
+layers.forEach(function(layer){
+  for (var i=0;i<layer.count;i++){
+    var g = new THREE.SphereGeometry(0.7, 16, 16);
+    var m = new THREE.MeshBasicMaterial({ color: 0x78785b, transparent:true, opacity: 0.5 }); // 強調色 #78785b
+    var s = new THREE.Mesh(g, m);
+    s.position.set((i - (layer.count - 1) / 2) * 2.5, (Math.random() - 0.5) * 5, layer.z);
+    scene.add(s);
+    neuronSpheres.push({ mesh: s, layerZ: layer.z });
+  }
+});
+
+// Connections
+for (var i=0;i<layers.length-1;i++){
+  var A = neuronSpheres.filter(n => n.layerZ === layers[i].z);
+  var B = neuronSpheres.filter(n => n.layerZ === layers[i+1].z);
+  A.forEach(a => {
+    B.forEach(b => {
+      var g = new THREE.Geometry();
+      g.vertices.push(a.mesh.position, b.mesh.position);
+      var m = new THREE.LineBasicMaterial({ color: 0x8c867b, transparent:true, opacity: 0.12 }); // 高亮色 #8c867b
+      var l = new THREE.Line(g, m);
+      scene.add(l);
+      connections.push({ line: l, from: a.mesh, to: b.mesh });
+    });
+  });
+}
+
+// === Animation ===
+var clock = new THREE.Clock();
+function animate(){
+  requestAnimationFrame(animate);
+  controls.update();
+  var t = clock.getElapsedTime();
+
+  neuronSpheres.forEach(function(n){
+    var act = Math.sin(t + n.mesh.position.x * 0.3 + n.layerZ * 0.2) > 0.8;
+    n.mesh.material.opacity = act ? 0.9 : 0.4;
+    n.mesh.material.color.set(act ? 0x8c867b : 0x78785b); // 高亮色 #8c867b / 強調色 #78785b
+    var s = act ? 1.3 : 0.8;
+    n.mesh.scale.set(s, s, s);
+  });
+
+  connections.forEach(function(c){
+    var f = c.from.material.opacity > 0.8;
+    var to = c.to.material.opacity > 0.8;
+    c.line.material.opacity = (f && to) ? 0.4 : 0.08;
+    c.line.material.color.set((f && to) ? 0x8c867b : 0xd1d1c2); // 高亮色 #8c867b / 邊框線色 #d1d1c2
+  });
+
+  renderer.render(scene, camera);
+}
+animate();
+
+window.addEventListener('resize', function(){
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+</body>
+</html>

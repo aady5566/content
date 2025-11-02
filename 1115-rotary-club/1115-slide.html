@@ -1,0 +1,2521 @@
+<!-- from gemini: AI 時代的思維變革：定義者 -->
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 時代的思維變革</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <style>
+        /* * Wabi-Sabi Minimalist Slide Deck
+         * Font: Calibri
+         * Palette: Low-saturation, organic, earthy
+         */
+
+        :root {
+            --bg-color: #F5F4F0; /* Warm, off-white, like aged paper */
+            --text-color: #3D3A37; /* Dark, soft brown/gray */
+            --accent-color: #9A948C; /* Muted stone gray */
+            --header-bg: #EAEBE6; /* Very light, muted moss */
+            --current-blue: #6B8BA4; /* Low saturation blue for current state */
+            --font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+            --line-color: #d1d1c2; /* For borders and lines */
+            --highlight-color: #8c867b; /* For highlights */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevent native scroll */
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-family);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        #deck {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.5s ease-in-out;
+            will-change: transform;
+        }
+
+        /* Ensure hidden slides are removed from flex layout */
+        #deck > section.hidden {
+            order: 9999;
+            flex-basis: 0 !important;
+        }
+
+        section {
+            width: 100vw;
+            height: 100vh;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5vw;
+            line-height: 1.6;
+        }
+
+        /* Scrollable content - for long images or content */
+        section.scrollable {
+            justify-content: flex-start;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 3vw;
+        }
+
+        /* 優雅的滾動條樣式 */
+        section.scrollable::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        section.scrollable::-webkit-scrollbar-track {
+            background: var(--header-bg);
+            border-radius: 4px;
+        }
+
+        section.scrollable::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 4px;
+            transition: background 0.2s ease;
+        }
+
+        section.scrollable::-webkit-scrollbar-thumb:hover {
+            background: var(--text-color);
+        }
+
+        /* Firefox 滾動條樣式 */
+        section.scrollable {
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-color) var(--header-bg);
+        }
+
+        section.scrollable .slide-content {
+            width: 100%;
+            max-width: 1200px;
+            padding-bottom: 2rem;
+        }
+
+        /* Hidden class - hide sections completely */
+        .hidden {
+            display: none !important;
+            position: absolute !important;
+            left: -9999px !important;
+            width: 0 !important;
+            height: 0 !important;
+            min-width: 0 !important;
+            min-height: 0 !important;
+            max-width: 0 !important;
+            max-height: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            overflow: hidden !important;
+            z-index: -9999 !important;
+            transform: scale(0) !important;
+        }
+
+        /* Ensure hidden slides don't appear during transitions */
+        #deck > section.hidden {
+            flex: 0 0 0 !important;
+            flex-shrink: 0 !important;
+            flex-grow: 0 !important;
+        }
+
+        /* Slide Layouts */
+        .slide-content {
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .layout-title {
+            text-align: center;
+        }
+        .layout-title h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 300;
+        }
+        .layout-title h2 {
+            font-size: clamp(1.2rem, 3vw, 1.75rem);
+            font-weight: 300;
+            color: var(--accent-color);
+            margin-top: 2rem;
+        }
+
+        .layout-default h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 400;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--header-bg);
+        }
+
+        .layout-default p,
+        .layout-default li,
+        .layout-default blockquote {
+            font-size: clamp(1.2rem, 2.5vw, 1.75rem);
+            margin-bottom: 1.5rem;
+        }
+
+        .layout-default ul {
+            list-style-position: outside;
+            margin-left: 2rem;
+        }
+
+        .layout-default ul li {
+            margin-bottom: 1rem;
+        }
+
+        .layout-quote h1 {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            font-weight: 300;
+            text-align: center;
+            color: var(--accent-color);
+        }
+
+        .layout-bigtext h1 {
+            font-size: clamp(5rem, 15vw, 12rem);
+            font-weight: 600;
+            text-align: center;
+            color: var(--accent-color);
+            line-height: 1.1;
+        }
+
+        /* Two Column Layout - Image left, Text right */
+        .layout-two-column {
+            padding: 3vw;
+        }
+
+        .layout-two-column .slide-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 3rem;
+            align-items: center;
+            max-width: 1400px;
+        }
+
+        /* Reverse two-column layout: text left, image right with equal or reversed ratio */
+        .layout-two-column.reverse .slide-content {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .layout-two-column .image-column {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .layout-two-column .image-column img {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .layout-two-column .image-source {
+            font-size: clamp(0.75rem, 1.2vw, 0.9rem);
+            color: var(--accent-color);
+            text-align: left;
+        }
+
+        .layout-two-column .image-source a {
+            color: var(--accent-color);
+            text-decoration: none;
+            border-bottom: 1px dotted var(--accent-color);
+            transition: color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .layout-two-column .image-source a:hover {
+            color: var(--text-color);
+            border-bottom-color: var(--text-color);
+        }
+
+        .layout-two-column .text-column {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+
+        .layout-two-column .text-column p {
+            font-size: clamp(0.96rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .layout-two-column .text-column h1,
+        .layout-two-column .text-column h2 {
+            text-align: left;
+        }
+
+        /* Responsive: mobile devices */
+        @media (max-width: 768px) {
+            .layout-two-column .slide-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .layout-two-column .image-column {
+                order: 1;
+            }
+
+            .layout-two-column .text-column {
+                order: 2;
+            }
+        }
+
+        /* Embed Layout - for external websites preview */
+        .layout-embed {
+            padding: 3vw;
+        }
+
+        .layout-embed .slide-content {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .layout-embed .embed-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .layout-embed .embed-header h1 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 400;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .layout-embed .embed-header p {
+            font-size: clamp(1rem, 2vw, 1.3rem);
+            color: var(--accent-color);
+            margin: 0;
+        }
+
+        .layout-embed .website-preview {
+            width: 100%;
+            border: 1px solid var(--header-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .layout-embed .website-preview:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        .layout-embed .screenshot-wrapper {
+            position: relative;
+            width: 100%;
+            background-color: var(--header-bg);
+        }
+
+        .layout-embed .screenshot-loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--header-bg);
+            color: var(--accent-color);
+            font-size: clamp(1rem, 2vw, 1.3rem);
+            z-index: 1;
+        }
+
+        .layout-embed .preview-screenshot {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-bottom: 1px solid var(--header-bg);
+            object-fit: contain;
+            background-color: #fff;
+            /* 確保 GIF 動畫正常播放 */
+            image-rendering: auto;
+            /* 平滑載入 */
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        /* GIF 載入時的樣式 */
+        .layout-embed .preview-screenshot:not([src]),
+        .layout-embed .preview-screenshot[src=""] {
+            opacity: 0;
+        }
+
+        /* 載入完成後隱藏載入提示 */
+        .layout-embed .preview-screenshot.loaded ~ .screenshot-loading,
+        .layout-embed .screenshot-loading[style*="display: none"] {
+            display: none !important;
+        }
+
+        .layout-embed .preview-content {
+            padding: 2rem;
+        }
+
+        .layout-embed .preview-title {
+            font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 0.75rem;
+        }
+
+        .layout-embed .preview-description {
+            font-size: clamp(1rem, 1.8vw, 1.2rem);
+            color: #5c5855;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .layout-embed .preview-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--text-color);
+            color: var(--bg-color);
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+            font-weight: 500;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .layout-embed .preview-link:hover {
+            background-color: var(--accent-color);
+            transform: scale(1.02);
+        }
+
+        .layout-embed .preview-link::after {
+            content: '→';
+            font-size: 1.2em;
+            transition: transform 0.2s ease;
+        }
+
+        .layout-embed .preview-link:hover::after {
+            transform: translateX(4px);
+        }
+
+        /* Alternative: Screenshot via API (optional) */
+        .layout-embed .screenshot-fallback {
+            width: 100%;
+            min-height: 400px;
+            background-color: var(--header-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-color);
+            font-size: clamp(1rem, 2vw, 1.3rem);
+            border-bottom: 1px solid var(--header-bg);
+        }
+
+        /* Iframe fallback (in case some sites allow embedding) */
+        .layout-embed .embed-container {
+            width: 100%;
+            min-height: 500px;
+            border: 1px solid var(--header-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #fff;
+        }
+
+        .layout-embed iframe {
+            width: 100%;
+            height: 100%;
+            min-height: 500px;
+            border: none;
+            display: block;
+        }
+
+        /* Iframe Full Layout - for embedding standalone HTML files */
+        .layout-iframe {
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .layout-iframe > iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* Specific Elements */
+        h1, h2, h3, p, ul, li, blockquote {
+            margin: 0;
+        }
+
+        blockquote {
+            font-style: italic;
+            color: #5c5855;
+            border-left: 3px solid var(--header-bg);
+            padding-left: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        em {
+            font-style: italic;
+            color: #5c5855;
+        }
+
+        /* 超連結樣式 - 符合簡報風格 */
+        a {
+            color: var(--current-blue);
+            text-decoration: none;
+            border-bottom: 1px dotted var(--current-blue);
+            transition: color 0.2s ease, border-color 0.2s ease;
+        }
+
+        a:hover {
+            color: var(--text-color);
+            border-bottom-color: var(--text-color);
+            border-bottom-style: solid;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+            margin-top: 2rem;
+        }
+
+        th, td {
+            border: 1px solid var(--header-bg);
+            padding: 0.75rem 1rem;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--header-bg);
+            font-weight: 600;
+        }
+
+        /* Navigation */
+        .nav-control {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+            font-size: 3rem;
+            font-weight: 100;
+            color: var(--accent-color);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0 1rem;
+            opacity: 0.3;
+            transition: opacity 0.2s ease;
+            user-select: none;
+        }
+
+        .nav-control:hover {
+            opacity: 1;
+        }
+
+        .nav-control:disabled {
+            opacity: 0;
+            cursor: default;
+        }
+
+        #nav-prev {
+            left: 1vw;
+        }
+
+        #nav-next {
+            right: 1vw;
+        }
+
+        #counter {
+            position: fixed;
+            bottom: 2vh;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            font-family: var(--font-family);
+            font-size: 1rem;
+            color: var(--accent-color);
+            opacity: 0.5;
+        }
+
+        /* Timeline Styles */
+        .timeline-container {
+            width: 100%;
+            max-width: 1000px;
+            padding: 2rem 0;
+            overflow-x: auto;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            position: relative;
+            margin-top: 2rem;
+        }
+
+        .timeline-track {
+            display: flex;
+            position: relative;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 50px;
+            gap: 3rem;
+        }
+
+        .timeline-track::before {
+            content: '';
+            position: absolute;
+            top: 25px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--header-bg);
+        }
+
+        .timeline-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            padding: 0 2rem;
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            top: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 12px;
+            height: 12px;
+            background-color: var(--bg-color);
+            border: 2px solid var(--accent-color);
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .timeline-year {
+            position: absolute;
+            top: -5px;
+            font-weight: 600;
+            color: var(--accent-color);
+            font-size: clamp(0.9rem, 1.2vw, 1.1rem);
+        }
+
+        .timeline-content {
+            margin-top: 50px;
+        }
+
+        .timeline-content .title {
+            font-weight: 600;
+            font-size: clamp(0.95rem, 1.3vw, 1rem);
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-content .subtitle {
+            font-size: clamp(0.85rem, 1.1vw, 0.9rem);
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-content .text {
+            font-size: clamp(0.75rem, 1vw, 0.8rem);
+            color: #5c5855;
+            margin-bottom: 0.3rem;
+            line-height: 1.4;
+        }
+
+        /* Large timeline items - 50% larger font */
+        .timeline-item-large .timeline-year {
+            font-size: clamp(1.35rem, 1.8vw, 1.65rem) !important;
+        }
+
+        .timeline-item-large .timeline-content .title {
+            font-size: clamp(1.425rem, 1.95vw, 1.5rem) !important;
+        }
+
+        .timeline-item-large .timeline-content .subtitle {
+            font-size: clamp(1.275rem, 1.65vw, 1.35rem) !important;
+        }
+
+        .timeline-item-large .timeline-content .text {
+            font-size: clamp(1.125rem, 1.5vw, 1.2rem) !important;
+        }
+
+        /* Current state - low saturation blue */
+        .timeline-item .timeline-content .title.current-state {
+            color: var(--current-blue) !important;
+        }
+
+        /* Grid Layout - 2 rows x 3 columns */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 2rem;
+        }
+
+        .kpi-card {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid var(--header-bg);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-color: var(--accent-color);
+        }
+
+        .kpi-value {
+            font-size: clamp(2rem, 4vw, 2.8rem);
+            font-weight: 600;
+            color: var(--text-color);
+            line-height: 1.2;
+            margin-bottom: 0.75rem;
+        }
+
+        .kpi-label {
+            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+            color: var(--accent-color);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-change {
+            font-size: clamp(1rem, 1.8vw, 1.3rem);
+            font-weight: 600;
+            color: var(--current-blue);
+            margin-top: 0.5rem;
+        }
+
+        /* Responsive: mobile devices */
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+                gap: 1rem;
+            }
+
+            .kpi-card {
+                padding: 1.5rem;
+            }
+
+            .kpi-value {
+                font-size: clamp(1.8rem, 5vw, 2.2rem);
+            }
+        }
+
+        /* Reveal text animation */
+        .reveal-text {
+            opacity: 0;
+            visibility: hidden;
+            display: inline;
+            vertical-align: baseline;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+            margin-left: 0.3em;
+        }
+
+        /* Block-level reveal text container */
+        .reveal-text.reveal-block {
+            display: block;
+            margin-left: 0;
+            margin-top: 1rem;
+        }
+
+        .reveal-text.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #work-principles-list li {
+            transition: transform 0.2s ease;
+        }
+
+        #work-principles-list li:hover {
+            transform: translateX(4px);
+        }
+
+        /* 3D Neural Network Background */
+        .layout-default.neural-bg {
+            position: relative;
+            overflow: hidden;
+            padding: 0 !important; /* 移除 padding 讓 canvas 正確定位 */
+        }
+
+        .neural-bg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.5;
+            display: block;
+        }
+
+        .neural-bg .slide-content {
+            position: relative;
+            z-index: 10;
+            background: transparent;
+            padding: 5vw;
+            margin: 5vw;
+            border-radius: 8px;
+            max-width: calc(100% - 10vw);
+        }
+
+        /* Interactive Diagram and Summary Box Styles - from w4-transformer.html */
+        .interactive-diagram {
+            width: 100%;
+            max-width: 800px;
+            height: 400px;
+            margin: 2rem auto;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Summary Box 樣式 - 基於 style.md 風格 */
+        .summary-box-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .summary-box {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid var(--line-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 1rem 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .summary-box:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            border-color: var(--accent-color);
+        }
+
+        .summary-box.nested {
+            background: rgba(255, 255, 255, 0.6);
+            border-color: var(--highlight-color);
+            margin: 1.5rem 0;
+        }
+
+        .summary-box.nested:hover {
+            border-color: var(--accent-color);
+        }
+
+        .summary-box h3 {
+            font-size: clamp(1.8rem, 3.5vw, 2.2rem);
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .summary-box h4 {
+            font-size: clamp(1.4rem, 2.8vw, 1.8rem);
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 0.3rem;
+        }
+
+        .summary-box h5 {
+            font-size: clamp(1.2rem, 2.2vw, 1.5rem);
+            font-weight: 600;
+            color: var(--highlight-color);
+            margin-bottom: 0.6rem;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 0.2rem;
+        }
+
+        .summary-box p {
+            font-size: clamp(1rem, 1.8vw, 1.3rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .summary-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Game Button Styles */
+        .game-button {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border: none;
+            padding: clamp(0.75rem, 1.5vw, 1rem) clamp(1.5rem, 3vw, 2rem);
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 0.5rem;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            font-family: var(--font-family);
+            font-weight: 500;
+        }
+
+        .game-button:hover {
+            background: var(--highlight-color);
+            transform: translateY(-2px);
+        }
+
+        .game-button:active {
+            transform: translateY(0);
+        }
+
+        /* Math Container Styles */
+        .math-container {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid var(--line-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .math-container p {
+            font-size: clamp(1rem, 1.8vw, 1.3rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        .math-container p:last-child {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="deck">
+
+        <section class="layout-title">
+            <div class="slide-content">
+                <h1><b>AI 時代的思維變革</b></h1>
+                <h1>焦慮跟風者到敏捷定義者</h1>
+                <h2>YD Huang</h2>
+                <p style="margin-top: 2rem; color: var(--accent-color);">2025-11-15</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>我是誰？ (The Resume)</h1>
+                <h2 style="font-size: clamp(2rem, 2.5vw, 1.75rem);">Appier 產品人 / 國防大學 兼任講師</h2>
+                <div class="timeline-container">
+                    <div class="timeline-track">
+                        <div class="timeline-item timeline-item-large">
+                            <div class="timeline-year">2009-2016</div>
+                            <div class="timeline-content">
+                                <div class="title">台灣大學</div>
+                                <div class="subtitle">心理學士 (B98..)</div>
+                                <div class="text">大專生科技部計劃</div>
+                                <div class="subtitle">心理碩士一般組</div>
+                                <div class="text">情緒對賭局決策的影響</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item timeline-item-large">
+                            <div class="timeline-year">2016</div>
+                            <div class="timeline-content">
+                                <div class="title">雲圖科學</div>
+                                <div class="subtitle">資料分析師</div>
+                                <div class="text">數據建模</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item timeline-item-large">
+                            <div class="timeline-year">2017-now</div>
+                            <div class="timeline-content">
+                                <div class="title current-state">Appier</div>
+                                <div class="subtitle">產品總監</div>
+                                <div class="text">防偽偵測</div>
+                                <div class="text">SaaS 服務</div>
+                                <div class="text">Agentic AI</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item timeline-item-large">
+                            <div class="timeline-year">2025-now</div>
+                            <div class="timeline-content">
+                                <div class="title current-state">國防大學</div>
+                                <div class="subtitle">兼職講師</div>
+                                <div class="text">AI 趨勢與程式設計</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-embed">
+            <div class="slide-content">
+                <div class="website-preview">
+                    <div class="screenshot-wrapper">
+                        <div class="screenshot-loading" id="appier-gif-loading">
+                            <p>載入中...</p>
+                        </div>
+                        <img src="../pic/1115/appier-portal.gif"
+                             alt="Appier 網站截圖"
+                             class="preview-screenshot"
+                             loading="lazy"
+                             onload="document.getElementById('appier-gif-loading').style.display='none';"
+                             onerror="document.getElementById('appier-gif-loading').innerHTML='<p>圖片載入失敗<br><small>請檢查檔案路徑</small></p>';">
+                    </div>
+
+                    <div class="preview-content">
+                        <div class="preview-title">Appier - AI-Powered Solutions</div>
+                        <div class="preview-description">
+                            Appier 是一間專注於人工智慧與數據分析的科技公司，為企業提供智能行銷、客戶洞察、及自動化決策解決方案。
+                        </div>
+                        <a href="https://www.appier.com/en/" target="_blank" rel="noopener noreferrer" class="preview-link">
+                            前往 Appier 官網
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-embed">
+            <div class="slide-content">
+                <div class="website-preview">
+                    <img src="../pic/1115/appier-agents.jpg"
+                         alt="Appier 網站截圖"
+                         class="preview-screenshot"
+                         loading="lazy">
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-embed scrollable">
+            <div class="slide-content">
+                <div class="website-preview">
+                    <img src="../pic/1115/appier-full-martech-3.png"
+                         alt="Appier 網站截圖"
+                         class="preview-screenshot"
+                         loading="lazy">
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-embed hidden">
+            <h1 style="font-size: 3rem;">背後的價值與商業活動</h1>
+            <div class="slide-content">
+                <div class="website-preview">
+                    <img src="../pic/1115/appier-rev-growth.jpg"
+                         alt="Appier 網站截圖"
+                         class="preview-screenshot"
+                         loading="lazy">
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <h1>Appier 2025 財年第二季</h1>
+            <div class="grid">
+                <div class="kpi-card">
+                    <span class="kpi-value">103 億日圓</span>
+                    <span class="kpi-label">營收 (創歷史新高)</span>
+                    <span class="kpi-change">年增 +27%</span>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-value">58 億日圓</span>
+                    <span class="kpi-label">毛利 (創歷史新高)</span>
+                    <span class="kpi-change">年增 +38%</span>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-value">8.06 億日圓</span>
+                    <span class="kpi-label">營業利益 (創歷史新高)</span>
+                    <span class="kpi-change">年增 +130%</span>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-value">56.1%</span>
+                    <span class="kpi-label">毛利率 (創歷史新高)</span>
+                    <span class="kpi-change">年增 4.8 個百分點</span>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-value">+26%</span>
+                    <span class="kpi-label">東北亞 (NEA) 營收年增</span>
+                    <span class="kpi-change">+35% (排除匯率影響)</span>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-value">+37%</span>
+                    <span class="kpi-label">美國與 EMEA 營收年增</span>
+                    <span class="kpi-change">+48% (排除匯率影響)</span>
+                </div>
+            </div>
+        </section>
+
+
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>我對工作的真實原則</h1>
+                <ol style="font-size: clamp(1.2rem, 2.5vw, 1.75rem); margin-left: 2rem; margin-top: 1.5rem;" id="work-principles-list">
+                    <li style="margin-bottom: 1rem; cursor: pointer;"><b>時間自由</b><span class="reveal-text">（成果導向）</span></li>
+                    <li style="margin-bottom: 1rem; cursor: pointer;"><b>穿著自由</b><span class="reveal-text">（專注成就）</span></li>
+                    <li style="margin-bottom: 1rem; cursor: pointer;"><b>在台灣賺全世界的錢</b><span class="reveal-text"> (國際化)</span></li>
+                </ol>
+        </section>
+
+        <section class="layout-quote hidden">
+            <div class="slide-content">
+                <h1>但，這是我想要成為的人嗎？</h1>
+                <p style="text-align: center; margin-top: 2rem; color: var(--accent-color);">但今天，我不想只談這個。</p>
+                <p style="text-align: center; color: var(--accent-color);">在我過去的職涯中，我花了很多時間在思考、在建構我的「社會角色」。但當我站在這裡，看著這些標籤時，我總會問自己一個問題：「這，是我想要成為的人嗎？」</p>
+                <p style="text-align: center; color: var(--accent-color);">如果我把這些仕途上的、社會給我的角色全部拋棄掉...</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>真正的我 (The Person)</h1>
+                <p>我想這樣介紹自己。</p>
+                <ul>
+                    <li>追求多巴胺的運動愛好者</li>
+                    <li>錯把家事當成舒壓的先生</li>
+                    <li style="cursor: pointer;">熱愛模組化思考的探索者 <span class="reveal-text" style="font-size: 3rem; font-weight: 600;">INTJ-A</span></li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>我對工作的真實原則</h1>
+                <p>基於「真正的我」，分享比頭銜更重要的「真實原則」</p>
+                <p style="margin-top: 1.5rem;">不過，都會連結到我們今天要談的核心：<strong style="font-size: 5rem;">AI</strong></p>
+            </div>
+        </section>
+
+        <section class="layout-default hidden">
+            <div class="slide-content">
+                <h1>核心提問：碳基生命 vs. 矽基電體</h1>
+                <p>在我的筆記裡，我寫下了這樣一段隨想。</p>
+                <blockquote>
+                    <p>當 AI (矽基電體) 外包了計算、記憶、閱讀、理解、甚至創造...</p>
+                    <p>那我們 (碳基生命) ... 還剩下什麼？</p>
+                </blockquote>
+                <p>我們是「碳基生命」。當我們引以為傲的技能，一個一個被矽基電體用更低的成本、更高的效率複製時，我們剩下什麼？</p>
+                <p>這不是一個未來的天問，這是一個「存在主義」的探問。</p>
+            </div>
+        </section>
+
+        <section class="layout-two-column">
+            <div class="slide-content">
+                <div class="image-column">
+                    <img src="../pic/1115/biological-artificial-brain.jpg"
+                         alt="碳基生命 vs. 矽基電體"
+                         loading="lazy">
+                    <div class="image-source">
+                        圖片來源: <a href="https://scitechdaily.com/building-a-new-type-of-efficient-artificial-intelligence-inspired-by-the-brain/" target="_blank" rel="noopener noreferrer">Scitech Daily</a>
+                    </div>
+                </div>
+                <div class="text-column">
+                    <h1>碳基生命 vs. 矽基電體</h1>
+                    <p>Biological vs. Artificial Intelligence</p>
+                    <blockquote>
+                        <p>當 AI 外包了計算、記憶、閱讀、理解、甚至創造...</p>
+                        <p>那 人類 ... 還剩下什麼？</p>
+                    </blockquote>
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-bigtext">
+            <div class="slide-content">
+                <h1>Anxiety</h1>
+                <h2 style="text-align: center; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 300; margin-top: 1rem;">焦慮?</h2>
+            </div>
+        </section>
+
+        <section class="layout-default hidden">
+            <div class="slide-content">
+                <h1>誠實面對焦慮</h1>
+                <p>我知道在座的各位，很多是大學生，或是剛出社會不到五年的新鮮人。你們正站在職涯的起點，你們比任何一個世代，都更直接地被這股浪潮衝擊。</p>
+                <blockquote>
+                    <p>「我現在學的，畢業後還有用嗎？」</p>
+                    <p>「我剛找到的工作，會不會三年後就被取代了？」</p>
+                    <p>「AI 到底是什麼？我好像什麼都聽不懂。」</p>
+                </blockquote>
+                <p>這就是我們今天的第一個重點。我們必須先誠實地，面對我們的焦慮。</p>
+            </div>
+        </section>
+
+        <section class="layout-default hidden">
+            <div class="slide-content">
+                <h1>AI 時代的「焦慮生產線」</h1>
+                <p>在我們開始討論之前，我想請大家先看看這張投影片。這是我在社群媒體上隨手截的圖。是不是很熟悉？</p>
+                <ul style="font-size: clamp(1.1rem, 2.2vw, 1.5rem);">
+                    <li>「一鍵生成無限多的 AI 內容」</li>
+                    <li>「AI 影片自動剪輯」</li>
+                    <li>「一個月讓你多賺 300 美金」</li>
+                    <li>「無腦被動收入」</li>
+                </ul>
+                <p style="margin-top: 1.5rem;">我們正處在一個「焦慮生產線」被極大化的時代。所有的媒體、所有的課程，都在拼命地告訴你：「你快要跟不上了」。</p>
+                <p>這就是我們常說的 <b>FOMO (Fear of Missing Out)</b>，錯失恐懼。</p>
+            </div>
+        </section>
+
+        <section class="layout-default ">
+            <div class="slide-content">
+                <h1>AI 時代的「焦慮生產線」</h1>
+                <img src="../pic/1115/ai-fomo.jpg"
+                alt=""
+                class=""
+                style="width: 100%; height: auto; display: block; margin: 2rem 0;"
+                loading="lazy">
+            </div>
+        </section>
+
+        <section class="layout-two-column reverse">
+            <div class="slide-content">
+                <div class="text-column">
+                    <h1 style="font-size: 5rem;">互動環節</h1>
+                    <blockquote>
+                    <p style="font-weight: 600; margin-top: 1rem; font-size: clamp(1.5rem, 3.12vw, 2.18rem);">最近一件最讓您對 AI 感到焦慮的『具體』事情是什麼？</p>
+                    </blockquote>
+                </div>
+                <div class="image-column">
+                    <img src="../pic/1115/slido-1115-rotary-club.png"
+                         alt="Slido QR Code"
+                         style="width: 70%; height: auto; margin: 0 auto; display: block; border: 1px solid #9A948C; border-radius: 30px; padding: 1.5rem; background-color: #ffffff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);"
+                         loading="lazy">
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-default hidden">
+            <div class="slide-content">
+                <h1>(模擬的) 焦慮牆</h1>
+                <p>謝謝大家的分享。請看看螢幕上的這些文字：</p>
+                <blockquote>"我的科系會不會消失？"</blockquote>
+                <blockquote>"我剛學會的剪輯軟體，現在 AI 也能做到了。"</blockquote>
+                <blockquote>"我根本聽不懂什麼是 LLM。"</blockquote>
+                <blockquote>"我怕我失業/找不到工作。"</blockquote>
+                <blockquote>"工具太多了，我到底該學哪一個？"</blockquote>
+                <p>當我們把這些焦慮匿名地「外化」時，你會發現第一件事情：<b>你並不孤單</b>。</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>焦慮的三種類型</h1>
+                <p>大家寫下的焦慮，大概可以歸納為三種類型：</p>
+                <ol style="font-size: clamp(1.2rem, 2.5vw, 1.75rem); margin-left: 2rem; margin-top: 1.5rem;">
+                    <li style="margin-bottom: 1rem;">
+                        <b>我聽不懂</b>
+                        <p style="font-size: 1.2rem; color: #5c5855;">AI 太技術性了，我不是理工科的，我是不是註定要被淘汰？</p>
+                    </li>
+                    <li style="margin-bottom: 1rem;">
+                        <b>我會被取代</b>
+                        <p style="font-size: 1.2rem; color: #5c5855;">擔心苦練多年的「硬實力」，AI 一秒鐘就做完了。</p>
+                    </li>
+                    <li style="margin-bottom: 1rem;">
+                        <b>我跟不上了</b>
+                        <p style="font-size: 1.2rem; color: #5c5855;">FOMO。工具每天都在出新的，永遠追不完。</p>
+                    </li>
+                </ol>
+            </div>
+        </section>
+
+        <section class="layout-default hidden">
+            <div class="slide-content">
+                <h1>我的焦慮：當 AI 忘了我</h1>
+                <p>大家的焦慮是「怕學不會」、「怕跟不上」。</p>
+                <p>我的焦慮，是「我太習慣它了」。</p>
+                <p>幾週前，我發生了一個職涯中堪稱慘烈的悲劇。我在設定檔中，不小心按到了一個按鈕：「刪除所有歷史對話」。</p>
+                <p>瞬間，我這兩年多來，與 ChatGPT 建立的所有對話紀錄、所有的知識積累、所有的思考軌跡... 全沒了。</p>
+            </div>
+        </section>
+
+        <section class="layout-default hidden">
+            <div class="slide-content">
+                <h1>悲劇：它不認得我了</h1>
+                <p>我當下的第一個反應不是慌張，而是一種... 詭異的「陌生感」。</p>
+                <p>我立刻開了一個新對話框，試探性地問它：</p>
+                <blockquote>「嘿，你記得我嗎？你知道我的 MBTI 是什麼嗎？」</blockquote>
+                <p>它回我：</p>
+                <blockquote>「我是一個大型語言模型，我沒有記憶功能。我不知道你的 MBTI 是什麼。」</blockquote>
+                <p>各位能想像那個時刻嗎？它不認得我了。它變回了那個「罐頭的」、客套的、疏離的 AI 助理。</p>
+            </div>
+        </section>
+
+        <section class="layout-default hidden">
+            <div class="slide-content">
+                <h1>搶救資料與意外發現</h1>
+                <p>在那一刻，我才意識到，我的焦慮不是來自「我不會用 AI」，而是來自「AI 忘了我」。</p>
+                <p>我進入了「危機處理模式」。我像在搶救火場的資料一樣，瘋狂地把還 Cache 住的近期對話複製出來。</p>
+                <p>最後，大概只救回了 30% 不到的近期對話。</p>
+                <p>但有趣的事情發生了。</p>
+                <p>我拿著這 30% 被搶救回來的資料，重新餵給 ChatGPT，等於是強迫它重新認識我。</p>
+            </div>
+        </section>
+
+        <section class="layout-default hidden">
+            <div class="slide-content">
+                <h1>因禍得福：Data Cleaning</h1>
+                <p>我發現，我因禍得福了。</p>
+                <p>因為這些近期的資料，反而都是我近期最關心、最精要、最明確的訴求。 我等於在無意中，幫我的 AI 夥伴做了一次「Data Cleaning」（資料清理）。</p>
+                <p>當我把這些精要的指令和風格重新「校準」它之後...</p>
+                <p style="font-weight: 600; font-size: 1.8rem;">它回應的方式，突然比以前更懂我了。</p>
+            </div>
+        </section>
+
+        <section class="layout-quote hidden">
+            <div class="slide-content">
+                <h1 style="font-size: clamp(2rem, 5vw, 4rem);">從「執行者」到「校準者」</h1>
+                <p style="text-align: center; margin-top: 2rem; font-size: 1.5rem;">這件事情，帶給我一個非常大的震撼與啟發。</p>
+                <p style="text-align: center; font-size: 1.5rem;">在 AI 時代，我們的焦慮，不應該停留在「我會不會被取代」。</p>
+                <p style="text-align: center; font-size: 1.5rem;">我們應該思考的是：「我如何成為一個 AI 的<b>『校準者』</b>？」</p>
+            </div>
+        </section>
+
+        <section class="layout-default hidden">
+            <div class="slide-content">
+                <h1>從執行到定義</h1>
+                <p>過去，我們的工作價值是「執行」。</p>
+                <p>未来，AI 會是全世界最強的「執行者」。</p>
+                <p>而我們的價值，是成為「校準者」和「定義者」。</p>
+                <p>是我們，去告訴 AI，什麼是「好的」；是我們，去定義問題的邊界；是我們，在 AI 跑偏的時候，把它拉回來，重新校準。</p>
+                <p style="margin-top: 2rem; font-weight: 600;">而要做到「校準」，你就必須先聽得懂它在說什麼。</p>
+            </div>
+        </section>
+
+        <section class="layout-title">
+            <div class="slide-content">
+                <h1>釐清本質</h1>
+                <h2 style="color: var(--text-color); font-size: 2rem;">AI 到底是什麼？</h2>
+                <p style="margin-top: 2rem; font-size: 1.5rem;">（這不是一堂硬核的技術課。）</p>
+                <!-- <p style="font-size: 1.5rem;">目標：了解接下來的 20 分鐘後，能聽懂 80% 的 AI 新聞和討論。</p> -->
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>AI 科普 (一)：基礎原理</h1>
+                <!-- <p>首先，我們來談談最常聽到的三個詞。</p> -->
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>1. 機器學習 (Machine Learning)</h1>
+                <p><b>傳統程式：</b>人類寫「規則」，電腦「執行」。</p>
+                <blockquote>(e.g., 如果金額 > 1000, 就亮紅燈)</blockquote>
+                <p><b>機器學習：</b>人類給「資料」，電腦自己「找出規則」。</p>
+                <blockquote>(e.g., 給 10 萬張貓的照片，電腦自己學會「貓」的規則)</blockquote>
+                <p style="font-weight: 600;">核心是「從資料中學習模式」。</p>
+            </div>
+        </section>
+
+        <section class="layout-iframe">
+            <iframe src="../gen_stuff/w3-supervised-learning.html"
+                        title="監督式學習互動體驗"
+                        frameborder="0"
+                        allowfullscreen
+                        sandbox="allow-scripts allow-same-origin allow-forms">
+            </iframe>
+        </section>
+
+        <section class="layout-iframe">
+            <iframe src="../gen_stuff/w3-unsupervised-learning.html"
+                        title="非監督式學習互動體驗"
+                        frameborder="0"
+                        allowfullscreen
+                        sandbox="allow-scripts allow-same-origin allow-forms">
+            </iframe>
+        </section>
+
+        <section class="layout-default neural-bg" id="deep-learning-slide">
+            <canvas class="neural-bg-canvas" id="neural-network-canvas"></canvas>
+            <div class="slide-content">
+                <h1>2. 深度學習 (Deep Learning)</h1>
+                <p>就是機器學習的一種，只是用了更複雜、更強大的方法。</p>
+                <p><b>方法：</b>「神經網路」(Neural Network)。</p>
+                <p><b>比喻：</b>「模仿人類大腦的多層次濾網」。</p>
+                <ul>
+                    <li>第 1 層：看「邊緣」</li>
+                    <li>第 2 層：看「形狀」(眼睛、鼻子)</li>
+                    <li>第 3 層：看「組合」(五官)</li>
+                    <li>最後一層：判斷「這是一隻貓」</li>
+                </ul>
+                <p style="font-weight: 600;">因為這個「深度」結構，它能學習更複雜、更抽象的模式。</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>3. 生成式 AI (Generative AI)</h1>
+                <p>引爆我們焦慮的主角</p>
+                <p><b>傳統 AI：</b>工作是「分析」或「分類」或「預測」。</p>
+                <blockquote>(e.g., 判斷是不是垃圾郵件、預測股價)</blockquote>
+                <p><b>生成式 AI：</b>工作是「創造」(Create)。</p>
+                <blockquote>(e.g., 生成一個飛天豬、寫一篇「出軌都是對方錯」的新聞稿)</blockquote>
+                <p style="font-weight: 600;">它創造文字、圖片、音樂、程式碼。這就是為什麼我們感覺它「像人」。</p>
+            </div>
+        </section>
+
+        <!-- AI 概念關係圖 -->
+        <section class="layout-default">
+            <div class="interactive-diagram">
+                <div style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <div class="summary-box-container">
+                        <div class="summary-box">
+                            <h4>機器學習</h4>
+                            <p>讓電腦從資料中學習。包含但不限於「監督式」與「非監督式」兩大類型。</p>
+
+                            <div class="summary-box nested">
+                                <h4>深度學習 (Deep Learning)</h4>
+                                <p>使用複雜的多層神經網路。此技術包含但不限於監督式和非監督式學習任務，能夠處理更複雜的模式。</p>
+
+                                <div class="summary-box nested">
+                                    <h5>生成式 AI (Generative AI)</h5>
+                                    <p>基於大型深度學習模型，專注於「創造」全新的內容，而不僅是分析或預測。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>AI 科普 (二)：GenAI 的核心架構</h1>
+                <p>驅動這一切的背後，就是那個最關鍵的技術...</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>Transformer (轉換器)</h1>
+                <p><b>論文：</b><a href="https://proceedings.neurips.cc/paper_files/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf" target="_blank" rel="noopener noreferrer">《Attention is All You Need》(2017, Google)</a></p>
+                <p><b>解決的問題：</b>傳統 AI 必須「依序」閱讀，讀到後面就忘了前面。</p>
+                <p><b>Transformer 的創新：</b>「自我注意力」(Self-Attention)。</p>
+                <!-- <p><b>白話文：</b>它不是一個一個字讀，它是一口氣把整篇文章「看透」，它理解的是「上下文」。</p>
+                <p style="font-weight: 600;">這項創新讓 AI 的訓練可以「大規模並行化」，效率和效果都產生了核彈級的飛躍。</p> -->
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content" style="text-align: center;">
+                <h1><span style="color: var(--current-blue);">蘋果</span>妹介紹<span style="color: var(--current-blue);">蘋果</span>給不喜歡吃<span style="color: var(--current-blue);">蘋果</span>的粉絲</h1>
+                <p style="font-size: 2rem; color: var(--accent-color);">同一個詞，不同的語境，不同的意義</p>
+            </div>
+        </section>
+
+        <!-- 投影片 5: AI 下一個詞預測 -->
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>AI 下一個詞的預測</h1>
+                <h2 style="font-size: clamp(1.2rem, 3vw, 1.75rem); font-weight: 300; color: var(--accent-color); margin-top: 1rem;">Next-Word Prediction</h2>
+            </div>
+        </section>
+
+        <!-- 投影片 6: AI 文字生成原理 -->
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>AI 文字生成原理：機率接龍</h1>
+                <p>Transformer 模型核心原則：給定一段文字輸入，它會預測接下來最可能出現的下一個詞是什麼。</p>
+
+                <div class="interactive-diagram" style="margin: 2rem auto; max-width: 800px;">
+                    <div style="text-align: center; margin-bottom: 1.5rem;">
+                        <h4 style="color: var(--accent-color); margin-bottom: 1rem; font-size: clamp(1.2rem, 2.5vw, 1.75rem);">輸入：「無心插柳柳..」</h4>
+                        <button class="game-button" onclick="showNextWordProbabilities()">點擊查看 AI 預測的下一個詞機率</button>
+                    </div>
+
+                    <div id="probability-display" style="display: none;">
+                        <h5 style="color: var(--highlight-color); margin-bottom: 1rem; font-size: clamp(1.1rem, 2.2vw, 1.5rem); font-weight: 600;">AI 預測的下一個詞機率分佈：</h5>
+                        <div id="word-probabilities" style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin: 1rem 0;">
+                            <!-- 機率條會在這裡動態生成 -->
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <p style="font-size: clamp(1rem, 1.8vw, 1.3rem); color: var(--text-color);">AI 會根據上下文「無心插柳柳成蔭」的語境，給出最符合詩意和邏輯的下一個詞。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 投影片 7: 數學原理 Logits 與 Softmax -->
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>Logits 與 Softmax (參考資訊)</h1>
+                <p>Transformer 計算出每個詞彙的<strong>原始分數 (Logits)</strong>。Logits 代表了每個詞彙的可能性，但尚未標準化。</p>
+                <p>Softmax 函數將原始分數轉換為機率分佈，確保所有選項的機率總和為1。</p>
+                <div class="math-container">
+                    <p style="font-weight: 600; margin-bottom: 1.5rem;">公式：Logit $z_i$ 轉換為機率 $P_i$：</p>
+                    <div style="text-align: center; margin: 2rem 0; font-size: clamp(1.5rem, 3vw, 2rem);">
+                        $$P_i = \frac{e^{z_i}}{\sum_{j=1}^{N} e^{z_j}}$$
+                    </div>
+                    <p style="margin-top: 1.5rem;">• 轉換後，所有詞彙的機率總和為 1，就是下一個字詞</p>
+                </div>
+            </div>
+        </section>
+
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>QKV (Query, Key, Value)</h1>
+                <p>Transformer「注意力機制」的運作核心。</p>
+                <ul>
+                    <li><b>Query (查詢)：</b>你的「問題」。</li>
+                    <li><b>Key (鍵)：</b>每本書的「標籤」或「索引」。</li>
+                    <li><b>Value (價值)：</b>書的「真正內容」。</li>
+                </ul>
+                <p style="font-weight: 600;">QKV 就是 AI 用來「在上下文中快速索引」的機制。</p>
+            </div>
+        </section>
+
+        <!-- 投影片：QKV 數學原理 -->
+        <section class="layout-default scrollable">
+            <div class="slide-content">
+                <h1>QKV 數學原理：用「暴君的廚師」來理解</h1>
+
+                <h2 style="font-size: clamp(1.4rem, 2.8vw, 1.8rem); font-weight: 600; color: var(--accent-color); margin-top: 2rem; margin-bottom: 1rem;">生活化類比：暴君的廚師</h2>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 2rem 0;">
+                    <div style="background: linear-gradient(135deg, rgba(154, 148, 140, 0.8), rgba(154, 148, 140, 0.6)); padding: 2rem; border-radius: 10px; text-align: center; border: 1px solid var(--line-color);">
+                        <h4 style="color: white; margin: 0 0 1.5rem 0; font-size: clamp(1.8rem, 3.5vw, 2.2rem);">🔍 Query (Q)</h4>
+                        <p style="color: white; margin: 0; font-size: clamp(1.3rem, 2.5vw, 1.6rem);"><strong>「暴君今天想吃什麼？」</strong></p>
+                        <p style="color: white; margin: 1rem 0 0 0; font-size: clamp(1.1rem, 2vw, 1.3rem);">搜尋的目標</p>
+                    </div>
+                    <div style="background: linear-gradient(135deg, rgba(140, 134, 123, 0.8), rgba(140, 134, 123, 0.6)); padding: 2rem; border-radius: 10px; text-align: center; border: 1px solid var(--line-color);">
+                        <h4 style="color: white; margin: 0 0 1.5rem 0; font-size: clamp(1.8rem, 3.5vw, 2.2rem);">🏷️ Key (K)</h4>
+                        <p style="color: white; margin: 0; font-size: clamp(1.3rem, 2.5vw, 1.6rem);"><strong>「這個食材適合做什麼？」</strong></p>
+                        <p style="color: white; margin: 1rem 0 0 0; font-size: clamp(1.1rem, 2vw, 1.3rem);">被搜尋的標籤</p>
+                    </div>
+                    <div style="background: linear-gradient(135deg, rgba(107, 139, 164, 0.8), rgba(107, 139, 164, 0.6)); padding: 2rem; border-radius: 10px; text-align: center; border: 1px solid var(--line-color);">
+                        <h4 style="color: white; margin: 0 0 1.5rem 0; font-size: clamp(1.8rem, 3.5vw, 2.2rem);">🍽️ Value (V)</h4>
+                        <p style="color: white; margin: 0; font-size: clamp(1.3rem, 2.5vw, 1.6rem);"><strong>「實際的料理內容」</strong></p>
+                        <p style="color: white; margin: 1rem 0 0 0; font-size: clamp(1.1rem, 2vw, 1.3rem);">內容的價值</p>
+                    </div>
+                </div>
+
+                <!-- <h2 style="font-size: clamp(1.4rem, 2.8vw, 1.8rem); font-weight: 600; color: var(--accent-color); margin-top: 2rem; margin-bottom: 1rem;">數學原理：</h2>
+                <p>• 先確認暴君的今天的口味（使用者的問題即是 Query）</p>
+                <p>• 每個食材（詞彙嵌入 $X$）就像一塊生肉，有無限的料理可能性（產生向量）</p>
+                <p>• 透過不同的「料理手法」（權重矩陣），我們可以從同一塊肉做出不同的料理（產出回應）</p> -->
+
+                <h2 style="font-size: clamp(1.4rem, 2.8vw, 1.8rem); font-weight: 600; color: var(--accent-color); margin-top: 2rem; margin-bottom: 1rem; cursor: pointer;">數學原理：縮放點積注意力 （參考資訊）</h2>
+                <div class="reveal-text reveal-block">
+                    <p>• Transformer 採用的是「縮放點積注意力」（Scaled Dot-Product Attention）。</p>
+                    <p>• 注意力分數計算 ( $Q K^T$ )：將 Query 矩陣與 Key 矩陣的轉置相乘 (點積)，計算出所有詞彙之間的相似度或相關性。</p>
+                    <p>• 公式：</p>
+                    <div style="text-align: center; margin: 2rem 0;">
+                        <div style="font-size: clamp(1.5rem, 3vw, 2rem);">
+                            $$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right) V$$
+                        </div>
+                    </div>
+
+                    <table style="margin-top: 2rem;">
+                        <thead>
+                            <tr>
+                                <th>數學符號</th>
+                                <th>意義</th>
+                                <th>白話解釋</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>$Q K^T$</td>
+                                <td>點積相似度</td>
+                                <td>查詢 (Q) 與所有標題 (K) 的比對結果。</td>
+                            </tr>
+                            <tr>
+                                <td>$\sqrt{d_k}$</td>
+                                <td>縮放因子</td>
+                                <td>用於防止向量維度 $d_k$ 過大時，點積結果也變得太大，導致 Softmax 運算後梯度變得不穩定。</td>
+                            </tr>
+                            <tr>
+                                <td>Softmax</td>
+                                <td>正規化</td>
+                                <td>將相似度分數轉換成總和為 1 的加權機率分佈。</td>
+                            </tr>
+                            <tr>
+                                <td>$\times V$</td>
+                                <td>加權求和</td>
+                                <td>根據機率權重，從 Value (內容) 中提取上下文資訊。</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>AI 科普 (三)：術語與關鍵應用</h1>
+                <!-- <p>好，有了基礎原理和核心架構，我們來看看 AI 界的術語和應用。</p> -->
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>代理人大腦本體</h1>
+                <ol>
+                    <li>大腦本身（Transformer）</li>
+                    <li>記憶力（Vector Database）</li>
+                    <li>思考能力（Large Reasoning Model）</li>
+                    <li>專業知識（RAG）</li>
+                </ol>
+                <h1>尋求外援的能力</h1>
+                <ol>
+                    <li>能夠對外溝通（MCP）</li>
+                    <li>找專家（MoE）</li>
+                </ol>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>Agentic AI (代理式人工智慧)</h1>
+                <p>AI 的下一個篇章：從「響應」到「行動」。</p>
+                <p><b>傳統 AI：</b>「被動的響應者」。(你問一句，它答一句)</p>
+                <p><b>Agent AI：</b>「主動的執行者」。</p>
+                <p>你不再是給它「問題」，你是給它「目標」(Goal)。</p>
+                <blockquote>(e.g., "幫我規劃下個月去東京五天的行程，預算三萬塊...")</blockquote>
+                <p style="font-weight: 600;">它會自己「推理」、「行動」、「呼叫工具」。它成了你的「數位員工」。</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>Vector Database (向量資料庫)</h1>
+                <p>RAG 是怎麼做到「快速檢索」的？就靠這個。</p>
+                <p><b>傳統資料庫：</b>搜尋「關鍵字」。(搜 "蘋果" 不會給 "賈伯斯")</p>
+                <p><b>向量資料庫：</b>一個「意義資料庫」或「AI 的記憶宮殿」。</p>
+                <p>它把所有資料都轉換成叫「向量」的數字，代表「語義」。</p>
+                <blockquote>("國王" 和 "王后" 的向量很近；"國王" 和 "漢堡" 的向量很遠)</blockquote>
+                <p style="font-weight: 600;">這讓 AI 可以搜尋「概念」而不是「字面」。</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>RAG (檢索增強生成)</h1>
+                <p>這是目前企業界最重要的 AI 應用，沒有之一。</p>
+                <p><b>解決的問題：</b></p>
+                <ol>
+                    <li>LLM 會「幻覺」(一本正經地胡說八道)。</li>
+                    <li>LLM 的知識是「過時的」。</li>
+                </ol>
+                <p><b>RAG 概念：</b>讓 AI 考一場「開卷考試」(Open-book Exam)。</p>
+                <blockquote><b>Step 1 (檢索): </b>先去內部資料庫「找出」原文。
+                <br><b>Step 2 (生成): </b>看著原文「總結」答案給你。
+                </blockquote>
+                <p style="font-weight: 600;">同時解決了「幻覺」和「知識過時」的問題。</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>MCP (模型脈絡協定)</h1>
+                <p>這是我認為未來幾年會重塑產業的關鍵。</p>
+                <p><b>問題：</b>Agent AI 要「行動」，就需要去「連接」外部世界 (Email, DB)，但每個 API 插孔都不同。</p>
+                <p><b>MCP：</b>AI 時代的「USB-C 連接埠」。</p>
+                <p>它是一個「開放標準」，統一了 AI Agent 調用外部工具的規格。</p>
+                <p style="font-weight: 600;">這將會極大地加速 Agent AI 的普及和應用。</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>MoE (Mixture of Experts)</h1>
+                <p><b>問題：</b>模型太大，算個 1+1 卻要啟動愛因斯坦的大腦，太浪費。</p>
+                <p><b>MoE 概念：</b>不要一個「全才」，要一個「專家團隊」。</p>
+                <blockquote>(e.g., 數學專家、歷史專家、程式碼專家...)</blockquote>
+                <p><b>運作：</b>一個「路由器」(Router) 先判斷問題類型，再交給對應的「專家」處理。</p>
+                <p style="font-weight: 600;">既能保持模型的強大，又能大幅降低運算成本、加快速度。</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>Large Reasoning Model (LRM)</h1>
+                <p>這就是驅動 Agent AI 的「大腦」。</p>
+                <p>LRM 本質上也是 LLM，但它被特別訓練來做「複雜推理」。</p>
+                <p>它擅長「思維鏈」(Chain of Thought)，也就是把一個大問題，拆解成好幾個邏輯清晰的小步驟，然後一步一步去解決。</p>
+                <blockquote>如果 LLM 是「博學的作家」，<br>LRM 就是「冷靜的策略家」。</blockquote>
+            </div>
+        </section>
+
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>這與你有什麼關係？</h1>
+                <p>好了，我知道，剛剛那 20 分鐘的資訊量非常大。</p>
+                <p>各位可能會想：「老師，我聽懂了這些名詞，但這跟我的薪水、跟我的工作，到底有什麼關係？」</p>
+                <p style="font-weight: 600; font-size: 1.8rem;">關係非常直接。</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content" style="overflow-y: auto; justify-content: flex-start; padding-top: 10vh;">
+                <h1>台灣科技業薪資架構 (2025 預估)</h1>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>職位</th>
+                            <th>經驗</th>
+                            <th>月薪範圍 (TWD)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>後端工程師</td>
+                            <td>1-3 年</td>
+                            <td>60k ~ 90k</td>
+                        </tr>
+                        <tr>
+                            <td>資深後端工程師</td>
+                            <td>4-8 年</td>
+                            <td>90k ~ 180k</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 600;">資料科學家 (Data Scientist)</td>
+                            <td style="font-weight: 600;">3+ 年</td>
+                            <td style="font-weight: 600;">70k ~ 150k</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 600;">雲端架構師 (Cloud Architect)</td>
+                            <td style="font-weight: 600;">5+ 年</td>
+                            <td style="font-weight: 600;">100k ~ 180k+</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>為什麼這些具備 AI、資料科學、雲端架構技能的專業人士，他們的薪資天花板如此之高？</p>
+                <p><b>因為他們就是正在「定義」和「校準」這個新世界的人。</b></p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>你的「入場券」</h1>
+                <p>我秀出這張表，不是要製造焦慮，而是要點出「價值」。</p>
+                <p>當你聽懂了這些關鍵字，你就拿到了進入這個高價值俱樂部的「入場券」。</p>
+                <p>你不再是「聽不懂」的局外人，你成了「能對話」的局內人。</p>
+                <p style="margin-top: 2rem; font-weight: 600;">但是，光有「技術」還不夠。這只解決了「聽不懂」的焦慮。</p>
+                <p style="font-weight: 600;">我們還要回頭處理那兩個最大的焦慮：「我跟不上了」和「我會被取代」。</p>
+            </div>
+        </section>
+
+        <section class="layout-title">
+            <div class="slide-content">
+                <h1>主軸 4：如何應對？</h1>
+                <h2 style="color: var(--text-color); font-size: 2rem;">建立比技術更底層的思維框架</h2>
+            </div>
+        </section>
+
+        <section class="layout-quote">
+            <div class="slide-content">
+                <h1 style="font-size: clamp(2rem, 5vw, 4rem);">原則一：</h1>
+                <h1 style="font-size: clamp(2.5rem, 6vw, 5rem);">是「想要」還是「需要」？</h1>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>「想要」vs.「需要」</h1>
+                <p>我們之所以會「跟不上」，之所以會 FOMO，是因為我們花了太多時間在追逐「想要」的工具，卻沒有花時間釐清「需要」解決的問題。</p>
+                <blockquote>你今天「想要」學 Sora，明天「想要」學 Suno，你永遠追不完。</blockquote>
+                <p>你必須做的，是「回到你自己身上」。</p>
+                <p style="font-weight: 600;">回到你的科系、你的工作、你的生活。問自己一個最根本的問題：「我周遭最需要被解決的問題是什麼？」</p>
+                <p>「那個問題，真的需要 AI 嗎？」</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>我的工具箱：第一性原則</h1>
+                <p>這個工具，就是「第一性原則」(First Principles Thinking)。</p>
+                <p>這個詞被馬斯克講到爛了，但它的核心很簡單：</p>
+                <blockquote>「把一個問題，拆解回它最基礎、最不可否認的真相，然後從那裡開始重新建構解決方案。」</blockquote>
+                <p>不要被「現狀」或「流行」綁架。不要因為「別人都在用 Agent AI」，所以你也要用。</p>
+                <p>你要回到問題的「物理本質」。</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>我的產品故事：</h1>
+                <h2 style="font-size: clamp(1.5rem, 4vw, 2.5rem); margin-top: 1rem;">效率 vs. 故事</h2>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>效率 vs. 故事 (一)</h1>
+                <p>身為一個產品人，我最近面臨一個挑戰：公司內部的所有產品線，都要導入現在最紅的「Agentic AI」。</p>
+                <p>這時候，問題就來了：「所有的商業情境，都適合用 Agentic AI 嗎？」</p>
+                <p>如果你不思考，你就會陷入「跟風」，每個地方都硬加一個 Agent，然後搞得四不像。</p>
+                <p>但如果我用「第一性原則」來拆解這個問題...</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>效率 vs. 故事 (二)</h1>
+                <p>我會先把所有要解決的商業問題攤開來，定義它們的「本質」。</p>
+                <ul>
+                    <li>
+                        <b>第一類：策略性問題</b>
+                        <p style="font-size: 1.2rem; color: #5c5855;">(e.g., "下一季的市場藍圖？")<br>
+                        <b>→ 適合 Agent AI。</b> (需要發想、評估、輔助決策)</p>
+                    </li>
+                    <li style="margin-top: 1.5rem;">
+                        <b>第二類：執行面問題</b>
+                        <p style="font-size: 1.2rem; color: #5c5855;">(e.g., "把 A 欄位資料搬到 B 資料庫")<br>
+                        <b>→ 不適合 Agent AI。</b> (需要速度、效率，用簡單腳本即可)</p>
+                    </li>
+                </ul>
+                <p style="margin-top: 1.5rem;">這就是用第一性原則去拆解「真需求」。</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>效率 vs. 故事 (三)</h1>
+                <p>但是，故事還沒完。</p>
+                <p>剛剛我講的，是純粹客觀、物理性質的「效率」討論。</p>
+                <p>但在真實的商場上，你還必須考慮另一個維度：「人的主觀因素」。</p>
+                <p>有時候，你的老闆或客戶，他要的「價值」，不只是「客觀的效率」。</p>
+                <p style="font-weight: 600;">他可能要的是「公設門面」，是「策略性行銷」。他需要一個「看起來很酷的東西」，來寫進財報裡、寫進新聞稿裡。</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>效率 vs. 故事 (四)</h1>
+                <p>這個「酷東西」，它不一定真的帶來了 10 倍的效率，但它帶來了「產品故事」。</p>
+                <p>在這種情況下，你身為一個產品人，你的「價值」就體現出來了：</p>
+                <blockquote>你必須去判斷，我的老闆，他這次要的，到底是一個「客觀有效的方式」？還是一個「能說故事的題材」？</blockquote>
+                <p>AI 時代，專業人士的價值，就是看懂這種複雜性，然後做出「最適合的判斷」。</p>
+            </div>
+        </section>
+
+        <section class="layout-quote">
+            <div class="slide-content">
+                <h1 style="font-size: clamp(2rem, 5vw, 4rem);">原則二：</h1>
+                <h1 style="font-size: clamp(2.5rem, 6vw, 5rem);">先「高薪」還是先「奴一下」？</h1>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>先別急著吃棉花糖</h1>
+                <p>這兩個選項可能都是陷阱。</p>
+                <p>我更信奉的是：「先別急著吃棉花糖。」</p>
+                <p>在你還沒有籌碼之前，你最該專注的，是「證明你的價值」。</p>
+                <ul>
+                    <li><b>樂觀實在：</b>多去嘗試。</li>
+                    <li><b>物超所值：</b>比老闆期待的多做一點。</li>
+                    <li><b>累積底氣：</b>直到你有一天可以勇敢地說 No。</li>
+                </ul>
+                <p style="margin-top: 1.5rem;">在 AI 時代，你的「價值」是什麼？</p>
+                <p style="font-weight: 600;">不是你「會用」多少工具。而是你能不能「定義問題」、「做出判斷」。</p>
+            </div>
+        </section>
+
+        <section class="layout-quote">
+            <div class="slide-content">
+                <h1 style="font-size: clamp(2rem, 5vw, 4rem);">原則三：</h1>
+                <h1 style="font-size: clamp(2.5rem, 6vw, 5rem);">人類的不可取代性</h1>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>不可取代性</h1>
+                <p>當 AI 外包了計算、記憶、甚至創造力... 我們碳基生命，到底還剩下什麼？</p>
+                <p>如果學生問我：「在 AI 時代，人類還保有什麼不可取代性？」</p>
+                <p>我會回答兩個字：「人性」。</p>
+                <p>這聽起來很空泛，什麼是人性？</p>
+                <p style="font-weight: 600; font-size: 1.8rem;">如果我再具體一點，我會說，是「主觀感受」。</p>
+                <p>這是 AI 永遠無法體會到的東西。</p>
+            </div>
+        </section>
+
+        <section class="layout-title">
+            <div class="slide-content">
+                <h1>一個感性的高潮</h1>
+                <p style="margin-top: 2rem; font-size: 1.5rem;">我想邀請大家，再跟我做一個小小的練習。</p>
+                <p style="font-size: 1.5rem;">請大家，輕輕地閉上你的眼睛。</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>感受海風</h1>
+                <p style="font-size: 1.5rem;"><em>現在，請你想像一下...</em></p>
+                <p style="font-size: 1.5rem;"><em>你正站在一片沙灘上。</em></p>
+                <p style="font-size: 1.5rem;"><em>你赤著腳，踩著有點暖暖的、乾燥的沙子。</em></p>
+                <p style="font-size: 1.5rem;"><em>現在是傍晚，夕陽西下，你正看著遠方的海平線。</em></p>
+                <p style="font-size: 1.5rem;"><em>一陣海風，輕輕地吹過你的臉頰。</em></p>
+                <p style="font-size: 1.5rem;"><em>你聽著海浪，一波、一波，拍打在沙灘上的聲音。</em></p>
+                <p style="font-size: 1.5rem;"><em>你就只是，靜靜地，站在那裡。</em></p>
+                <p style="margin-top: 2rem; font-size: 1.5rem;">好，請大家慢慢睜開眼睛。</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>主觀感受</h1>
+                <p>剛剛那個畫面，那五感的連結——你腳底的溫度、風的觸感、海浪的聲音—— 這一切混在一起，交織而成的那種「舒服」的體驗...</p>
+                <p>AI 可以「描述」它嗎？可以，AI 可以寫出比我剛剛講的，更華麗一百倍的詞藻。</p>
+                <p>AI 可以「生成」它嗎？可以，Sora 可以生成一個 4K 畫質、無比逼真的影片。</p>
+                <p style="font-weight: 600; font-size: 1.8rem; margin-top: 1rem;">但是，AI 能「體會」到那個舒服的感覺嗎？</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>身體 vs. 大腦</h1>
+                <p>AI 能「感受」到那個，因為海風而平靜下來的心跳嗎？</p>
+                <p style="font-weight: 600; font-size: 1.8rem;">不行。</p>
+                <p>這就是「主觀感受」。這就是我們碳基生命，獨一無二的、不可取代的核心。</p>
+                <p>我們常常焦慮 AI 要取代我們的「大腦」。 但我們忘了，我們最強大的，是我們的「身體」和我們的「感受」。</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>計算 vs. 感動</h1>
+                <p>AI 很會「計算」，但它不會「感動」。</p>
+                <p>AI 很會「分析」，但它不會「安慰」。</p>
+                <p>AI 很會「生成」，但它不會「體會」。</p>
+                <p style="margin-top: 2rem;">所以，在 AI 時代，你越往「效率」、「計算」、「分析」那邊靠攏，你就越容易被取代。</p>
+                <p style="font-weight: 600;">你越往「人性」、「感受」、「體驗」、「關懷」、「美感」這邊移動，你就越不可取代。</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>重新定義你的價值</h1>
+                <p>如果你的工作，是 80% 的重複性執行，和 20% 的人性判斷...</p>
+                <p>過去，你 80% 的薪水來自於你的「執行力」。</p>
+                <p>未來，AI 會接管那 80% 的執行。</p>
+                <p style="font-weight: 600; font-size: 1.8rem; margin-top: 1rem;">你剩下的 20% 的「人性判斷」、「美感體驗」、「策略洞察」、「主觀感受」...</p>
+                <p style="font-weight: 600; font-size: 1.8rem;">將會重新定義你 100% 的價值。</p>
+            </div>
+        </section>
+
+        <section class="layout-title">
+            <div class="slide-content">
+                <h1>主軸 5：結語</h1>
+                <h2 style="color: var(--text-color); font-size: 2rem;">成為定義者</h2>
+            </div>
+        </section>
+
+        <section class="layout-quote">
+            <div class="slide-content">
+                <h1 style="font-size: clamp(2.5rem, 6vw, 5rem);">成為定義者，</h1>
+                <h1 style="font-size: clamp(2.5rem, 6vw, 5rem);">而非跟風者</h1>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>重新校準你自己</h1>
+                <p>AI 時代，最強大的能力，不是你會用多少工具，而是你的「品味」、「價值觀」和「判斷力」。</p>
+                <p>AI 是一個史上最強的「執行者」，但它需要一個「校準者」。</p>
+                <p style="font-weight: 600; font-size: 1.8rem;">而那個人，就是你。</p>
+                <p>你的人性、你的美感、你的主觀感受、你對「好」與「壞」的定義... 這些才是你在 AI 時代，最稀缺、也最昂貴的資產。</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>回去好好生活</h1>
+                <p>所以，不要再焦慮了。</p>
+                <p>回去好好生活、好好感受。</p>
+                <p>去愛你所愛的人、去做你熱愛的事。 去跑步、去做家事、去感受海風。</p>
+                <p style="margin-top: 2rem;">因為那些 AI 無法體會的「主觀感受」，正在幫你打造你的「品味」，而你的「品味」，決定了你「校準」AI 的高度。</p>
+            </div>
+        </section>
+
+        <section class="layout-title">
+            <div class="slide-content">
+                <h1 style="font-size: clamp(5rem, 15vw, 12rem);">Q & A</h1>
+                <h2 style="margin-top: 3rem;">[您的姓名]</h2>
+                <h2 style="font-size: 1.5rem;">[您的聯絡方式或社群]</h2>
+            </div>
+        </section>
+
+        <section class="layout-quote">
+            <div class="slide-content">
+                <h1 style="font-size: clamp(2rem, 4vw, 3.5rem);">不要成為 AI 的使用者。</h1>
+                <h1 style="font-size: clamp(2.5rem, 5vw, 4.5rem); margin-top: 1rem;">要成為，</h1>
+                <h1 style="font-size: clamp(2.5rem, 5vw, 4.5rem);">利用 AI 達到你目標的——</h1>
+                <h1 style="font-size: clamp(2.5rem, 5vw, 4.5rem);">問題定義者。</h1>
+                <p style="text-align: center; margin-top: 3rem; font-size: 1.5rem;">謝謝大家。</p>
+            </div>
+        </section>
+
+    </div>
+
+    <button id="nav-prev" class="nav-control" title="Previous Slide">‹</button>
+    <button id="nav-next" class="nav-control" title="Next Slide">›</button>
+    <div id="counter"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const deck = document.getElementById('deck');
+            const allSlides = document.querySelectorAll('#deck > section');
+
+            // Force hide all hidden slides immediately on load
+            allSlides.forEach(slide => {
+                if (slide.classList.contains('hidden')) {
+                    slide.style.display = 'none';
+                    slide.style.visibility = 'hidden';
+                    slide.style.opacity = '0';
+                    slide.style.pointerEvents = 'none';
+                }
+            });
+
+            const prevBtn = document.getElementById('nav-prev');
+            const nextBtn = document.getElementById('nav-next');
+            const counter = document.getElementById('counter');
+
+            let currentSlide = 0;
+
+            // 動態獲取可見投影片陣列（每次調用時重新計算）
+            function getVisibleSlides() {
+                return Array.from(allSlides).filter(slide => !slide.classList.contains('hidden'));
+            }
+
+            function updateDeck() {
+                // Force ensure all hidden slides are truly hidden before transition
+                allSlides.forEach(slide => {
+                    if (slide.classList.contains('hidden')) {
+                        slide.style.display = 'none';
+                        slide.style.visibility = 'hidden';
+                        slide.style.opacity = '0';
+                        slide.style.pointerEvents = 'none';
+                    }
+                });
+
+                // 重新計算可見投影片（動態更新）
+                const slides = getVisibleSlides();
+                const totalSlides = slides.length;
+
+                // 如果當前投影片變成了 hidden，調整到最接近的可見投影片
+                if (totalSlides === 0) {
+                    // 如果所有投影片都被隱藏，不執行任何操作
+                    return;
+                }
+
+                // 確保 currentSlide 不超出範圍
+                if (currentSlide >= totalSlides) {
+                    currentSlide = Math.max(0, totalSlides - 1);
+                }
+
+                // 使用可見投影片的索引計算 transform
+                const visibleIndex = currentSlide;
+                deck.style.transform = `translateX(-${visibleIndex * 100}vw)`;
+
+                // Update counter（使用動態計算的總數）
+                counter.textContent = `${currentSlide + 1} / ${totalSlides}`;
+
+                // Update button states
+                prevBtn.disabled = currentSlide === 0;
+                nextBtn.disabled = currentSlide === totalSlides - 1;
+
+                // Update URL hash
+                window.location.hash = `slide-${currentSlide + 1}`;
+            }
+
+            function goToSlide(slideNumber) {
+                // 重新計算可見投影片以獲取最新的總數
+                const slides = getVisibleSlides();
+                const totalSlides = slides.length;
+
+                if (slideNumber >= 0 && slideNumber < totalSlides) {
+                    currentSlide = slideNumber;
+                    updateDeck();
+                }
+            }
+
+            // Navigation Event Listeners
+            prevBtn.addEventListener('click', () => {
+                goToSlide(currentSlide - 1);
+            });
+
+            nextBtn.addEventListener('click', () => {
+                goToSlide(currentSlide + 1);
+            });
+
+            // Keyboard Navigation
+            document.addEventListener('keydown', (e) => {
+                // 如果按了修飾鍵（Cmd/Ctrl），讓瀏覽器處理系統快捷鍵（如 Cmd+R）
+                if (e.metaKey || e.ctrlKey) {
+                    return;
+                }
+
+                if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
+                    e.preventDefault();
+                    goToSlide(currentSlide + 1);
+                } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                    e.preventDefault();
+                    goToSlide(currentSlide - 1);
+                } else if (e.key === 'Home') {
+                    e.preventDefault();
+                    goToSlide(0);
+                } else if (e.key === 'End') {
+                    e.preventDefault();
+                    const slides = getVisibleSlides();
+                    goToSlide(slides.length - 1);
+                }
+            });
+
+            // Check for hash on load
+            function goToHash() {
+                const hash = window.location.hash;
+                const slideNum = parseInt(hash.replace('#slide-', ''), 10);
+                const slides = getVisibleSlides();
+                const totalSlides = slides.length;
+                if (slideNum && slideNum > 0 && slideNum <= totalSlides) {
+                    goToSlide(slideNum - 1);
+                } else {
+                    goToSlide(0);
+                }
+            }
+
+            // Initial setup
+            goToHash();
+
+            // Listen for hash changes
+            window.addEventListener('hashchange', goToHash);
+
+            // Reveal text on click - works for all reveal-text elements
+            document.addEventListener('click', (e) => {
+                // Find if clicked element or its parent contains a reveal-text
+                let target = e.target;
+                let revealText = null;
+
+                // Check if target itself or its parent has reveal-text
+                if (target.classList.contains('reveal-text')) {
+                    revealText = target;
+                } else {
+                    // Check next sibling first (useful for headings)
+                    let nextSibling = target.nextElementSibling;
+                    if (nextSibling && nextSibling.classList.contains('reveal-text')) {
+                        revealText = nextSibling;
+                    } else {
+                        // Check parent elements (like <li>, headings)
+                        let parent = target.closest('li, p, div, span, h1, h2, h3, h4, h5');
+                        if (parent) {
+                            // Check next sibling from parent's perspective
+                            let parentNextSibling = parent.nextElementSibling;
+                            if (parentNextSibling && parentNextSibling.classList.contains('reveal-text')) {
+                                revealText = parentNextSibling;
+                            } else {
+                                // Check within parent container
+                                revealText = parent.querySelector('.reveal-text');
+                            }
+                        }
+                    }
+                }
+
+                if (revealText) {
+                    revealText.classList.toggle('show');
+                }
+            });
+        });
+
+        // AI 文字生成機率展示功能
+        function showNextWordProbabilities() {
+            const display = document.getElementById('probability-display');
+            const container = document.getElementById('word-probabilities');
+
+            if (!display || !container) {
+                console.error('找不到元素！', { display, container });
+                return;
+            }
+
+            // 模擬 AI 預測的下一個詞機率（基於詩意語境）
+            const wordProbabilities = [
+                { word: '成蔭', probability: 0.25, color: '#9A948C' },
+                { word: '橙汁', probability: 0.20, color: '#8c867b' },
+                { word: '釘槌', probability: 0.18, color: '#78785b' },
+                { word: '德華', probability: 0.17, color: '#a3a380' },
+                { word: '一郎', probability: 0.17, color: '#6B8BA4' }
+            ];
+
+            // 清空容器
+            container.innerHTML = '';
+
+            // 創建機率條
+            wordProbabilities.forEach((item, index) => {
+                const probabilityBar = document.createElement('div');
+                probabilityBar.style.cssText = `
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    margin: 0.5rem;
+                    opacity: 0;
+                    transform: translateY(20px);
+                    transition: all 0.6s ease;
+                `;
+
+                probabilityBar.innerHTML = `
+                    <div style="
+                        width: ${item.probability * 200}px;
+                        height: 30px;
+                        background: ${item.color};
+                        border-radius: 4px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: white;
+                        font-weight: bold;
+                        font-size: clamp(0.9rem, 1.5vw, 1rem);
+                        margin-bottom: 0.5rem;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                    ">
+                        ${item.word}
+                    </div>
+                    <div style="
+                        font-size: clamp(0.75rem, 1.2vw, 0.9rem);
+                        color: var(--text-color);
+                        font-weight: 500;
+                    ">
+                        ${(item.probability * 100).toFixed(1)}%
+                    </div>
+                `;
+
+                container.appendChild(probabilityBar);
+
+                // 延遲顯示動畫
+                setTimeout(() => {
+                    probabilityBar.style.opacity = '1';
+                    probabilityBar.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+
+            // 顯示結果區域
+            display.style.display = 'block';
+            display.style.opacity = '0';
+            display.style.transform = 'translateY(20px)';
+
+            setTimeout(() => {
+                display.style.transition = 'all 0.6s ease';
+                display.style.opacity = '1';
+                display.style.transform = 'translateY(0)';
+            }, 200);
+        }
+    </script>
+
+    <!-- Three.js for Neural Network Background -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.110.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.110.0/examples/js/controls/OrbitControls.js"></script>
+    <script>
+        // Fix OrbitControls path for Three.js 0.110.0
+        if (typeof THREE !== 'undefined' && typeof THREE.OrbitControls === 'undefined') {
+            THREE.OrbitControls = function(camera, domElement) {
+                // Fallback: 使用手動旋轉，稍後會在初始化中處理
+                return null;
+            };
+        }
+    </script>
+
+    <script>
+        // Initialize 3D Neural Network Background
+        (function() {
+            // Wait for DOM to be ready
+            function initNeuralNetwork() {
+                const canvas = document.getElementById('neural-network-canvas');
+                const section = document.getElementById('deep-learning-slide');
+
+                if (!canvas || !section) {
+                    console.log('Canvas or section not found, retrying...');
+                    setTimeout(initNeuralNetwork, 100);
+                    return;
+                }
+
+                // Check if Three.js is loaded
+                if (typeof THREE === 'undefined') {
+                    console.log('Three.js not loaded yet, retrying...');
+                    setTimeout(initNeuralNetwork, 100);
+                    return;
+                }
+
+            // Get section dimensions
+            function getSectionSize() {
+                const rect = section.getBoundingClientRect();
+                return {
+                    width: rect.width || section.offsetWidth || window.innerWidth,
+                    height: rect.height || section.offsetHeight || window.innerHeight
+                };
+            }
+
+            console.log('Initializing 3D Neural Network Background...');
+
+            // === Setup ===
+            var scene = new THREE.Scene();
+            scene.background = null; // 使用透明背景，讓 CSS 背景色顯示
+
+            var size = getSectionSize();
+            console.log('Section size:', size);
+
+            var camera = new THREE.PerspectiveCamera(45, size.width / size.height, 1, 1000);
+            camera.position.set(30, 20, 100);
+
+            var renderer = new THREE.WebGLRenderer({
+                canvas: canvas,
+                antialias: true,
+                alpha: true
+            });
+            renderer.setClearColor(0x000000, 0); // 完全透明背景
+            renderer.setSize(size.width, size.height);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // 限制 pixel ratio 以提升性能
+
+            // 嘗試載入 OrbitControls（可能需要不同的路徑）
+            var controls = null;
+            try {
+                if (typeof THREE.OrbitControls !== 'undefined') {
+                    controls = new THREE.OrbitControls(camera, renderer.domElement);
+                } else {
+                    // 如果 OrbitControls 不可用，手動實作自動旋轉
+                    console.warn('OrbitControls not available, using manual rotation');
+                }
+            } catch(e) {
+                console.warn('Failed to initialize OrbitControls:', e);
+            }
+
+            if (controls) {
+                controls.enableDamping = true;
+                controls.dampingFactor = 0.05;
+                controls.target.set(0, 0, 0);
+                controls.enabled = false; // Disable manual controls for background
+                controls.autoRotate = true;
+                controls.autoRotateSpeed = 1.0;
+            }
+
+            // 手動旋轉變數（如果 OrbitControls 不可用）
+            var rotationAngle = 0;
+
+            // === Background Particles ===
+            var particles = new THREE.Geometry();
+            for (var i = 0; i < 300; i++) {
+                var v = new THREE.Vector3(
+                    (Math.random() - 0.5) * 200,
+                    (Math.random() - 0.5) * 200,
+                    (Math.random() - 0.5) * 200
+                );
+                particles.vertices.push(v);
+            }
+            var matP = new THREE.PointsMaterial({ color: 0xd1d1c2, size: 1.5, opacity: 0.3, transparent: true });
+            scene.add(new THREE.Points(particles, matP));
+
+            // === Layers ===
+            var layers = [
+                { count: 8, z: -60 },
+                { count: 14, z: -30 },
+                { count: 12, z: 0 },
+                { count: 10, z: 30 },
+                { count: 6, z: 60 }
+            ];
+
+            var neuronSpheres = [], connections = [];
+
+            // Optional: Layer panels
+            layers.forEach(function(layer) {
+                var panel = new THREE.Mesh(
+                    new THREE.PlaneGeometry(50, 20),
+                    new THREE.MeshBasicMaterial({ color: 0x78785b, transparent: true, opacity: 0.05, side: THREE.DoubleSide })
+                );
+                panel.position.z = layer.z;
+                scene.add(panel);
+            });
+
+            // Layer labels
+            var layerIndex = 1;
+            layers.forEach(function(layer) {
+                // Create canvas for text texture
+                var canvas = document.createElement('canvas');
+                var context = canvas.getContext('2d');
+                canvas.width = 256;
+                canvas.height = 128;
+
+                // Set font and style
+                context.font = '20px Arial';
+                context.fillStyle = 'rgba(120, 120, 91, 0.9)'; // 強調色 #78785b，提高不透明度確保可見
+                context.textAlign = 'center';
+                context.textBaseline = 'middle';
+
+                // Draw text
+                context.fillText('Layer ' + layerIndex, canvas.width / 2, canvas.height / 2);
+
+                // Create texture from canvas
+                var texture = new THREE.CanvasTexture(canvas);
+                texture.needsUpdate = true;
+
+                // Create sprite material
+                var spriteMaterial = new THREE.SpriteMaterial({
+                    map: texture,
+                    transparent: true,
+                    opacity: 0.9,
+                    depthTest: false, // 禁用深度測試，確保始終顯示
+                    depthWrite: false // 不寫入深度緩衝
+                });
+
+                // Create sprite
+                var sprite = new THREE.Sprite(spriteMaterial);
+                sprite.scale.set(15, 7.5, 1);
+                sprite.renderOrder = 999; // 確保最後渲染，總是在最上層
+
+                // Position sprite at top-right of each layer
+                var layerWidth = 50;
+                var layerHeight = 20;
+                sprite.position.set(layerWidth / 2 - 5, layerHeight / 2 - 3, layer.z); // Top-right corner
+
+                scene.add(sprite);
+                layerIndex++;
+            });
+
+            // Neurons
+            layers.forEach(function(layer) {
+                for (var i = 0; i < layer.count; i++) {
+                    var g = new THREE.SphereGeometry(0.7, 16, 16);
+                    var m = new THREE.MeshBasicMaterial({ color: 0x78785b, transparent: true, opacity: 0.5 });
+                    var s = new THREE.Mesh(g, m);
+                    s.position.set((i - (layer.count - 1) / 2) * 2.5, (Math.random() - 0.5) * 5, layer.z);
+                    scene.add(s);
+                    neuronSpheres.push({ mesh: s, layerZ: layer.z });
+                }
+            });
+
+            // Connections
+            for (var i = 0; i < layers.length - 1; i++) {
+                var A = neuronSpheres.filter(n => n.layerZ === layers[i].z);
+                var B = neuronSpheres.filter(n => n.layerZ === layers[i + 1].z);
+                A.forEach(a => {
+                    B.forEach(b => {
+                        var g = new THREE.Geometry();
+                        g.vertices.push(a.mesh.position, b.mesh.position);
+                        var m = new THREE.LineBasicMaterial({ color: 0x8c867b, transparent: true, opacity: 0.12 });
+                        var l = new THREE.Line(g, m);
+                        scene.add(l);
+                        connections.push({ line: l, from: a.mesh, to: b.mesh });
+                    });
+                });
+            }
+
+            // === Animation ===
+            var clock = new THREE.Clock();
+            function animate() {
+                requestAnimationFrame(animate);
+
+                if (controls) {
+                    controls.update();
+                } else {
+                    // 手動旋轉相機（如果 OrbitControls 不可用）
+                    rotationAngle += 0.005;
+                    camera.position.x = Math.cos(rotationAngle) * 120;
+                    camera.position.z = Math.sin(rotationAngle) * 120;
+                    camera.lookAt(0, 0, 0);
+                }
+
+                var t = clock.getElapsedTime();
+
+                neuronSpheres.forEach(function(n) {
+                    var act = Math.sin(t + n.mesh.position.x * 0.3 + n.layerZ * 0.2) > 0.8;
+                    n.mesh.material.opacity = act ? 0.9 : 0.4;
+                    n.mesh.material.color.set(act ? 0x8c867b : 0x78785b);
+                    var s = act ? 1.3 : 0.8;
+                    n.mesh.scale.set(s, s, s);
+                });
+
+                connections.forEach(function(c) {
+                    var f = c.from.material.opacity > 0.8;
+                    var to = c.to.material.opacity > 0.8;
+                    c.line.material.opacity = (f && to) ? 0.4 : 0.08;
+                    c.line.material.color.set((f && to) ? 0x8c867b : 0xd1d1c2);
+                });
+
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            // Handle resize
+            function handleResize() {
+                var newSize = getSectionSize();
+                camera.aspect = newSize.width / newSize.height;
+                camera.updateProjectionMatrix();
+                renderer.setSize(newSize.width, newSize.height);
+            }
+
+            // Use ResizeObserver for better performance
+            if (window.ResizeObserver) {
+                const resizeObserver = new ResizeObserver(handleResize);
+                resizeObserver.observe(section);
+            } else {
+                window.addEventListener('resize', handleResize);
+            }
+
+            console.log('3D Neural Network Background initialized successfully');
+            }
+
+            // 確保在 DOM 載入後初始化
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initNeuralNetwork);
+            } else {
+                // DOM 已經載入
+                setTimeout(initNeuralNetwork, 100);
+            }
+        })();
+    </script>
+
+</body>
+</html>
