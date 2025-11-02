@@ -311,7 +311,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 // 判斷當前語言並切換
                 if (currentPath.includes('/1141-gk2362k24/html_en/')) {
                     // 當前是英文版（在課程路徑下），切換到中文版
-                    if (currentPath.includes('_en.html')) {
+                    if (currentPath.endsWith('/index_en.html')) {
+                        // 英文課程首頁 → 中文課程首頁
+                        window.location.href = '../index.html';
+                    } else if (currentPath.includes('_en.html')) {
                         // 英文投影片頁面 → 中文投影片頁面
                         const chinesePath = currentPath.replace('/html_en/', '/html/').replace('_en.html', '.html');
                         window.location.href = chinesePath;
@@ -323,6 +326,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         const englishPath = currentPath.replace('/html/', '/html_en/').replace('.html', '_en.html');
                         window.location.href = englishPath;
                     }
+                } else if (currentPath.includes('/1141-gk2362k24/index.html')) {
+                    // 中文課程首頁 → 英文課程首頁
+                    window.location.href = 'html_en/index_en.html';
                 } else if (currentPath.includes('/html_en/')) {
                     // 舊的英文版路徑（如果還有其他地方使用）
                     if (currentPath.endsWith('/index_en.html')) {
@@ -332,17 +338,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         window.location.href = chinesePath;
                     }
                 } else {
-                    // 當前是中文版（舊路徑），切換到英文版
+                    // 其他情況（舊路徑或根目錄）
                     if (currentPath.includes('/html/') && currentPath.includes('.html')) {
                         const englishPath = currentPath.replace('/html/', '/html_en/').replace('.html', '_en.html');
                         window.location.href = englishPath;
-                    } else if (currentPath.includes('/1141-gk2362k24/index.html')) {
-                        // 中文課程首頁 → 英文課程首頁（如果未來有英文版）
-                        // 目前暫時保持在同一頁面或指向英文版首頁
-                        window.location.href = '../html_en/index_en.html';
                     } else if (currentPath.endsWith('/index.html') || currentPath === '/') {
-                        // 根目錄或其他中文首頁 → 英文首頁
-                        window.location.href = 'html_en/index_en.html';
+                        // 根目錄歡迎頁面不需要語言切換
+                        return;
                     }
                 }
             });
