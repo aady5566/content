@@ -31,9 +31,20 @@
         }
 
         .container {
-            max-width: 600px;
+            max-width: 1000px;
             text-align: center;
             animation: fadeIn 1s ease-in;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .column {
+            text-align: center;
         }
 
         h1 {
@@ -95,29 +106,40 @@
             .message {
                 font-size: 1rem;
             }
+
+            .two-column {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>歡迎</h1>
-        <p class="message">
-            你來到了這裡。<br>
-            有時候，最好的內容<br>
-            需要一個特殊的邀請才能找到。<br>
-            <br>
-            如果你知道該去哪裡，<br>
-            那你應該知道答案了。
-        </p>
-        <h1>Welcome</h1>
-        <p class="message">
-            So, you found your way here.<br>
-            Sometimes the best things<br>
-            don’t show up on Google.<br>
-            <br>
-            If you know where to look,<br>
-            well... you already know the answer.
-        </p>
+        <div class="two-column">
+            <div class="column">
+                <h1>歡迎</h1>
+                <p class="message">
+                    你來到了這裡。<br>
+                    有時候，最好的內容<br>
+                    需要一個特殊的邀請才能找到。<br>
+                    <br>
+                    如果你知道該去哪裡，<br>
+                    那你應該知道答案了。
+                </p>
+            </div>
+            <div class="column">
+                <h1>Welcome</h1>
+                <p class="message">
+                    So, you found your way here.<br>
+                    Sometimes the best things<br>
+                    don't show up on Google.<br>
+                    <br>
+                    If you know where to look,<br>
+                    well... you already know the answer.
+                </p>
+            </div>
+        </div>
         <div class="footer">
             <p>&copy; 2025 ydhuang. all rights reserved.</p>
         </div>
