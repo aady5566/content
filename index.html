@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>1141-gk2362k24 課程投影片</title>
-    <script src="sidebar_tools/sidebar.js?v=6"></script>
+    <title>歡迎</title>
     <style>
         :root {
-            --bg-color: #F4F2EF;        /* 主背景色 - 溫暖的米白色 */
-            --text-color: #5a5a5a;      /* 主文字色 - 深灰色 */
-            --accent-color: #78785b;    /* 強調色 - 低飽和橄欖綠 */
-            --line-color: #d1d1c2;      /* 邊框線色 - 淺灰色 */
-            --font-family: 'Calibri', 'Noto Sans TC', sans-serif;  /* 字體 */
+            --bg-color: #F4F2EF;
+            --text-color: #5a5a5a;
+            --accent-color: #78785b;
+            --font-family: 'Calibri', 'Noto Sans TC', sans-serif;
         }
 
         * {
@@ -26,363 +24,96 @@
             color: var(--text-color);
             line-height: 1.6;
             min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             padding: 2rem;
         }
 
-        .header {
+        .container {
+            max-width: 600px;
             text-align: center;
-            margin-bottom: 3rem;
+            animation: fadeIn 1s ease-in;
         }
 
-        .header h1 {
-            font-size: clamp(2rem, 6vw, 3.5rem);
+        h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
             font-weight: 300;
             color: var(--text-color);
-            margin-bottom: 1rem;
+            margin-bottom: 2rem;
+            letter-spacing: 0.1em;
         }
 
-        .header .subtitle {
+        .message {
+            font-size: clamp(1.1rem, 2.5vw, 1.5rem);
             color: #888;
-            font-size: clamp(1rem, 2vw, 1.4rem);
             font-weight: 300;
-        }
-
-        .weeks-container {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 2rem;
+            line-height: 1.8;
             margin-bottom: 3rem;
-            justify-items: center;  /* 卡片置中對齊 */
-            place-items: center;    /* 額外確保置中 */
         }
 
-        /* 手機版優化 */
-        @media (max-width: 767px) {
-            .container {
-                padding: 1rem;
-            }
-
-            .header {
-                margin-bottom: 2rem;
-            }
-
-            .week-card {
-                padding: 1.2rem;
-            }
-
-            .slide-link {
-                padding: 0.6rem 0.8rem;
-                font-size: 0.9rem;
-            }
-        }
-
-        @media (min-width: 768px) {
-            .weeks-container {
-                grid-template-columns: repeat(2, 1fr);
-                justify-items: center;
-                place-items: center;
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .weeks-container {
-                grid-template-columns: repeat(3, 1fr);
-                justify-items: center;
-                place-items: center;
-            }
-        }
-
-        /* 當有2個卡片時，讓它們填滿2欄網格 */
-        .weeks-container:has(.week-card:nth-child(2)):not(:has(.week-card:nth-child(3))) {
-            justify-items: stretch;
-            place-items: stretch;
-        }
-
-        /* 當有3個或更多卡片時，讓它們填滿3欄網格 */
-        .weeks-container:has(.week-card:nth-child(3)) {
-            justify-items: stretch;
-            place-items: stretch;
-        }
-
-        .week-card {
-            background: rgba(163, 163, 129, 0.1);
-            border-radius: 1rem;
-            padding: clamp(1.5rem, 3vw, 2rem);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-            border: 1px solid var(--line-color);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            width: 100%;
-            max-width: 400px;  /* 限制卡片最大寬度 */
-        }
-
-        .week-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
-        }
-
-        .week-title {
-            font-size: clamp(1.5rem, 4vw, 2.2rem);
-            font-weight: 300;
-            color: var(--accent-color);
+        .emoji {
+            font-size: 3rem;
             margin-bottom: 1rem;
-            border-bottom: 1px solid var(--line-color);
-            padding-bottom: 0.5rem;
-        }
-
-        .slides-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .slide-item {
-            margin-bottom: 0.8rem;
-        }
-
-        .slide-link {
             display: block;
-            padding: 0.8rem 1rem;
-            background: rgba(120, 120, 91, 0.1);
-            border: 1px solid var(--line-color);
-            border-radius: 0.5rem;
-            text-decoration: none;
-            color: var(--text-color);
-            transition: all 0.3s ease;
-            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+            animation: float 3s ease-in-out infinite;
         }
-
-        .slide-link:hover {
-            background: var(--accent-color);
-            color: var(--bg-color);
-            transform: translateX(5px);
-        }
-
-        .slide-title {
-            font-weight: 400;
-            margin-bottom: 0.3rem;
-        }
-
-        .slide-description {
-            font-size: 0.85em;
-            color: #777;
-            opacity: 0.8;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 3rem;
-            padding-top: 2rem;
-            border-top: 1px solid var(--line-color);
-            color: #888;
-            font-size: 0.9rem;
-        }
-
-        /* mobile-first：避免遮擋內容，增加上方安全邊距 */
-        .container { padding-top: 1rem; }
-        @media (min-width: 768px) { .container { padding-top: 1.2rem; } }
-
-        .fade-in {
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeIn 0.8s forwards;
-        }
-
-        .week-card:nth-child(1) { animation-delay: 0.2s; }
-        .week-card:nth-child(2) { animation-delay: 0.4s; }
-        .week-card:nth-child(3) { animation-delay: 0.6s; }
-        .week-card:nth-child(4) { animation-delay: 0.8s; }
-        .week-card:nth-child(5) { animation-delay: 1.0s; }
-        .week-card:nth-child(6) { animation-delay: 1.2s; }
-        .week-card:nth-child(7) { animation-delay: 1.4s; }
-        .week-card:nth-child(8) { animation-delay: 1.6s; }
-        .week-card:nth-child(9) { animation-delay: 1.8s; }
 
         @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
             to {
                 opacity: 1;
                 transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #d1d1c2;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 767px) {
+            body {
+                padding: 1rem;
+            }
+
+            .message {
+                font-size: 1rem;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>1141-gk2362k24</h1>
-            <p class="subtitle">課程內容</p>
-        </div>
-
-        <div class="weeks-container">
-            <!-- Week 9 -->
-            <div class="week-card fade-in">
-                <h2 class="week-title">第九週 11/4</h2>
-                <ul class="slides-list">
-                    <li class="slide-item">
-                        <a href="html/w9-midterm-prep.html" class="slide-link">
-                            <div class="slide-title">AI 簡報期中專案準備</div>
-                            <div class="slide-description">Week 9: 準備階段</div>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-            <!-- Week 8 -->
-            <div class="week-card fade-in">
-                <h2 class="week-title">第八週 10/28</h2>
-                <ul class="slides-list">
-                    <li class="slide-item">
-                        <a href="html/w8-love-survey.html" class="slide-link">
-                            <div class="slide-title">什麼是愛？</div>
-                            <div class="slide-description">從心動到放手的關係</div>
-                        </a>
-                    </li>
-                    <li class="slide-item">
-                        <a href="gen_stuff/belbin-team-roles.html" class="slide-link">
-                            <div class="slide-title">團隊合作能力識別工具</div>
-                            <div class="slide-description">了解自己擅長什麼，定位自己團隊中的角色為何</div>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-            <!-- Week 7 -->
-            <div class="week-card fade-in">
-                <h2 class="week-title">第七週 10/21</h2>
-                <ul class="slides-list">
-                    <li class="slide-item">
-                        <a href="html/w7-gpt+canva.html" class="slide-link">
-                            <div class="slide-title">ChatGPT + Canva：內容與簡報製作一次完成</div>
-                            <div class="slide-description">敏捷簡報工作流</div>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-            <!-- Week 6 -->
-            <div class="week-card fade-in">
-                <h2 class="week-title">第六週 10/14</h2>
-                <ul class="slides-list">
-                    <li class="slide-item">
-                        <a href="html/w6-fact-ai-checking.html" class="slide-link">
-                            <div class="slide-title">事實查核與 AI 生成內容辨識</div>
-                            <div class="slide-description">培養數位時代的媒體素養</div>
-                        </a>
-                    </li>
-                    <li class="slide-item">
-                        <a href="https://app.sli.do/event/4Rrhd8boupNCjBpz5MWzGT" class="slide-link" target="_blank" rel="noopener noreferrer">
-                            <div class="slide-title">Slido 線上問答</div>
-                            <div class="slide-description">課堂即時提問與互動</div>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-            <!-- Week 5 -->
-            <div class="week-card fade-in">
-                <h2 class="week-title">第五週 10/7</h2>
-                <ul class="slides-list">
-                    <li class="slide-item">
-                        <a href="html/w5-prompt-guides.html" class="slide-link">
-                            <div class="slide-title">如何寫好提示詞</div>
-                            <div class="slide-description">提示工程，你就是在寫程式！</div>
-                        </a>
-                    </li>
-                    <li class="slide-item">
-                        <a href="https://app.sli.do/event/gy54HqBb6UmxQ4RZdxuo9w" class="slide-link" target="_blank" rel="noopener noreferrer">
-                            <div class="slide-title">Slido 線上問答</div>
-                            <div class="slide-description">課堂即時提問與互動</div>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-            <!-- Week 4 -->
-            <div class="week-card fade-in">
-                <h2 class="week-title">第四週 9/30</h2>
-                <ul class="slides-list">
-                    <li class="slide-item">
-                        <a href="html/w4-transformer.html" class="slide-link">
-                            <div class="slide-title">Transformer 核心概念與應用原理</div>
-                            <div class="slide-description">深度學習 AI 的變革者：自我注意力機制與 QKV 原理</div>
-                        </a>
-                    </li>
-                    <li class="slide-item">
-                        <a href="html/w4-what-is-transformer.html" class="slide-link">
-                            <div class="slide-title">Transformer 是什麼？</div>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-            <!-- Week 3 -->
-            <div class="week-card fade-in">
-                <h2 class="week-title">第三週 9/23</h2>
-                <ul class="slides-list">
-                    <li class="slide-item">
-                        <a href="html/w3.html" class="slide-link">
-                            <div class="slide-title">機器學習、深度學習基本原理</div>
-                            <div class="slide-description">監督式學習、非監督式學習與深度學習概念</div>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-            <!-- Week 2 -->
-            <div class="week-card fade-in">
-                <h2 class="week-title">第二週 9/16</h2>
-                <ul class="slides-list">
-                    <li class="slide-item">
-                        <a href="html/w2.html" class="slide-link">
-                            <div class="slide-title">AI 人性與自我意識</div>
-                            <div class="slide-description">探討 AI 的意識、情感與人性特質</div>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-            <!-- Week 1 -->
-            <div class="week-card fade-in">
-                <h2 class="week-title">第一週 9/9</h2>
-                <ul class="slides-list">
-                    <li class="slide-item">
-                        <a href="html/w1.html" class="slide-link">
-                            <div class="slide-title">課程簡介</div>
-                            <div class="slide-description">課程大綱與基本介紹</div>
-                        </a>
-                    </li>
-                    <li class="slide-item">
-                        <a href="html/w1-2095-ai-forecast.html" class="slide-link">
-                            <div class="slide-title">2095 AI 預測</div>
-                            <div class="slide-description">AI 發展趨勢預測分析</div>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-        </div>
-
+        <span class="emoji">👋</span>
+        <h1>歡迎</h1>
+        <p class="message">
+            你來到了這裡。<br>
+            有時候，最好的內容<br>
+            需要一個特殊的邀請才能找到。<br>
+            <br>
+            如果你知道該去哪裡，<br>
+            你應該知道該去哪裡。
+        </p>
         <div class="footer">
-            <p>&copy; 2025 ydhuang. all rights reserved.</p>
+            <p>&copy; 2025</p>
         </div>
     </div>
-
-    <script>
-        // 動畫效果已經在 CSS 中設定，不需要重複添加 class
-        // 如果需要重新觸發動畫，可以使用以下代碼：
-        // document.addEventListener('DOMContentLoaded', () => {
-        //     const cards = document.querySelectorAll('.week-card');
-        //     cards.forEach((card, index) => {
-        //         setTimeout(() => {
-        //             card.style.opacity = '0';
-        //             card.style.transform = 'translateY(20px)';
-        //             card.style.animation = 'fadeIn 0.8s forwards';
-        //         }, index * 200);
-        //     });
-        // });
-    </script>
 </body>
 </html>
+
