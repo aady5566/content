@@ -324,6 +324,58 @@
             left: 0;
         }
 
+        /* 分組卡片容器 */
+        .group-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 1.5vh 2vw;
+            overflow-y: auto;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 1.5rem;
+        }
+
+        .group-card {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .group-card h4 {
+            font-size: clamp(1.8rem, 3.3vw, 2.4rem);
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .group-members {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .group-members p {
+            font-size: clamp(1.3rem, 2.3vw, 1.7rem);
+            color: var(--text-color);
+            margin-bottom: 0;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(209, 209, 194, 0.3);
+        }
+
+        .group-members p:last-child {
+            border-bottom: none;
+        }
+
         /* 手機版優化 */
         @media (max-width: 767px) {
             .slide {
@@ -383,6 +435,20 @@
             .goal-list li {
                 font-size: clamp(1rem, 2vw, 1.2rem);
                 padding-left: 1.5rem;
+            }
+
+            .group-container {
+                padding: 2vh 3vw;
+                gap: 1.2rem;
+            }
+
+            .group-card {
+                padding: 1.5rem;
+            }
+
+            .group-members p {
+                font-size: clamp(1.1rem, 2vw, 1.4rem);
+                padding: 0.4rem 0;
             }
         }
     </style>
@@ -467,6 +533,69 @@
                         <li><strong>確保內容一致性：</strong>檢查簡報的「開頭（重要性）」、「中段（細節）」和「結尾（核心問題）」邏輯是否連貫。</li>
                         <li><strong>主持 Q&A：</strong>擔任主持人，分派問題給組員回答。</li>
                     </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 分組名單 -->
+        <section class="slide scrollable">
+            <h3>[分組名單] 交換球員？</h3>
+            <div class="group-container">
+                <!-- Group 1 -->
+                <div class="group-card">
+                    <h4>Group 1</h4>
+                    <div class="group-members">
+                        <p>陳I烜</p>
+                        <p>高N婕</p>
+                        <p>陳I立</p>
+                        <p>黃E昕</p>
+                        <p>曹S諺</p>
+                    </div>
+                </div>
+
+                <!-- Group 2 -->
+                <div class="group-card">
+                    <h4>Group 2</h4>
+                    <div class="group-members">
+                        <p>楊I笙</p>
+                        <p>温S奇</p>
+                        <p>白I莛</p>
+                        <p>林E貞</p>
+                        <p>楊N儒</p>
+                    </div>
+                </div>
+
+                <!-- Group 3 -->
+                <div class="group-card">
+                    <h4>Group 3</h4>
+                    <div class="group-members">
+                        <p>張E彗</p>
+                        <p>陳S瑩</p>
+                        <p>楊N凡</p>
+                        <p>許I綺</p>
+                    </div>
+                </div>
+
+                <!-- Group 4 -->
+                <div class="group-card">
+                    <h4>Group 4</h4>
+                    <div class="group-members">
+                        <p>林S鈞</p>
+                        <p>陳E蓁</p>
+                        <p>蕭N婕</p>
+                        <p>周I瑄</p>
+                    </div>
+                </div>
+
+                <!-- Group 5 -->
+                <div class="group-card">
+                    <h4>Group 5</h4>
+                    <div class="group-members">
+                        <p>汪S駿</p>
+                        <p>林N民</p>
+                        <p>黃E農</p>
+                        <p>何I秞</p>
+                    </div>
                 </div>
             </div>
         </section>
