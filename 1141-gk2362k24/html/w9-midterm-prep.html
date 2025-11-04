@@ -257,6 +257,79 @@
             line-height: 1.8;
             color: var(--text-color);
             margin-bottom: 0.8rem;
+            position: relative;
+        }
+
+        /* 複製按鈕樣式 */
+        .copy-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            margin-left: 8px;
+            padding: 0;
+            background: rgba(120, 120, 91, 0.1);
+            border: 1px solid var(--line-color);
+            border-radius: 4px;
+            color: var(--accent-color);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            vertical-align: middle;
+            opacity: 0.6;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+
+        .copy-btn.copied {
+            background: #4caf50;
+            color: white;
+            opacity: 1;
+        }
+
+        .topic-item {
+            position: relative;
+        }
+
+        /* 複製提示訊息 */
+        .copy-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--accent-color);
+            color: var(--bg-color);
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 1rem;
+            z-index: 10000;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .copy-toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 767px) {
+            .copy-btn {
+                width: 24px;
+                height: 24px;
+                font-size: 0.8rem;
+                margin-left: 6px;
+            }
         }
 
         .step-card {
@@ -607,41 +680,41 @@
                 <!-- A. 心理健康與自我成長 -->
                 <div class="topic-section">
                     <h4>A. 心理健康與自我成長 (Mental Health & Self-Growth)</h4>
-                    <p>1. 大學生的「冒名頂替症候群 (Imposter Syndrome)」：探討其成因，以及對學業、社交的影響與應對策略。</p>
-                    <p>2. 「心流 (Flow)」的科學：如何利用 AI 工具（如番茄鐘 App、專注軟體）打造個人的最佳學習與工作體驗？</p>
-                    <p>3. 睡眠科學與夢境：探討睡眠品質如何影響大學生的記憶力、情緒穩定與學習表現。</p>
-                    <p>4. 認知偏誤 (Cognitive Biases) 如何主導你的決策：分析 1-2 個常見偏誤（如：確認偏誤）如何影響我們的新聞解讀或消費行為。</p>
-                    <p>5. 數位時代的「自我認同」：網路人設 (Persona) 與真實自我之間的拉扯與焦慮。</p>
+                    <p class="topic-item">1. 大學生的「冒名頂替症候群 (Imposter Syndrome)」：探討其成因，以及對學業、社交的影響與應對策略。<button class="copy-btn" data-topic="1" title="複製題目 1 (快捷鍵: 1)">📋</button></p>
+                    <p class="topic-item">2. 「心流 (Flow)」的科學：如何利用 AI 工具（如番茄鐘 App、專注軟體）打造個人的最佳學習與工作體驗？<button class="copy-btn" data-topic="2" title="複製題目 2 (快捷鍵: 2)">📋</button></p>
+                    <p class="topic-item">3. 睡眠科學與夢境：探討睡眠品質如何影響大學生的記憶力、情緒穩定與學習表現。<button class="copy-btn" data-topic="3" title="複製題目 3 (快捷鍵: 3)">📋</button></p>
+                    <p class="topic-item">4. 認知偏誤 (Cognitive Biases) 如何主導你的決策：分析 1-2 個常見偏誤（如：確認偏誤）如何影響我們的新聞解讀或消費行為。<button class="copy-btn" data-topic="4" title="複製題目 4 (快捷鍵: 4)">📋</button></p>
+                    <p class="topic-item">5. 數位時代的「自我認同」：網路人設 (Persona) 與真實自我之間的拉扯與焦慮。<button class="copy-btn" data-topic="5" title="複製題目 5 (快捷鍵: 5)">📋</button></p>
                 </div>
 
                 <!-- B. 社會關懷與社工實踐 -->
                 <div class="topic-section">
                     <h4>B. 社會關懷與社工實踐 (Social Care & Social Work)</h4>
-                    <p>6. AI 如何輔助弱勢群體：以「高齡者」或「身心障礙者」的智慧照護應用為例，探討其便利與倫理。</p>
-                    <p>7. 「社會污名 (Stigma)」的重量：探討污名化如何加劇精神疾病患者或貧窮者的困境。</p>
-                    <p>8. 「助人者」的職業倦怠 (Burnout)：分析社工、護理、諮商等行業的壓力源與自我照顧。</p>
-                    <p>9. 什麼是「社區營造」：探討在地連結（如：社區共同空間、在地 NGO）如何提升居民的幸福感與歸屬感。</p>
-                    <p>10. 流浪動物的「TNR」與「零撲殺」政策：探討其在社工（動物福利）與公共衛生間的平衡。</p>
+                    <p class="topic-item">6. AI 如何輔助弱勢群體：以「高齡者」或「身心障礙者」的智慧照護應用為例，探討其便利與倫理。<button class="copy-btn" data-topic="6" title="複製題目 6 (快捷鍵: 6)">📋</button></p>
+                    <p class="topic-item">7. 「社會污名 (Stigma)」的重量：探討污名化如何加劇精神疾病患者或貧窮者的困境。<button class="copy-btn" data-topic="7" title="複製題目 7 (快捷鍵: 7)">📋</button></p>
+                    <p class="topic-item">8. 「助人者」的職業倦怠 (Burnout)：分析社工、護理、諮商等行業的壓力源與自我照顧。<button class="copy-btn" data-topic="8" title="複製題目 8 (快捷鍵: 8)">📋</button></p>
+                    <p class="topic-item">9. 什麼是「社區營造」：探討在地連結（如：社區共同空間、在地 NGO）如何提升居民的幸福感與歸屬感。<button class="copy-btn" data-topic="9" title="複製題目 9 (快捷鍵: 9)">📋</button></p>
+                    <p class="topic-item">10. 流浪動物的「TNR」與「零撲殺」政策：探討其在社工（動物福利）與公共衛生間的平衡。<button class="copy-btn" data-topic="10" title="複製題目 10 (快捷鍵: 0)">📋</button></p>
                 </div>
 
                 <!-- C. 健康飲食與營養科學 -->
                 <div class="topic-section">
                     <h4>C. 健康飲食與營養科學 (Healthy Eating & Nutrition Science)</h4>
-                    <p>11. 「腸道-大腦軸 (Gut-Brain Axis)」：飲食如何透過腸道菌影響你的情緒、壓力與心理健康？</p>
-                    <p>12. 流行飲食法的科學驗證：以「168 斷食」或「生酮飲食」為例，分析其有效性與潛在風險。</p>
-                    <p>13. 「植物肉」與「培養肉」的戰爭：這真的是更健康、更永續的未來食物選擇嗎？</p>
-                    <p>14. 「健康食品」的行銷陷阱：分析營養標籤與廣告術語（如：有機、低脂、無麩質）如何影響消費者的認知。</p>
-                    <p>15. 大學生（外食/宿舍）的「飲食貧窮」：如何在有限的預算和選擇下實踐均衡飲食？</p>
+                    <p class="topic-item">11. 「腸道-大腦軸 (Gut-Brain Axis)」：飲食如何透過腸道菌影響你的情緒、壓力與心理健康？<button class="copy-btn" data-topic="11" title="複製題目 11 (快捷鍵: Ctrl+1)">📋</button></p>
+                    <p class="topic-item">12. 流行飲食法的科學驗證：以「168 斷食」或「生酮飲食」為例，分析其有效性與潛在風險。<button class="copy-btn" data-topic="12" title="複製題目 12 (快捷鍵: Ctrl+2)">📋</button></p>
+                    <p class="topic-item">13. 「植物肉」與「培養肉」的戰爭：這真的是更健康、更永續的未來食物選擇嗎？<button class="copy-btn" data-topic="13" title="複製題目 13 (快捷鍵: Ctrl+3)">📋</button></p>
+                    <p class="topic-item">14. 「健康食品」的行銷陷阱：分析營養標籤與廣告術語（如：有機、低脂、無麩質）如何影響消費者的認知。<button class="copy-btn" data-topic="14" title="複製題目 14 (快捷鍵: Ctrl+4)">📋</button></p>
+                    <p class="topic-item">15. 大學生（外食/宿舍）的「飲食貧窮」：如何在有限的預算和選擇下實踐均衡飲食？<button class="copy-btn" data-topic="15" title="複製題目 15 (快捷鍵: Ctrl+5)">📋</button></p>
                 </div>
 
                 <!-- D. 兩性與人際關係 -->
                 <div class="topic-section">
                     <h4>D. 兩性與人際關係 (Gender & Interpersonal Relationships)</h4>
-                    <p>16. 交友軟體的「遊戲化 (Gamification)」：探討滑動 (Swipe) 機制是擴大了交友圈，還是加深了速食愛情與孤獨感？</p>
-                    <p>17. 影視作品如何形塑我們的「愛情腳本 (Romantic Scripts)」：分析偶像劇或電影如何影響我們對理想伴侶的期待。</p>
-                    <p>18. 「情緒勞動 (Emotional Labor)」：在親密關係、友誼或服務業中，誰承擔了更多的隱形付出？</p>
-                    <p>19. 數位時代的「友誼」：探討線上關係（網友、社群按讚）對線下真實連結的衝擊與補足。</p>
-                    <p>20. 性別溝通的迷思：男性和女性的溝通風格真的來自不同星球嗎？（探討刻板印象 vs. 社會化）</p>
+                    <p class="topic-item">16. 交友軟體的「遊戲化 (Gamification)」：探討滑動 (Swipe) 機制是擴大了交友圈，還是加深了速食愛情與孤獨感？<button class="copy-btn" data-topic="16" title="複製題目 16 (快捷鍵: Ctrl+6)">📋</button></p>
+                    <p class="topic-item">17. 影視作品如何形塑我們的「愛情腳本 (Romantic Scripts)」：分析偶像劇或電影如何影響我們對理想伴侶的期待。<button class="copy-btn" data-topic="17" title="複製題目 17 (快捷鍵: Ctrl+7)">📋</button></p>
+                    <p class="topic-item">18. 「情緒勞動 (Emotional Labor)」：在親密關係、友誼或服務業中，誰承擔了更多的隱形付出？<button class="copy-btn" data-topic="18" title="複製題目 18 (快捷鍵: Ctrl+8)">📋</button></p>
+                    <p class="topic-item">19. 數位時代的「友誼」：探討線上關係（網友、社群按讚）對線下真實連結的衝擊與補足。<button class="copy-btn" data-topic="19" title="複製題目 19 (快捷鍵: Ctrl+9)">📋</button></p>
+                    <p class="topic-item">20. 性別溝通的迷思：男性和女性的溝通風格真的來自不同星球嗎？（探討刻板印象 vs. 社會化）<button class="copy-btn" data-topic="20" title="複製題目 20 (快捷鍵: Ctrl+0)">📋</button></p>
                 </div>
             </div>
         </section>
@@ -684,6 +757,9 @@
         <button id="prev" class="nav-btn">&#8249;</button>
         <button id="next" class="nav-btn">&#8250;</button>
     </div>
+
+    <!-- 複製提示訊息 -->
+    <div id="copyToast" class="copy-toast">已複製到剪貼簿！</div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -745,6 +821,147 @@
             }
 
             showSlide(currentSlide);
+        });
+
+        // 複製功能
+        const copyToast = document.getElementById('copyToast');
+        const topicMap = new Map();
+
+        // 初始化題目映射表
+        function initTopicMap() {
+            const topicItems = document.querySelectorAll('.topic-item');
+            topicItems.forEach(item => {
+                const copyBtn = item.querySelector('.copy-btn');
+                if (copyBtn) {
+                    const topicNum = parseInt(copyBtn.getAttribute('data-topic'));
+                    // 複製元素並移除按鈕，然後取得純文字
+                    const clone = item.cloneNode(true);
+                    const btnClone = clone.querySelector('.copy-btn');
+                    if (btnClone) {
+                        btnClone.remove();
+                    }
+                    const text = clone.textContent.trim();
+                    topicMap.set(topicNum, text);
+                }
+            });
+        }
+
+        // 複製文字到剪貼簿
+        async function copyTopic(topicNum) {
+            const text = topicMap.get(topicNum);
+            if (!text) return false;
+
+            try {
+                await navigator.clipboard.writeText(text);
+                showToast(`已複製題目 ${topicNum}`);
+
+                // 更新按鈕狀態
+                const btn = document.querySelector(`.copy-btn[data-topic="${topicNum}"]`);
+                if (btn) {
+                    btn.classList.add('copied');
+                    btn.textContent = '✓';
+                    setTimeout(() => {
+                        btn.classList.remove('copied');
+                        btn.textContent = '📋';
+                    }, 2000);
+                }
+                return true;
+            } catch (err) {
+                // 降級方案：使用傳統方法
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'fixed';
+                textArea.style.opacity = '0';
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showToast(`已複製題目 ${topicNum}`);
+                    document.body.removeChild(textArea);
+
+                    // 更新按鈕狀態
+                    const btn = document.querySelector(`.copy-btn[data-topic="${topicNum}"]`);
+                    if (btn) {
+                        btn.classList.add('copied');
+                        btn.textContent = '✓';
+                        setTimeout(() => {
+                            btn.classList.remove('copied');
+                            btn.textContent = '📋';
+                        }, 2000);
+                    }
+                    return true;
+                } catch (err2) {
+                    document.body.removeChild(textArea);
+                    showToast('複製失敗，請手動複製');
+                    return false;
+                }
+            }
+        }
+
+        // 顯示提示訊息
+        function showToast(message) {
+            copyToast.textContent = message;
+            copyToast.classList.add('show');
+            setTimeout(() => {
+                copyToast.classList.remove('show');
+            }, 2000);
+        }
+
+        // 初始化
+        initTopicMap();
+
+        // 為所有複製按鈕添加點擊事件
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const topicNum = parseInt(btn.getAttribute('data-topic'));
+                copyTopic(topicNum);
+            });
+        });
+
+        // 快捷鍵功能（只在主題選擇頁面啟用）
+        // 檢查是否在主題選擇頁面
+        function isTopicSlideActive() {
+            const topicContainer = document.querySelector('.topic-container');
+            if (!topicContainer) return false;
+            const topicSlide = topicContainer.closest('.slide');
+            return topicSlide && topicSlide.classList.contains('active');
+        }
+
+        // 快捷鍵監聽
+        document.addEventListener('keydown', (e) => {
+            // 檢查是否在主題選擇頁面
+            if (!isTopicSlideActive()) {
+                return;
+            }
+
+            // 檢查是否在輸入框中（避免干擾正常輸入）
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) {
+                return;
+            }
+
+            // 1-9 數字鍵對應題目 1-9
+            if (e.key >= '1' && e.key <= '9' && !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey) {
+                e.preventDefault();
+                const topicNum = parseInt(e.key);
+                copyTopic(topicNum);
+            }
+            // 0 對應題目 10
+            else if (e.key === '0' && !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey) {
+                e.preventDefault();
+                copyTopic(10);
+            }
+            // Ctrl+1 到 Ctrl+0 對應題目 11-20
+            else if (e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey) {
+                if (e.key >= '1' && e.key <= '9') {
+                    e.preventDefault();
+                    const topicNum = parseInt(e.key) + 10;
+                    copyTopic(topicNum);
+                } else if (e.key === '0') {
+                    e.preventDefault();
+                    copyTopic(20);
+                }
+            }
         });
     </script>
 </body>
