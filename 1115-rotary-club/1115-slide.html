@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI 時代的思維變革</title>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>
         window.MathJax = {
@@ -15,6 +14,7 @@
             }
         };
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <style>
         /* * Wabi-Sabi Minimalist Slide Deck
          * Font: Calibri
@@ -936,6 +936,57 @@
         .math-container p:last-child {
             margin-bottom: 0;
         }
+
+        /* Mermaid Diagram Styles - Wabi-Sabi Minimalist */
+        .mermaid {
+            width: 100%;
+            max-width: 100%;
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid var(--line-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            overflow: auto;
+        }
+
+        /* Override Mermaid colors to match wabi-sabi theme */
+        .mermaid svg {
+            font-family: var(--font-family);
+        }
+
+        /* Mermaid node styling */
+        .mermaid .node rect,
+        .mermaid .node circle,
+        .mermaid .node ellipse,
+        .mermaid .node polygon {
+            fill: var(--header-bg) !important;
+            stroke: var(--accent-color) !important;
+            stroke-width: 2px !important;
+        }
+
+        /* Mermaid edge styling */
+        .mermaid .edgePath .path {
+            stroke: var(--accent-color) !important;
+            stroke-width: 2px !important;
+        }
+
+        .mermaid .edgeLabel {
+            background-color: var(--bg-color) !important;
+            color: var(--text-color) !important;
+        }
+
+        /* Mermaid subgraph styling */
+        .mermaid .cluster rect {
+            fill: rgba(234, 235, 230, 0.5) !important;
+            stroke: var(--accent-color) !important;
+            stroke-width: 2px !important;
+        }
+
+        .mermaid .cluster-label {
+            fill: var(--text-color) !important;
+            font-weight: 600 !important;
+        }
     </style>
 </head>
 <body>
@@ -1400,7 +1451,7 @@
                 <p><b>傳統 AI：</b>工作是「分析」或「分類」或「預測」。</p>
                 <blockquote>(e.g., 判斷是不是垃圾郵件、預測股價)</blockquote>
                 <p><b>生成式 AI：</b>工作是「創造」(Create)。</p>
-                <blockquote>(e.g., 生成一個飛天豬、寫一篇「出軌都是對方錯」的新聞稿)</blockquote>
+                <blockquote>(e.g., 生成一個飛天豬、寫一篇「出軌都是對方的錯」新聞稿)</blockquote>
                 <p style="font-weight: 600;">它創造文字、圖片、音樂、程式碼。這就是為什麼我們感覺它「像人」。</p>
             </div>
         </section>
@@ -1600,93 +1651,265 @@
             </div>
         </section>
 
-        <section class="layout-default">
+        <section class="layout-title">
             <div class="slide-content">
-                <h1>代理人大腦本體</h1>
-                <ol>
-                    <li>大腦本身（Transformer）</li>
-                    <li>記憶力（Vector Database）</li>
-                    <li>思考能力（Large Reasoning Model）</li>
-                    <li>專業知識（RAG）</li>
-                </ol>
-                <h1>尋求外援的能力</h1>
-                <ol>
-                    <li>能夠對外溝通（MCP）</li>
-                    <li>找專家（MoE）</li>
-                </ol>
+                <h2 style="font-size: clamp(2rem, 3vw, 1.75rem); font-weight: 400; color: var(--accent-color); margin-top: 2rem; margin-bottom: 1rem;">想一下，假如要製作一個大腦代理人，它需要具備哪些核心功能？</h2>
             </div>
         </section>
 
-        <section class="layout-default">
-            <div class="slide-content">
-                <h1>Agentic AI (代理式人工智慧)</h1>
-                <p>AI 的下一個篇章：從「響應」到「行動」。</p>
-                <p><b>傳統 AI：</b>「被動的響應者」。(你問一句，它答一句)</p>
-                <p><b>Agent AI：</b>「主動的執行者」。</p>
-                <p>你不再是給它「問題」，你是給它「目標」(Goal)。</p>
-                <blockquote>(e.g., "幫我規劃下個月去東京五天的行程，預算三萬塊...")</blockquote>
-                <p style="font-weight: 600;">它會自己「推理」、「行動」、「呼叫工具」。它成了你的「數位員工」。</p>
-            </div>
+        <section class="layout-iframe">
+            <iframe src="ai-agent-figure.html"
+                        title="代理人大腦本體"
+                        frameborder="0"
+                        allowfullscreen
+                        sandbox="allow-scripts allow-same-origin allow-forms">
+            </iframe>
         </section>
 
         <section class="layout-default">
             <div class="slide-content">
                 <h1>Vector Database (向量資料庫)</h1>
-                <p>RAG 是怎麼做到「快速檢索」的？就靠這個。</p>
-                <p><b>傳統資料庫：</b>搜尋「關鍵字」。(搜 "蘋果" 不會給 "賈伯斯")</p>
-                <p><b>向量資料庫：</b>一個「意義資料庫」或「AI 的記憶宮殿」。</p>
-                <p>它把所有資料都轉換成叫「向量」的數字，代表「語義」。</p>
-                <blockquote>("國王" 和 "王后" 的向量很近；"國王" 和 "漢堡" 的向量很遠)</blockquote>
-                <p style="font-weight: 600;">這讓 AI 可以搜尋「概念」而不是「字面」。</p>
+                <p><b>支援「語意搜尋」（semantic search）</b>、儲存與比較的向量的資料庫。</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>術語</th>
+                            <th>功能</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Token</td>
+                            <td>模型讀取文字、圖像、音訊的最小單位</td>
+                        </tr>
+                        <tr>
+                            <td>Vector Embedding</td>
+                            <td>把文字轉成數字語意向量</td>
+                        </tr>
+                        <tr>
+                            <td>Vector Database</td>
+                            <td>儲存與搜尋向量</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!-- 嵌入 SVG -->
+                <div style="width: 100%; max-width: 1100px; margin: 2rem auto; overflow: visible; transform: translateX(-30px);">
+                    <svg viewBox="0 0 780 260" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: auto;" xmlns="http://www.w3.org/2000/svg" font-family="Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif">
+                        <!-- 定義箭頭 -->
+                        <defs>
+                            <marker id="arrow-vector-db" markerWidth="10" markerHeight="10" refX="10" refY="5" orient="auto">
+                                <path d="M0,0 L10,5 L0,10 Z" fill="#9A948C"/>
+                            </marker>
+                        </defs>
+
+                        <!-- Tokens -->
+                        <rect x="40" y="80" width="200" height="100" rx="12" ry="12" fill="#EAEBE6" stroke="#6B8BA4" stroke-width="2"/>
+                        <text x="140" y="115" text-anchor="middle" font-size="16" fill="#3D3A37" font-weight="500">Tokens</text>
+                        <text x="140" y="140" text-anchor="middle" font-size="12" fill="#5c5855">(e.g. "Chat", "GPT", "is")</text>
+
+                        <!-- Arrow 1 -->
+                        <line x1="240" y1="130" x2="310" y2="130" stroke="#9A948C" stroke-width="2" marker-end="url(#arrow-vector-db)"/>
+                        <text x="275" y="115" text-anchor="middle" font-size="12" fill="#5c5855">Embedding</text>
+
+                        <!-- Embedding -->
+                        <rect x="310" y="80" width="200" height="100" rx="12" ry="12" fill="#F5F4F0" stroke="#8c867b" stroke-width="2"/>
+                        <text x="410" y="115" text-anchor="middle" font-size="16" fill="#3D3A37" font-weight="500">Vector Embedding</text>
+                        <text x="410" y="140" text-anchor="middle" font-size="12" fill="#5c5855">[0.12, -0.45, 0.77, ...]</text>
+
+                        <!-- Arrow 2 -->
+                        <line x1="510" y1="130" x2="580" y2="130" stroke="#9A948C" stroke-width="2" marker-end="url(#arrow-vector-db)"/>
+                        <text x="545" y="115" text-anchor="middle" font-size="12" fill="#5c5855">Store/Search</text>
+
+                        <!-- Vector Database -->
+                        <rect x="580" y="80" width="200" height="100" rx="12" ry="12" fill="#d1d1c2" stroke="#9A948C" stroke-width="2"/>
+                        <text x="680" y="110" text-anchor="middle" font-size="16" fill="#3D3A37" font-weight="500">Vector Database</text>
+                        <text x="680" y="135" text-anchor="middle" font-size="12" fill="#5c5855">Semantic Search</text>
+                        <text x="680" y="155" text-anchor="middle" font-size="12" fill="#5c5855">("pet" → finds "dog")</text>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-two-column reverse">
+            <div class="slide-content">
+                <div class="text-column">
+                    <h1>Token 計算方式</h1>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>語言</th>
+                                <th>1 token 約為</th>
+                                <th>範例</th>
+                                <th>說明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>英文</td>
+                                <td> 4 個字母、0.75 個單字</td>
+                                <td>"ChatGPT is smart" ≈ 5 tokens</td>
+                                <td>拆成子字根或常見片段</td>
+                            </tr>
+                            <tr>
+                                <td>中文（繁體）</td>
+                                <td> 1~1.2 個中文字</td>
+                                <td>「我喜歡學習」 ≈ 5 tokens</td>
+                                <td>幾乎逐字切分</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <blockquote>結論：中文比較耗資源</blockquote>
+                </div>
+                <div class="image-column">
+                    <img src="../pic/1115/token-per-month.jpg"
+                         alt="Token"
+                         loading="lazy">
+                </div>
             </div>
         </section>
 
         <section class="layout-default">
             <div class="slide-content">
-                <h1>RAG (檢索增強生成)</h1>
-                <p>這是目前企業界最重要的 AI 應用，沒有之一。</p>
-                <p><b>解決的問題：</b></p>
-                <ol>
-                    <li>LLM 會「幻覺」(一本正經地胡說八道)。</li>
-                    <li>LLM 的知識是「過時的」。</li>
-                </ol>
-                <p><b>RAG 概念：</b>讓 AI 考一場「開卷考試」(Open-book Exam)。</p>
-                <blockquote><b>Step 1 (檢索): </b>先去內部資料庫「找出」原文。
-                <br><b>Step 2 (生成): </b>看著原文「總結」答案給你。
-                </blockquote>
-                <p style="font-weight: 600;">同時解決了「幻覺」和「知識過時」的問題。</p>
+                <div style="text-align: center; width: 100%;">
+                    <img src="../pic/w5-thanks.jpg"
+                         alt="感謝圖片"
+                         style="width: 100%; max-width: clamp(250px, 40vw, 500px); height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);"
+                         loading="lazy">
+                </div>
             </div>
         </section>
 
         <section class="layout-default">
             <div class="slide-content">
-                <h1>MCP (模型脈絡協定)</h1>
-                <p>這是我認為未來幾年會重塑產業的關鍵。</p>
-                <p><b>問題：</b>Agent AI 要「行動」，就需要去「連接」外部世界 (Email, DB)，但每個 API 插孔都不同。</p>
-                <p><b>MCP：</b>AI 時代的「USB-C 連接埠」。</p>
-                <p>它是一個「開放標準」，統一了 AI Agent 調用外部工具的規格。</p>
-                <p style="font-weight: 600;">這將會極大地加速 Agent AI 的普及和應用。</p>
+                <h1>禮貌成本</h1>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-top: 2rem; align-items: start;">
+                    <div style="cursor: pointer;" class="reveal-trigger">
+                        <p><strong>一年會花多少資源在這些禮貌詞彙上？</strong></p>
+                        <ul style="font-size: clamp(1rem, 1.8vw, 1.3rem); margin-top: 1rem;">
+                            <li style="margin-bottom: 0.8rem;">ChatGPT 日均活躍用戶：1000萬人</li>
+                            <li style="margin-bottom: 0.8rem;">每人每日平均對話輪數：20輪</li>
+                            <li style="margin-bottom: 0.8rem;">每輪中平均含 1 次「請」或「謝謝」類字眼</li>
+                            <li style="margin-bottom: 0.8rem;">每次「請 / 謝謝」觸發模型多產生 10 個 token（模型會回一句「不客氣」或「當然可以」）</li>
+                            <li style="margin-bottom: 0.8rem;">每 token 產生的平均能耗約 0.00003 kWh（度）</li>
+                        </ul>
+                    </div>
+                    <div class="reveal-text reveal-block" id="politeness-cost-result">
+                        <p style="font-size: clamp(1rem, 1.8vw, 1.3rem); margin-bottom: 1rem;"><strong>全年額外能源消耗：</strong><br>
+                        7.3兆 × 0.00003 kWh ≈ 219,000,000 kWh / 年</p>
+                        <p style="font-size: clamp(1rem, 1.8vw, 1.3rem); margin-bottom: 2rem;"><strong>折算為電費成本（以每度電 3 台幣估）：</strong><br>
+                        219M kWh × 3 台幣 ≈ </p>
+                        <p style="text-align: center; margin-top: 2rem;">
+                            <span style="font-size: clamp(3rem, 8vw, 5rem); color: rgba(180, 120, 120, 1); font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">6.57億 / 年</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>大推理模型（Large Reasoning Model, LRM）</h1>
+                <p>進階版的 LLM，專門針對多步邏輯推理、結構化思考與複雜問題求解 而設計。</p>
+                <p>它擅長「思維鏈」(Chain of Thought)，也就是把一個大問題，拆解成好幾個邏輯清晰的小步驟，然後一步一步去解決。</p>
+                <blockquote>如果 LLM 是「博學的作家」，<br>LRM 就是「冷靜的策略家」。</blockquote>
             </div>
         </section>
 
         <section class="layout-default">
             <div class="slide-content">
                 <h1>MoE (Mixture of Experts)</h1>
-                <p><b>問題：</b>模型太大，算個 1+1 卻要啟動愛因斯坦的大腦，太浪費。</p>
-                <p><b>MoE 概念：</b>不要一個「全才」，要一個「專家團隊」。</p>
+                <p>一種讓大型語言模型<b>內部分工協作</b>的架構。</p>
+                <p>在語言模型內選擇最適的「子專家網路」參與運算，以最小的資源達成最大的效果。</p>
                 <blockquote>(e.g., 數學專家、歷史專家、程式碼專家...)</blockquote>
                 <p><b>運作：</b>一個「路由器」(Router) 先判斷問題類型，再交給對應的「專家」處理。</p>
-                <p style="font-weight: 600;">既能保持模型的強大，又能大幅降低運算成本、加快速度。</p>
+                <p style="font-weight: 600;">像是人類不同腦區負責不同功能，既能保持功能運作，又能大幅降低運算成本、加快速度。</p>
             </div>
         </section>
 
         <section class="layout-default">
             <div class="slide-content">
-                <h1>Large Reasoning Model (LRM)</h1>
-                <p>這就是驅動 Agent AI 的「大腦」。</p>
-                <p>LRM 本質上也是 LLM，但它被特別訓練來做「複雜推理」。</p>
-                <p>它擅長「思維鏈」(Chain of Thought)，也就是把一個大問題，拆解成好幾個邏輯清晰的小步驟，然後一步一步去解決。</p>
-                <blockquote>如果 LLM 是「博學的作家」，<br>LRM 就是「冷靜的策略家」。</blockquote>
+                <h1>RAG（Retrieval-Augmented Generation，檢索增強生成）</h1>
+                <p>一種讓大型語言模型在生成答案前，先從外部資料庫搜尋（Retrieval）再生成回應（Generation） 的技術，<b>部分解決「幻覺」和「知識過時」的問題</b></p>
+                <p><b>RAG 概念：</b>讓 AI 進行「開書考試」(Open-book Test)。</p>
+                <blockquote><b>Step 1 (檢索): </b>先去內部資料庫「找出」原文。
+                <br><b>Step 2 (生成): </b>看著原文「總結」答案給你。
+                </blockquote>
+            </div>
+        </section>
+
+        <section class="layout-title">
+            <div class="slide-content">
+                <h2 style="font-weight: 600;">如果要讓 AI 代理人去使用別人開發的工具或是和其他 AI 溝通？</h2>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h2><b style="color: #70a8d4;">MCP</b> (<b style="color: #70a8d4;">Model Context Protocol</b>, from Anthropic)：專注於單一代理與外部工具、資料的連接</h2>
+                <h2><b style="color: #d9a548;">A2A</b> (<b style="color: #d9a548;">Agent2Agent Protocol</b>, from Google)：專注於 AI 代理與 AI 代理之間的溝通協作</h2>
+                <div class="mermaid">
+                    flowchart TD
+                    subgraph AgentA["Agent A"]
+                           A["Agent A"]
+                           A_DB[("資料庫")]
+                           A_API[("HTTP API")]
+                     end
+                    subgraph AgentB["Agent B"]
+                           B["Agent B"]
+                           B_FS[("檔案系統")]
+                           B_QUEUE[("工作佇列")]
+                     end
+                    subgraph AgentC["Agent C"]
+                           C["Agent C"]
+                           C_VEC[("Vector DB")]
+                           C_FUNC[("內部函式")]
+                     end
+                       A -- MCP --> A_DB & A_API
+                       B -- MCP --> B_FS & B_QUEUE
+                       C -- MCP --> C_VEC & C_FUNC
+                       A <-- A2A --> B
+                       B <-- A2A --> C
+
+                        A:::agent
+                        A_DB:::tool
+                        A_API:::tool
+                        B:::agent
+                        B_FS:::tool
+                        B_QUEUE:::tool
+                        C:::agent
+                        C_VEC:::tool
+                        C_FUNC:::tool
+                       classDef agent fill:#EAEBE6,stroke:#d9a548,stroke-width:2
+                       classDef tool fill:#F5F4F0,stroke:#70a8d4,stroke-width:2
+                       classDef link fill:none,stroke:#70a8d4,stroke-width:2,stroke-dasharray:6 4
+                       linkStyle 0 stroke:#70a8d4,fill:none
+                       linkStyle 1 stroke:#70a8d4,fill:none
+                       linkStyle 2 stroke:#70a8d4,fill:none
+                       linkStyle 3 stroke:#70a8d4,fill:none
+                       linkStyle 4 stroke:#70a8d4,fill:none
+                       linkStyle 5 stroke:#70a8d4,fill:none
+                       linkStyle 6 stroke:#d9a548,fill:none
+                       linkStyle 7 stroke:#d9a548,fill:none
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-iframe">
+            <iframe src="a2a-mcp-interaction.html"
+                        title="範例分享：輸入座標搜尋方圓 2 公里內好評價餐廳"
+                        frameborder="0"
+                        allowfullscreen
+                        sandbox="allow-scripts allow-same-origin allow-forms">
+            </iframe>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>Agentic AI (代理式人工智慧) </h1>
+                <p><b>現今主流 AI：</b>「被動的回應者」。</p>
+                <p><b>Agentic AI：</b>「主動的執行者」。（正在發生中）</p>
+                <p style="font-size: 1.2rem;">你不再是給它「問題」，你是給它「目標」，它會自己「推理」、「行動」、「呼叫工具」。<br><b style="color: #92a247;">在你的授權下 (Human-in-the-loop)，主動執行任務。</b></p>
             </div>
         </section>
 
@@ -1700,7 +1923,13 @@
             </div>
         </section>
 
-        <section class="layout-default">
+TODO 產業相關
+TODO 自身故事：坦承自己的不足以及可以協助的部分（時程）、交換條件
+TODO 不知、不足、不能、不為（面對）
+TODO 該有底氣還是要有，為團隊發聲（面對主管）
+TODO 透明化溝通（轉型）：difficult conversation，配上具體做法
+數據化管理（數據化溝通）
+        <section class="layout-default hidden">
             <div class="slide-content" style="overflow-y: auto; justify-content: flex-start; padding-top: 10vh;">
                 <h1>台灣科技業薪資架構 (2025 預估)</h1>
                 <table>
@@ -2143,10 +2372,20 @@
                 let target = e.target;
                 let revealText = null;
 
+                // Special case: check for reveal-trigger class
+                let triggerElement = target.closest('.reveal-trigger');
+                if (triggerElement) {
+                    // Find the reveal-text sibling in the same parent
+                    let parent = triggerElement.parentElement;
+                    if (parent) {
+                        revealText = parent.querySelector('.reveal-text');
+                    }
+                }
+
                 // Check if target itself or its parent has reveal-text
-                if (target.classList.contains('reveal-text')) {
+                if (!revealText && target.classList.contains('reveal-text')) {
                     revealText = target;
-                } else {
+                } else if (!revealText) {
                     // Check next sibling first (useful for headings)
                     let nextSibling = target.nextElementSibling;
                     if (nextSibling && nextSibling.classList.contains('reveal-text')) {
@@ -2515,6 +2754,59 @@
                 setTimeout(initNeuralNetwork, 100);
             }
         })();
+    </script>
+
+    <!-- Initialize Mermaid -->
+    <script>
+        // Wait for both DOM and Mermaid script to be ready
+        function initMermaid() {
+            if (typeof mermaid !== 'undefined') {
+                try {
+                    mermaid.initialize({
+                        startOnLoad: true, // Auto-render all .mermaid elements
+                        theme: 'base',
+                        themeVariables: {
+                            primaryColor: '#EAEBE6',
+                            primaryTextColor: '#3D3A37',
+                            primaryBorderColor: '#9A948C',
+                            lineColor: '#9A948C',
+                            secondaryColor: '#F5F4F0',
+                            tertiaryColor: '#d1d1c2',
+                            background: '#F5F4F0',
+                            mainBkg: '#EAEBE6',
+                            secondBkg: '#F5F4F0',
+                            textColor: '#3D3A37',
+                            fontSize: '16px',
+                            fontFamily: 'Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif'
+                        },
+                        flowchart: {
+                            curve: 'basis',
+                            useMaxWidth: true,
+                            htmlLabels: true
+                        }
+                    });
+                    console.log('Mermaid initialized successfully');
+                } catch (error) {
+                    console.error('Mermaid initialization error:', error);
+                }
+            } else {
+                // Retry if Mermaid not loaded yet (max 10 attempts = 1 second)
+                var attempts = arguments[0] || 0;
+                if (attempts < 10) {
+                    setTimeout(function() { initMermaid(attempts + 1); }, 100);
+                } else {
+                    console.error('Mermaid failed to load after multiple attempts');
+                }
+            }
+        }
+
+        // Try to initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initMermaid);
+        } else {
+            // DOM already loaded, but wait for Mermaid script
+            setTimeout(initMermaid, 100);
+        }
     </script>
 
 </body>

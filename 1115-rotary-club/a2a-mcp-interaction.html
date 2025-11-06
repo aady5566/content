@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>A2A＋MCP 模擬互動流程</title>
+  <style>
+    body {
+      font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+      font-size: 19.2px; /* 24px 縮小 20% (24px * 0.8 = 19.2px) */
+      padding: 20px;
+      background-color: #F5F4F0;
+      color: #3D3A37;
+    }
+    .chat {
+      border: 1px solid #d1d1c2;
+      padding: 15px;
+      max-width: 800px;
+      margin: 20px 0 0 0;
+      background-color: #EAEBE6;
+      border-radius: 4px;
+    }
+    .message { margin: 8px 0; }
+    .user { color: #6B8BA4; } /* 低飽和藍色 */
+    .agent { color: #3D3A37; }
+    .agent‑root { color: #a67c7c; } /* 低飽和紅色 */
+    .agent‑map { color: #7a8570; } /* 低飽和綠色 */
+    .agent‑review { color: #b89a6f; } /* 低飽和橙色/黃色 */
+    .toolcall {
+      font-style: italic;
+      color: #9A948C;
+      margin-left: 20px;
+    }
+    #inputArea {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-start;
+      margin-top: 20px;
+      max-width: 800px;
+    }
+    #userInput {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #d1d1c2;
+      border-radius: 4px;
+      background-color: #F5F4F0;
+      color: #3D3A37;
+      font-size: 1em; /* 與 body 字體大小一致 */
+    }
+    #sendBtn {
+      padding: 8px 12px;
+      background-color: #9A948C;
+      color: #F5F4F0;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      font-size: 1em; /* 與 body 字體大小一致 */
+    }
+    #sendBtn:hover {
+      background-color: #8c867b;
+    }
+    h2 {
+      color: #3D3A37;
+      font-weight: 400;
+    }
+    p {
+      color: #5c5855;
+    }
+  </style>
+</head>
+<body>
+  <h2>A2A ＋ MCP 對話流程：輸入座標搜尋好評價餐廳</h2>
+  <div id="inputArea">
+    <input type="text" id="userInput" value="我人在 25.0330,121.5654，請幫我搜尋方圓 2 公里內好評價餐廳，評價 > 4.3，評價數 50~ 500 間" />
+    <button id="sendBtn">送出</button>
+  </div>
+
+  <div class="chat" id="chatBox">
+    <!-- 對話內容會動態加入 -->
+  </div>
+
+  <script>
+    const chatBox = document.getElementById('chatBox');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+
+    function appendMessage(senderClass, senderLabel, content) {
+      const div = document.createElement('div');
+      div.className = 'message ' + senderClass;
+      div.innerHTML = '<strong>' + senderLabel + ':</strong> ' + content;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    sendBtn.addEventListener('click', () => {
+      const input = userInput.value.trim();
+      if (!input) return;
+      appendMessage('user', 'User', input);
+      userInput.value = ''; // 清空輸入框
+
+      // root_agent 接收和理解任務（需要思考時間）
+      setTimeout(() => {
+        appendMessage('agent‑root', 'root_agent', '收到座標 “25.0330,121.5654”。理解任務內容：方圓 2 公里內、Google 評價 ≥ 4.3、評價數 50‑500 的餐廳。');
+
+        // root_agent → map_agent（A2A 通信，需要傳輸時間）
+        setTimeout(() => {
+          appendMessage('agent‑root', 'root_agent', '<span class="toolcall">委派給 map_agent：搜尋 2 公里內餐廳清單 …</span>');
+
+          // map_agent 呼叫地圖工具（MCP 調用外部服務，需要等待 API 回應）
+          setTimeout(() => {
+            appendMessage('agent‑map', 'map_agent', '<span class="toolcall">使用者希望透過座標查找對應的餐廳資訊，呼叫地圖服務 (MCP tool on google maps)：搜尋座標 25.0330,121.5654 周邊 2 公里所有餐廳</span>');
+
+            // map_agent 回報清單（處理和整理搜尋結果）
+            setTimeout(() => {
+              appendMessage('agent‑map', 'map_agent', '取得初步餐廳清單，共 37 筆。傳回給 root_agent，並委派 review_agent。');
+
+              // root_agent → review_agent（A2A 通信，傳遞資料）
+              setTimeout(() => {
+                appendMessage('agent‑root', 'root_agent', '<span class="toolcall">委派給 review_agent：檢查每筆餐廳的 Google 評價與評價數，並根據使用者的條件篩選出符合條件的餐廳</span>');
+
+                // review_agent 呼叫評論工具（MCP 調用，需要查詢 37 筆資料，最耗時）
+                setTimeout(() => {
+                  appendMessage('agent‑review', 'review_agent', '<span class="toolcall">呼叫評論服務 (MCP tool on google reviews)：查詢餐廳名稱、評分、評價數 …</span>');
+
+                  // review_agent 回報篩選結果（處理和篩選 37 筆資料，需要較長時間）
+                  setTimeout(() => {
+                    appendMessage('agent‑review', 'review_agent', '篩選後符合條件的餐廳 5 筆：<br>1. 餐廳 A – 評分 4.5 – 評價數 120<br>2. 餐廳 B – 評分 4.4 – 評價數 200<br>3. 餐廳 C – 評分 4.8 – 評價數 75<br>4. 餐廳 D – 評分 4.6 – 評價數 90<br>5. 餐廳 E – 評分 4.3 – 評價數 300');
+
+                    // root_agent 最後回覆使用者（組裝結果，相對簡單）
+                    setTimeout(() => {
+                      appendMessage('agent‑root', 'root_agent', '任務完成，以下是搜尋結果：<br>[如上 5 筆清單]。如果還有什麼需要的，我可以幫忙嗎？');
+                    }, 2800);
+                  }, 7000);
+                }, 3200);
+              }, 5200);
+            }, 5500);
+          }, 5000);
+        }, 1500);
+      }, 1000);
+    });
+  </script>
+</body>
+</html>
