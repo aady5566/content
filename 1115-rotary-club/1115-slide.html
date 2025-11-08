@@ -238,6 +238,8 @@
             display: flex;
             flex-direction: column;
             gap: 0.75rem;
+            justify-content: center;
+            align-items: center;
         }
 
         .layout-two-column .image-column img {
@@ -1992,7 +1994,7 @@
             <div class="slide-content">
                 <h1>Agentic AI (代理式人工智慧) </h1>
                 <p><b>現今主流 AI：</b>「被動的回應者」。</p>
-                <p><b>Agentic AI：</b>「主動的執行者」。（正在發生中）</p>
+                <p><b>Agentic AI：</b>「主動的執行者」。（正在發生）</p>
                 <p style="font-size: 1.2rem;">你不再是給它「問題」，你是給它「目標」，它會自己「推理」、「行動」、「呼叫工具」。<br><b style="color: #92a247;">在你的授權下 (Human-in-the-loop)，主動執行任務。</b></p>
             </div>
         </section>
@@ -2518,8 +2520,25 @@
         </section>
 
 
-        <section class = "layout-default">
+        <section class="layout-two-column scrollable" id="speed-running-section">
+            <div class="slide-content">
+                <div class="image-column">
+                    <img src="../pic/1115/speed-running-promotion.jpg"
+                         alt=""
+                         class="reveal-trigger"
+                         style="cursor: pointer; transform: scale(0.8);">
+                </div>
+                <div class="text-column">
+                    <div class="reveal-text reveal-block" style="margin-top: 230px; margin-left: -100px;">
+                        <p>努力只是門票，<br>選擇和機運..都很重要。</p>
 
+                        <iframe src="../1115-rotary-club/linkedin-short.html"
+                                frameborder="0"
+                                style="width: 130%; height: 900px; border: none; border-radius: 4px; box-shadow: 0 4px 12px rgba(187, 174, 174, 0.1);">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <section class="layout-quote">
@@ -2542,6 +2561,13 @@
 
         <section class="layout-default">
             <div class="slide-content">
+                找出你的「需要」
+                用 NotebookLM 進行
+            </div>
+        </section>
+
+        <section class="layout-default hidden">
+            <div class="slide-content">
                 <h1>我的工具箱：第一性原則</h1>
                 <p>這個工具，就是「第一性原則」(First Principles Thinking)。</p>
                 <p>這個詞被馬斯克講到爛了，但它的核心很簡單：</p>
@@ -2551,14 +2577,14 @@
             </div>
         </section>
 
-        <section class="layout-default">
+        <section class="layout-default hidden">
             <div class="slide-content">
                 <h1>我的產品故事：</h1>
                 <h2 style="font-size: clamp(1.5rem, 4vw, 2.5rem); margin-top: 1rem;">效率 vs. 故事</h2>
             </div>
         </section>
 
-        <section class="layout-default">
+        <section class="layout-default hidden">
             <div class="slide-content">
                 <h1>效率 vs. 故事 (一)</h1>
                 <p>身為一個產品人，我最近面臨一個挑戰：公司內部的所有產品線，都要導入現在最紅的「Agentic AI」。</p>
@@ -2568,7 +2594,7 @@
             </div>
         </section>
 
-        <section class="layout-default">
+        <section class="layout-default hidden">
             <div class="slide-content">
                 <h1>效率 vs. 故事 (二)</h1>
                 <p>我會先把所有要解決的商業問題攤開來，定義它們的「本質」。</p>
@@ -2588,7 +2614,7 @@
             </div>
         </section>
 
-        <section class="layout-default">
+        <section class="layout-default hidden">
             <div class="slide-content">
                 <h1>效率 vs. 故事 (三)</h1>
                 <p>但是，故事還沒完。</p>
@@ -2599,7 +2625,7 @@
             </div>
         </section>
 
-        <section class="layout-default">
+        <section class="layout-default hidden">
             <div class="slide-content">
                 <h1>效率 vs. 故事 (四)</h1>
                 <p>這個「酷東西」，它不一定真的帶來了 10 倍的效率，但它帶來了「產品故事」。</p>
@@ -2612,7 +2638,7 @@
         <section class="layout-quote">
             <div class="slide-content">
                 <h1 style="font-size: clamp(2rem, 5vw, 4rem);">原則二：</h1>
-                <h1 style="font-size: clamp(2.5rem, 6vw, 5rem);">先「高薪」還是先「奴一下」？</h1>
+                <h1 style="font-size: clamp(2.5rem, 6vw, 5rem);">先「高薪」還是「奴一下」？</h1>
             </div>
         </section>
 
@@ -2635,11 +2661,29 @@
         <section class="layout-quote">
             <div class="slide-content">
                 <h1 style="font-size: clamp(2rem, 5vw, 4rem);">原則三：</h1>
-                <h1 style="font-size: clamp(2.5rem, 6vw, 5rem);">人類的不可取代性</h1>
+                <h1 style="font-size: clamp(2.5rem, 6vw, 5rem);">職場打團體戰</h1>
             </div>
         </section>
 
         <section class="layout-default">
+            <div class="slide-content">
+
+管事：
+- PoC 游擊戰一開始專案人不用多，先確認可行性，並證明能力。
+- 專案管理用三角形、scope, resource, timeline, quality
+管人：
+- 不知，知而不能（缺資源、缺能力，指導，找 peer），知而不為（缺乏動機、共識利益交換）
+            </div>
+        </section>
+
+        <section class="layout-quote hidden">
+            <div class="slide-content">
+                <h1 style="font-size: clamp(2rem, 5vw, 4rem);">原則四：</h1>
+                <h1 style="font-size: clamp(2.5rem, 6vw, 5rem);">人類的不可取代性</h1>
+            </div>
+        </section>
+
+        <section class="layout-default hidden">
             <div class="slide-content">
                 <h1>不可取代性</h1>
                 <p>當 AI 外包了計算、記憶、甚至創造力... 我們碳基生命，到底還剩下什麼？</p>
@@ -2651,7 +2695,7 @@
             </div>
         </section>
 
-        <section class="layout-title">
+        <section class="layout-title hidden">
             <div class="slide-content">
                 <h1>一個感性的高潮</h1>
                 <p style="margin-top: 2rem; font-size: 1.5rem;">我想邀請大家，再跟我做一個小小的練習。</p>
@@ -2659,7 +2703,7 @@
             </div>
         </section>
 
-        <section class="layout-default">
+        <section class="layout-default hidden">
             <div class="slide-content">
                 <h1>感受海風</h1>
                 <p style="font-size: 1.5rem;"><em>現在，請你想像一下...</em></p>
@@ -2673,7 +2717,7 @@
             </div>
         </section>
 
-        <section class="layout-default">
+        <section class="layout-default hidden">
             <div class="slide-content">
                 <h1>主觀感受</h1>
                 <p>剛剛那個畫面，那五感的連結——你腳底的溫度、風的觸感、海浪的聲音—— 這一切混在一起，交織而成的那種「舒服」的體驗...</p>
@@ -2683,7 +2727,7 @@
             </div>
         </section>
 
-        <section class="layout-default">
+        <section class="layout-default hidden">
             <div class="slide-content">
                 <h1>身體 vs. 大腦</h1>
                 <p>AI 能「感受」到那個，因為海風而平靜下來的心跳嗎？</p>
@@ -2693,7 +2737,7 @@
             </div>
         </section>
 
-        <section class="layout-default">
+        <section class="layout-default hidden">
             <div class="slide-content">
                 <h1>計算 vs. 感動</h1>
                 <p>AI 很會「計算」，但它不會「感動」。</p>
@@ -2704,7 +2748,7 @@
             </div>
         </section>
 
-        <section class="layout-default">
+        <section class="layout-default hidden">
             <div class="slide-content">
                 <h1>重新定義你的價值</h1>
                 <p>如果你的工作，是 80% 的重複性執行，和 20% 的人性判斷...</p>
@@ -2715,7 +2759,7 @@
             </div>
         </section>
 
-        <section class="layout-title">
+        <section class="layout-title hidden">
             <div class="slide-content">
                 <h1>主軸 5：結語</h1>
                 <h2 style="color: var(--text-color); font-size: 2rem;">成為定義者</h2>
@@ -2734,12 +2778,10 @@
                 <h1>重新校準你自己</h1>
                 <p>AI 時代，最強大的能力，不是你會用多少工具，而是你的「品味」、「價值觀」和「判斷力」。</p>
                 <p>AI 是一個史上最強的「執行者」，但它需要一個「校準者」。</p>
-                <p style="font-weight: 600; font-size: 1.8rem;">而那個人，就是你。</p>
-                <p>你的人性、你的美感、你的主觀感受、你對「好」與「壞」的定義... 這些才是你在 AI 時代，最稀缺、也最昂貴的資產。</p>
             </div>
         </section>
 
-        <section class="layout-default">
+        <section class="layout-default hidden">
             <div class="slide-content">
                 <h1>回去好好生活</h1>
                 <p>所以，不要再焦慮了。</p>
@@ -2749,7 +2791,7 @@
             </div>
         </section>
 
-        <section class="layout-title">
+        <section class="layout-title hidden">
             <div class="slide-content">
                 <h1 style="font-size: clamp(5rem, 15vw, 12rem);">Q & A</h1>
                 <h2 style="margin-top: 3rem;">[您的姓名]</h2>
@@ -2757,7 +2799,7 @@
             </div>
         </section>
 
-        <section class="layout-quote">
+        <section class="layout-quote hidden">
             <div class="slide-content">
                 <h1 style="font-size: clamp(2rem, 4vw, 3.5rem);">不要成為 AI 的使用者。</h1>
                 <h1 style="font-size: clamp(2.5rem, 5vw, 4.5rem); margin-top: 1rem;">要成為，</h1>
@@ -2834,6 +2876,37 @@
                 // 為當前投影片添加 active class（漸進漸出效果）
                 if (slides[currentSlide]) {
                     slides[currentSlide].classList.add('active');
+
+                    // 如果是 speed-running-section，自動滾動到中間
+                    if (slides[currentSlide].id === 'speed-running-section') {
+                        const section = slides[currentSlide];
+                        const img = section.querySelector('img');
+
+                        // 如果圖片已載入，直接滾動；否則等待圖片載入完成
+                        const scrollToCenter = () => {
+                            if (section.scrollHeight > section.clientHeight) {
+                                // 計算中間位置：總高度 - 視窗高度，然後除以 2
+                                const scrollPosition = (section.scrollHeight - section.clientHeight) / 2;
+                                section.scrollTo({
+                                    top: scrollPosition,
+                                    behavior: 'smooth'
+                                });
+                            }
+                        };
+
+                        if (img && img.complete) {
+                            // 圖片已載入，稍微延遲確保 DOM 已更新
+                            setTimeout(scrollToCenter, 200);
+                        } else if (img) {
+                            // 等待圖片載入完成
+                            img.addEventListener('load', scrollToCenter, { once: true });
+                            // 如果圖片載入超時，也執行滾動
+                            setTimeout(scrollToCenter, 1000);
+                        } else {
+                            // 沒有圖片，直接滾動
+                            setTimeout(scrollToCenter, 200);
+                        }
+                    }
                 }
 
                 // Update counter（使用動態計算的總數）
@@ -2922,6 +2995,13 @@
                     let parent = triggerElement.parentElement;
                     if (parent) {
                         revealText = parent.querySelector('.reveal-text');
+                    }
+                    // If not found, check in slide-content level (for two-column layouts)
+                    if (!revealText) {
+                        let slideContent = triggerElement.closest('.slide-content');
+                        if (slideContent) {
+                            revealText = slideContent.querySelector('.reveal-text');
+                        }
                     }
                 }
 
