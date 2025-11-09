@@ -5,9 +5,10 @@
   "scripts": {
     "extract": "node scripts/extract-content.js",
     "encrypt": "node scripts/encrypt-content.js",
-    "build": "node scripts/build.js",
+    "build": "node scripts/build-simple.js",
+    "build-full": "node scripts/build.js",
     "dev": "node scripts/setup-dev-mode.js",
-    "inject": "node scripts/inject-loader.js",
+    "inject": "node scripts/inject-loader-simple.js",
     "restore": "node scripts/restore-original.js",
     "remove-automation": "node scripts/remove-automation.js",
     "test-production": "node scripts/test-production.js"
