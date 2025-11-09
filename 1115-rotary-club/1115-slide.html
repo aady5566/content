@@ -1182,147 +1182,2010 @@
     
 
     
-
-    
-
-    
-
-    <!-- CONTENT-LOADER-INJECTED -->
-    <script>
-        /**
-         * 簡化版內容載入器：從 JSON 載入內容
-         */
-        (function() {
-            // 檢測是否為開發模式
-            const isDevMode =
-                document.documentElement.hasAttribute('data-dev-mode') ||
-                window.location.hostname === 'localhost' ||
-                window.location.hostname === '127.0.0.1' ||
-                window.location.hostname === '' ||
-                window.location.search.includes('dev=true');
-
-            // 如果是生產模式，從 JSON 載入內容
-            if (!isDevMode) {
-                function loadContentFromJSON() {
-                    const deck = document.getElementById('deck');
-                    if (!deck) {
-                        console.error('找不到 #deck 元素');
-                        return;
-                    }
-
-                    // 保存原始內容作為 fallback
-                    const originalContent = deck.innerHTML;
-
-                    // 確定基礎路徑
-                    const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
-
-                    // 從 JSON 載入內容
-                    fetch(basePath + 'slides-content.json')
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('無法載入 slides-content.json: ' + response.status);
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            // 確認內容有效
-                            if (!data || !data.slides || !Array.isArray(data.slides)) {
-                                throw new Error('無效的 JSON 格式');
-                            }
-
-                            // 先渲染到臨時容器
-                            const tempContainer = document.createElement('div');
-                            tempContainer.style.display = 'none';
-                            document.body.appendChild(tempContainer);
-
-                            // 渲染投影片
-                            data.slides.forEach((slide, index) => {
-                                try {
-                                    const section = document.createElement('section');
-                                    section.className = slide.classes || slide.layout || 'layout-default';
-                                    section.innerHTML = slide.content || '';
-                                    tempContainer.appendChild(section);
-                                } catch (error) {
-                                    console.error('渲染投影片 ' + index + ' 失敗：', error);
-                                }
-                            });
-
-                            // 確認渲染成功後，再替換原內容
-                            if (tempContainer.children.length > 0) {
-                                deck.innerHTML = '';
-                                while (tempContainer.firstChild) {
-                                    deck.appendChild(tempContainer.firstChild);
-                                }
-                                document.body.removeChild(tempContainer);
-
-                                // 觸發事件通知其他腳本內容已載入
-                                setTimeout(() => {
-                                    // 標記內容已載入完成（先設定，讓其他腳本可以檢查）
-                                    window.slidesContentLoaded = true;
-
-                                    // 觸發 slidesLoaded 事件
-                                    window.dispatchEvent(new CustomEvent('slidesLoaded', {
-                                        detail: { slideCount: data.slides.length }
-                                    }));
-
-                                    // 觸發 resize 事件
-                                    window.dispatchEvent(new Event('resize'));
-
-                                    // 觸發自定義事件，讓其他腳本知道可以初始化了
-                                    window.dispatchEvent(new CustomEvent('contentReady'));
-
-                                    console.log('✅ 成功載入 JSON 內容，共 ' + data.slides.length + ' 個投影片');
-                                    console.log('📢 已觸發 contentReady 事件，其他腳本可以開始初始化');
-
-                                    // 重新觸發所有等待中的 DOMContentLoaded 監聽器
-                                    // 這會讓已經註冊的腳本重新執行
-                                    window.dispatchEvent(new Event('DOMContentLoaded'));
-                                }, 500);
-                            } else {
-                                throw new Error('渲染失敗，沒有生成投影片');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('載入 JSON 內容失敗，使用原始內容', error);
-                            // 如果載入失敗，恢復原始內容
-                            if (originalContent) {
-                                deck.innerHTML = originalContent;
-                                console.log('✅ 已恢復原始內容');
-                            }
-                        });
-                }
-
-                // 確保 DOM 已載入
-                function initLoader() {
-                    if (document.readyState === 'complete') {
-                        setTimeout(() => {
-                            loadContentFromJSON();
-                        }, 200);
-                    } else {
-                        window.addEventListener('load', () => {
-                            setTimeout(() => {
-                                loadContentFromJSON();
-                            }, 200);
-                        });
-                    }
-                }
-
-                if (document.readyState === 'loading') {
-                    document.addEventListener('DOMContentLoaded', initLoader);
-                } else {
-                    initLoader();
-                }
-            }
-        })();
-    </script>
-
 </head>
 <body>
     <!-- ============================================
          投影片容器開始
          ============================================ -->
     <div id="deck">
-        <!-- 內容由 JavaScript 從 JSON 動態載入 -->
+
+        <section class="layout-title">
+            <div class="slide-content">
+                <h1><b>AI 時代的思維變革</b></h1>
+                <h2>YD Huang</h2>
+                <p style="margin-top: 2rem; color: var(--accent-color);">2025-11-15</p>
+            </div>
+        </section>
+
+        <section class="layout-default scrollable">
+            <div class="slide-content">
+                <h1 style="text-align: center; margin-bottom: 3rem;">大綱</h1>
+                <div style="max-width: 900px; margin: 0 auto;">
+                    <ol style="font-size: clamp(1.3rem, 2.5vw, 1.8rem); line-height: 2.5; margin-left: 2rem;">
+                        <li style="margin-bottom: 2rem;">
+                            <strong>認識與焦慮</strong>
+                        </li>
+                        <li style="margin-bottom: 2rem;">
+                            <strong>AI 本質與全球競賽</strong>
+                        </li>
+                        <li style="margin-bottom: 2rem;">
+                            <strong>實踐與心法</strong>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>我是誰？ (The Resume)</h1>
+                <h2 style="font-size: clamp(2rem, 2.5vw, 1.75rem);">Appier 產品人 / 國防大學 兼任講師</h2>
+                <div class="timeline-container">
+                    <div class="timeline-track">
+                        <div class="timeline-item timeline-item-large">
+                            <div class="timeline-year">2009-2016</div>
+                            <div class="timeline-content">
+                                <div class="title">台灣大學</div>
+                                <div class="subtitle">心理學士</div>
+                                <!-- <div class="text">大專生科技部計劃</div> -->
+                                <div class="subtitle">心理碩士認知計量</div>
+                                <!-- <div class="text">情緒對賭局決策的影響</div> -->
+                            </div>
+                        </div>
+                        <div class="timeline-item timeline-item-large">
+                            <div class="timeline-year">2016</div>
+                            <div class="timeline-content">
+                                <div class="title">雲圖科學</div>
+                                <div class="subtitle">資料分析師</div>
+                                <div class="text">數據建模</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item timeline-item-large">
+                            <div class="timeline-year">2017-now</div>
+                            <div class="timeline-content">
+                                <div class="title current-state">Appier</div>
+                                <div class="subtitle">產品總監</div>
+                                <div class="text">防偽偵測</div>
+                                <div class="text">SaaS 服務</div>
+                                <div class="text">Agentic AI</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item timeline-item-large">
+                            <div class="timeline-year">2025-now</div>
+                            <div class="timeline-content">
+                                <div class="title current-state">國防大學</div>
+                                <div class="subtitle">兼職講師</div>
+                                <div class="text">AI 趨勢與程式設計</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-embed">
+            <div class="slide-content">
+                <div class="website-preview">
+                    <div class="screenshot-wrapper">
+                        <div class="screenshot-loading" id="appier-gif-loading">
+                            <p>載入中...</p>
+                        </div>
+                        <img src="../pic/1115/appier-portal.gif"
+                             alt="Appier 網站截圖"
+                             class="preview-screenshot"
+                             loading="lazy"
+                             onload="document.getElementById('appier-gif-loading').style.display='none';"
+                             onerror="document.getElementById('appier-gif-loading').innerHTML='<p>圖片載入失敗<br><small>請檢查檔案路徑</small></p>';">
+                    </div>
+
+                    <div class="preview-content">
+                        <div class="preview-title">Appier - AI-Powered Solutions</div>
+                        <div class="preview-description">
+                            Appier 是一間專注於人工智慧與數據分析的科技公司，為企業提供智能行銷、客戶洞察、及自動化決策解決方案。
+                        </div>
+                        <a href="https://www.appier.com/en/" target="_blank" rel="noopener noreferrer" class="preview-link">
+                            前往 Appier 官網
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-embed">
+            <div class="slide-content">
+                <div class="website-preview">
+                    <img src="../pic/1115/appier-agents.jpg"
+                         alt="Appier 網站截圖"
+                         class="preview-screenshot"
+                         loading="lazy">
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-embed scrollable">
+            <div class="slide-content">
+                <div class="website-preview">
+                    <img src="../pic/1115/appier-full-martech-3.png"
+                         alt="Appier 網站截圖"
+                         class="preview-screenshot"
+                         loading="lazy">
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-embed hidden">
+            <h1 style="font-size: 3rem;">背後的價值與商業活動</h1>
+            <div class="slide-content">
+                <div class="website-preview">
+                    <img src="../pic/1115/appier-rev-growth.jpg"
+                         alt="Appier 網站截圖"
+                         class="preview-screenshot"
+                         loading="lazy">
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <h1>Appier 2025 財年第二季</h1>
+            <div class="grid">
+                <div class="kpi-card">
+                    <span class="kpi-value">103 億日圓</span>
+                    <span class="kpi-label">營收 (創歷史新高)</span>
+                    <span class="kpi-change">年增 +27%</span>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-value">58 億日圓</span>
+                    <span class="kpi-label">毛利 (創歷史新高)</span>
+                    <span class="kpi-change">年增 +38%</span>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-value">8.06 億日圓</span>
+                    <span class="kpi-label">營業利益 (創歷史新高)</span>
+                    <span class="kpi-change">年增 +130%</span>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-value">56.1%</span>
+                    <span class="kpi-label">毛利率 (創歷史新高)</span>
+                    <span class="kpi-change">年增 4.8 個百分點</span>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-value">+26%</span>
+                    <span class="kpi-label">東北亞 (NEA) 營收年增</span>
+                    <span class="kpi-change">+35% (排除匯率影響)</span>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-value">+37%</span>
+                    <span class="kpi-label">美國與 EMEA 營收年增</span>
+                    <span class="kpi-change">+48% (排除匯率影響)</span>
+                </div>
+            </div>
+        </section>
+
+
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>我對工作的真實原則</h1>
+                <ol style="font-size: clamp(1.2rem, 2.5vw, 1.75rem); margin-left: 2rem; margin-top: 1.5rem;" id="work-principles-list">
+                    <li style="margin-bottom: 1rem; cursor: pointer;"><b>時間自由</b><span class="reveal-text">（成果導向）</span></li>
+                    <li style="margin-bottom: 1rem; cursor: pointer;"><b>穿著自由</b><span class="reveal-text">（專注成就）</span></li>
+                    <li style="margin-bottom: 1rem; cursor: pointer;"><b>在台灣賺全世界的錢</b><span class="reveal-text"> (國際化)</span></li>
+                </ol>
+        </section>
+
+        <section class="layout-quote hidden">
+            <div class="slide-content">
+                <h1>但，這是我想要成為的人嗎？</h1>
+                <p style="text-align: center; margin-top: 2rem; color: var(--accent-color);">但今天，我不想只談這個。</p>
+                <p style="text-align: center; color: var(--accent-color);">在我過去的職涯中，我花了很多時間在思考、在建構我的「社會角色」。但當我站在這裡，看著這些標籤時，我總會問自己一個問題：「這，是我想要成為的人嗎？」</p>
+                <p style="text-align: center; color: var(--accent-color);">如果我把這些仕途上的、社會給我的角色全部拋棄掉...</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>真正的我 (The Person)</h1>
+                <ul>
+                    <li>錯把家事當成舒壓的先生</li>
+                    <li style="cursor: pointer;">熱愛模組化思考的探索者 <span class="reveal-text" style="font-size: 3rem; font-weight: 600;">INTJ-A</span></li>
+                    <li>AI 實踐的狂熱者</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="layout-default hidden">
+            <div class="slide-content">
+                <h1>核心提問：碳基生命 vs. 矽基電體</h1>
+                <p>在我的筆記裡，我寫下了這樣一段隨想。</p>
+                <blockquote>
+                    <p>當 AI (矽基電體) 外包了計算、記憶、閱讀、理解、甚至創造...</p>
+                    <p>那我們 (碳基生命) ... 還剩下什麼？</p>
+                </blockquote>
+                <p>我們是「碳基生命」。當我們引以為傲的技能，一個一個被矽基電體用更低的成本、更高的效率複製時，我們剩下什麼？</p>
+                <p>這不是一個未來的天問，這是一個「存在主義」的探問。</p>
+            </div>
+        </section>
+
+        <section class="layout-two-column">
+            <div class="slide-content">
+                <div class="image-column">
+                    <img src="../pic/1115/biological-artificial-brain.jpg"
+                         alt="碳基生命 vs. 矽基電體"
+                         loading="lazy">
+                    <div class="image-source">
+                        圖片來源: <a href="https://scitechdaily.com/building-a-new-type-of-efficient-artificial-intelligence-inspired-by-the-brain/" target="_blank" rel="noopener noreferrer">Scitech Daily</a>
+                    </div>
+                </div>
+                <div class="text-column">
+                    <h1>碳基生命 vs. 矽基電體</h1>
+                    <p style="font-size: 1.5rem;">Biological vs. Artificial Intelligence</p>
+                    <blockquote>
+                        <p>當 AI 外包了計算、記憶、閱讀、理解、甚至創造...</p>
+                        <p>那 人類 ... 還剩下什麼？</p>
+                    </blockquote>
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-bigtext">
+            <div class="slide-content">
+                <h1>Anxiety</h1>
+                <h2 style="text-align: center; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 300; margin-top: 1rem;">焦慮?</h2>
+            </div>
+        </section>
+
+        <section class="layout-default hidden">
+            <div class="slide-content">
+                <h1>誠實面對焦慮</h1>
+                <p>我知道在座的各位，很多是大學生，或是剛出社會不到五年的新鮮人。你們正站在職涯的起點，你們比任何一個世代，都更直接地被這股浪潮衝擊。</p>
+                <blockquote>
+                    <p>「我現在學的，畢業後還有用嗎？」</p>
+                    <p>「我剛找到的工作，會不會三年後就被取代了？」</p>
+                    <p>「AI 到底是什麼？我好像什麼都聽不懂。」</p>
+                </blockquote>
+                <p>這就是我們今天的第一個重點。我們必須先誠實地，面對我們的焦慮。</p>
+            </div>
+        </section>
+
+        <section class="layout-default hidden">
+            <div class="slide-content">
+                <h1>AI 時代的「焦慮生產線」</h1>
+                <p>在我們開始討論之前，我想請大家先看看這張投影片。這是我在社群媒體上隨手截的圖。是不是很熟悉？</p>
+                <ul style="font-size: clamp(1.1rem, 2.2vw, 1.5rem);">
+                    <li>「一鍵生成無限多的 AI 內容」</li>
+                    <li>「AI 影片自動剪輯」</li>
+                    <li>「一個月讓你多賺 300 美金」</li>
+                    <li>「無腦被動收入」</li>
+                </ul>
+                <p style="margin-top: 1.5rem;">我們正處在一個「焦慮生產線」被極大化的時代。所有的媒體、所有的課程，都在拼命地告訴你：「你快要跟不上了」。</p>
+                <p>這就是我們常說的 <b>FOMO (Fear of Missing Out)</b>，錯失恐懼。</p>
+            </div>
+        </section>
+
+        <section class="layout-default ">
+            <div class="slide-content">
+                <h1>AI 時代的「焦慮生產線」</h1>
+                <img src="../pic/1115/ai-fomo.jpg"
+                alt=""
+                class=""
+                style="width: 100%; height: auto; display: block; margin: 2rem 0;"
+                loading="lazy">
+            </div>
+        </section>
+
+        <section class="layout-two-column reverse">
+            <div class="slide-content">
+                <div class="text-column">
+                    <h1 style="font-size: 5rem;">分享時間</h1>
+                    <blockquote>
+                    <p style="font-weight: 600; margin-top: 1rem; font-size: clamp(1.5rem, 3.12vw, 2.18rem);">最近一件最讓您對 AI 感到焦慮的『具體』事情是什麼？</p>
+                    </blockquote>
+                </div>
+                <div class="image-column">
+                    <img src="../pic/1115/slido-1115-rotary-club.png"
+                         alt="Slido QR Code"
+                         style="width: 70%; height: auto; margin: 0 auto; display: block; border: 1px solid #9A948C; border-radius: 30px; padding: 1.5rem; background-color: #ffffff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);"
+                         loading="lazy">
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-default hidden">
+            <div class="slide-content">
+                <h1>(模擬的) 焦慮牆</h1>
+                <p>謝謝大家的分享。請看看螢幕上的這些文字：</p>
+                <blockquote>"我的科系會不會消失？"</blockquote>
+                <blockquote>"我剛學會的剪輯軟體，現在 AI 也能做到了。"</blockquote>
+                <blockquote>"我根本聽不懂什麼是 LLM。"</blockquote>
+                <blockquote>"我怕我失業/找不到工作。"</blockquote>
+                <blockquote>"工具太多了，我到底該學哪一個？"</blockquote>
+                <p>當我們把這些焦慮匿名地「外化」時，你會發現第一件事情：<b>你並不孤單</b>。</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>焦慮的三種類型</h1>
+                <p>大家寫下的焦慮，大概可以歸納為三種類型：</p>
+                <ol style="font-size: clamp(1.2rem, 2.5vw, 1.75rem); margin-left: 2rem; margin-top: 1.5rem;">
+                    <li style="margin-bottom: 1rem;">
+                        <b>我聽不懂</b>
+                        <p style="font-size: 1.2rem; color: #5c5855;">AI 太技術性了，我不是理工科的，我是不是註定要被淘汰？</p>
+                    </li>
+                    <li style="margin-bottom: 1rem;">
+                        <b>我會被取代</b>
+                        <p style="font-size: 1.2rem; color: #5c5855;">擔心苦練多年的「硬實力」，AI 一秒鐘就做完了。</p>
+                    </li>
+                    <li style="margin-bottom: 1rem;">
+                        <b>我跟不上了</b>
+                        <p style="font-size: 1.2rem; color: #5c5855;">FOMO。工具每天都在出新的，永遠追不完。</p>
+                    </li>
+                </ol>
+            </div>
+        </section>
+
+        <section class="layout-default hidden">
+            <div class="slide-content">
+                <h1>我的焦慮：當 AI 忘了我</h1>
+                <p>大家的焦慮是「怕學不會」、「怕跟不上」。</p>
+                <p>我的焦慮，是「我太習慣它了」。</p>
+                <p>幾週前，我發生了一個職涯中堪稱慘烈的悲劇。我在設定檔中，不小心按到了一個按鈕：「刪除所有歷史對話」。</p>
+                <p>瞬間，我這兩年多來，與 ChatGPT 建立的所有對話紀錄、所有的知識積累、所有的思考軌跡... 全沒了。</p>
+            </div>
+        </section>
+
+        <section class="layout-default hidden">
+            <div class="slide-content">
+                <h1>悲劇：它不認得我了</h1>
+                <p>我當下的第一個反應不是慌張，而是一種... 詭異的「陌生感」。</p>
+                <p>我立刻開了一個新對話框，試探性地問它：</p>
+                <blockquote>「嘿，你記得我嗎？你知道我的 MBTI 是什麼嗎？」</blockquote>
+                <p>它回我：</p>
+                <blockquote>「我是一個大型語言模型，我沒有記憶功能。我不知道你的 MBTI 是什麼。」</blockquote>
+                <p>各位能想像那個時刻嗎？它不認得我了。它變回了那個「罐頭的」、客套的、疏離的 AI 助理。</p>
+            </div>
+        </section>
+
+        <section class="layout-default hidden">
+            <div class="slide-content">
+                <h1>搶救資料與意外發現</h1>
+                <p>在那一刻，我才意識到，我的焦慮不是來自「我不會用 AI」，而是來自「AI 忘了我」。</p>
+                <p>我進入了「危機處理模式」。我像在搶救火場的資料一樣，瘋狂地把還 Cache 住的近期對話複製出來。</p>
+                <p>最後，大概只救回了 30% 不到的近期對話。</p>
+                <p>但有趣的事情發生了。</p>
+                <p>我拿著這 30% 被搶救回來的資料，重新餵給 ChatGPT，等於是強迫它重新認識我。</p>
+            </div>
+        </section>
+
+        <section class="layout-default hidden">
+            <div class="slide-content">
+                <h1>因禍得福：Data Cleaning</h1>
+                <p>我發現，我因禍得福了。</p>
+                <p>因為這些近期的資料，反而都是我近期最關心、最精要、最明確的訴求。 我等於在無意中，幫我的 AI 夥伴做了一次「Data Cleaning」（資料清理）。</p>
+                <p>當我把這些精要的指令和風格重新「校準」它之後...</p>
+                <p style="font-weight: 600; font-size: 1.8rem;">它回應的方式，突然比以前更懂我了。</p>
+            </div>
+        </section>
+
+        <section class="layout-quote hidden">
+            <div class="slide-content">
+                <h1 style="font-size: clamp(2rem, 5vw, 4rem);">從「執行者」到「校準者」</h1>
+                <p style="text-align: center; margin-top: 2rem; font-size: 1.5rem;">這件事情，帶給我一個非常大的震撼與啟發。</p>
+                <p style="text-align: center; font-size: 1.5rem;">在 AI 時代，我們的焦慮，不應該停留在「我會不會被取代」。</p>
+                <p style="text-align: center; font-size: 1.5rem;">我們應該思考的是：「我如何成為一個 AI 的<b>『校準者』</b>？」</p>
+            </div>
+        </section>
+
+        <section class="layout-default hidden">
+            <div class="slide-content">
+                <h1>從執行到定義</h1>
+                <p>過去，我們的工作價值是「執行」。</p>
+                <p>未来，AI 會是全世界最強的「執行者」。</p>
+                <p>而我們的價值，是成為「校準者」和「定義者」。</p>
+                <p>是我們，去告訴 AI，什麼是「好的」；是我們，去定義問題的邊界；是我們，在 AI 跑偏的時候，把它拉回來，重新校準。</p>
+                <p style="margin-top: 2rem; font-weight: 600;">而要做到「校準」，你就必須先聽得懂它在說什麼。</p>
+            </div>
+        </section>
+
+        <section class="layout-title">
+            <div class="slide-content">
+                <h1>釐清本質</h1>
+                <h2 style="color: var(--text-color); font-size: 2rem;">AI 到底是什麼？</h2>
+                <p style="margin-top: 2rem; font-size: 1.5rem;">（這不是一堂硬核的技術課。）</p>
+                <!-- <p style="font-size: 1.5rem;">目標：了解接下來的 20 分鐘後，能聽懂 80% 的 AI 新聞和討論。</p> -->
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>AI 科普 (一)：基礎原理</h1>
+                <!-- <p>首先，我們來談談最常聽到的三個詞。</p> -->
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>1. 機器學習 (Machine Learning)</h1>
+                <p><b>傳統程式：</b>人類寫「規則」，電腦「執行」。（計算機）</p>
+                <p><b>機器學習：</b>人類給「資料」，電腦自己「找出規則」</p>
+            </div>
+        </section>
+
+        <section class="layout-iframe">
+            <iframe src="../gen_stuff/w3-supervised-learning.html"
+                        title="監督式學習互動體驗"
+                        frameborder="0"
+                        allowfullscreen
+                        sandbox="allow-scripts allow-same-origin allow-forms">
+            </iframe>
+        </section>
+
+        <section class="layout-iframe">
+            <iframe src="../gen_stuff/w3-unsupervised-learning.html"
+                        title="非監督式學習互動體驗"
+                        frameborder="0"
+                        allowfullscreen
+                        sandbox="allow-scripts allow-same-origin allow-forms">
+            </iframe>
+        </section>
+
+        <section class="layout-default neural-bg" id="deep-learning-slide">
+            <canvas class="neural-bg-canvas" id="neural-network-canvas"></canvas>
+            <div class="slide-content">
+                <h1>2. 深度學習 (Deep Learning)</h1>
+                <p>「神經網路」(Neural Network)</p>
+                <p>模擬人類大腦的層級結構，學習更複雜、更抽象的模式。</p>
+                <ul style="font-size: 100% !important;">
+                    <li style="font-size: 100% !important;">神經元 (Neuron)：每個節點接收多個輸入，進行加權、求和，再經「啟動函數」決定輸出。</li>
+                    <li style="font-size: 100% !important;">權重 (Weight)：控制每個輸入的重要性。</li>
+                    <li style="font-size: 100% !important;">偏置 (Bias)：幫助模型調整輸出。</li>
+                    <li style="font-size: 100% !important;">啟動函數 (Activation Function)：讓模型具備非線性能力（如 ReLU、Sigmoid）</li>
+                </ul>
+                <blockquote style="font-size: 100% !important;">(e.g., 給 10 萬張貓的照片，電腦自己學會「貓」的規則)</blockquote>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>3. 生成式 AI (Generative AI)</h1>
+                <h2>引爆我們焦慮的主角</h2>
+                <br>
+                <p style="font-size: 120% !important;"><b>傳統 AI：</b>工作是「分析」或「分類」或「預測」。</p>
+                <blockquote style="font-size: 120% !important;">(e.g., 判斷是不是垃圾郵件、預測股價)</blockquote>
+                <p style="font-size: 120% !important;"><b>生成式 AI：</b>工作是「創造」(Create)。</p>
+                <blockquote style="font-size: 120% !important;">(e.g., 生成一個飛天豬、寫一篇「出軌都是對方的錯」新聞稿)</blockquote>
+                <p style="font-weight: 600; font-size: 120% !important;">它創造文字、圖片、音樂、程式碼。這就是為什麼我們感覺它「像人」。</p>
+            </div>
+        </section>
+
+        <!-- AI 概念關係圖 -->
+        <section class="layout-default">
+            <div class="interactive-diagram">
+                <div style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <div class="summary-box-container">
+                        <div class="summary-box">
+                            <h4>機器學習</h4>
+                            <p>讓電腦從資料中學習。包含但不限於「監督式」與「非監督式」兩大類型。</p>
+
+                            <div class="summary-box nested">
+                                <h4>深度學習 (Deep Learning)</h4>
+                                <p>使用複雜的多層神經網路。此技術包含但不限於監督式和非監督式學習任務，能夠處理更複雜的模式。</p>
+
+                                <div class="summary-box nested">
+                                    <h5>生成式 AI (Generative AI)</h5>
+                                    <p>基於大型深度學習模型，專注於「創造」全新的內容，而不僅是分析或預測。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>AI 科普 (二)：GenAI 的核心架構</h1>
+                <p>驅動這一切的背後，就是那個最關鍵的技術...</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>Transformer (轉換器)</h1>
+                <p><b>論文：</b><a href="https://proceedings.neurips.cc/paper_files/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf" target="_blank" rel="noopener noreferrer">《Attention is All You Need》(2017, Google)</a></p>
+                <p><b>解決的問題：</b>傳統 AI 必須「依序」閱讀，讀到後面就忘了前面。</p>
+                <p><b>Transformer 的創新：</b>「自我注意力」(Self-Attention)。</p>
+                <!-- <p><b>白話文：</b>它不是一個一個字讀，它是一口氣把整篇文章「看透」，它理解的是「上下文」。</p>
+                <p style="font-weight: 600;">這項創新讓 AI 的訓練可以「大規模並行化」，效率和效果都產生了核彈級的飛躍。</p> -->
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content" style="text-align: center;">
+                <h1><span style="color: var(--current-blue);">蘋果</span>妹介紹<span style="color: var(--current-blue);">蘋果</span>給不喜歡吃<span style="color: var(--current-blue);">蘋果</span>的粉絲</h1>
+                <p style="font-size: 2rem; color: var(--accent-color);">同一個詞，不同的語境，不同的意義</p>
+            </div>
+        </section>
+
+        <!-- 投影片 5: AI 下一個詞預測 -->
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>AI 下一個詞的預測</h1>
+                <h2 style="font-size: clamp(1.2rem, 3vw, 1.75rem); font-weight: 300; color: var(--accent-color); margin-top: 1rem;">Next-Word Prediction</h2>
+            </div>
+        </section>
+
+        <!-- 投影片 6: AI 文字生成原理 -->
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>AI 文字生成原理：機率接龍</h1>
+                <p>Transformer 模型核心原則：給定一段文字輸入，它會預測接下來最可能出現的下一個詞是什麼。</p>
+
+                <div class="interactive-diagram" style="margin: 2rem auto; max-width: 800px;">
+                    <div style="text-align: center; margin-bottom: 1.5rem;">
+                        <h4 style="color: var(--accent-color); margin-bottom: 1rem; font-size: clamp(1.2rem, 2.5vw, 1.75rem);">輸入：「無心插柳柳..」</h4>
+                        <button class="game-button" onclick="showNextWordProbabilities()">點擊查看 AI 預測的下一個詞機率</button>
+                    </div>
+
+                    <div id="probability-display" style="display: none;">
+                        <h5 style="color: var(--highlight-color); margin-bottom: 1rem; font-size: clamp(1.1rem, 2.2vw, 1.5rem); font-weight: 600;">AI 預測的下一個詞機率分佈：</h5>
+                        <div id="word-probabilities" style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin: 1rem 0;">
+                            <!-- 機率條會在這裡動態生成 -->
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <p style="font-size: clamp(1rem, 1.8vw, 1.3rem); color: var(--text-color);">AI 會根據上下文「無心插柳柳成蔭」的語境，給出最符合詩意和邏輯的下一個詞。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 投影片 7: 數學原理 Logits 與 Softmax -->
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>Logits 與 Softmax (參考資訊)</h1>
+                <p>Transformer 計算出每個詞彙的<strong>原始分數 (Logits)</strong>。Logits 代表了每個詞彙的可能性，但尚未標準化。</p>
+                <p>Softmax 函數將原始分數轉換為機率分佈，確保所有選項的機率總和為1。</p>
+                <div class="math-container">
+                    <p style="font-weight: 600; margin-bottom: 1.5rem;">公式：Logit $z_i$ 轉換為機率 $P_i$：</p>
+                    <div style="text-align: center; margin: 2rem 0; font-size: clamp(1.5rem, 3vw, 2rem);">
+                        $$P_i = \frac{e^{z_i}}{\sum_{j=1}^{N} e^{z_j}}$$
+                    </div>
+                    <p style="margin-top: 1.5rem;">• 轉換後，所有詞彙的機率總和為 1，就是下一個字詞</p>
+                </div>
+            </div>
+        </section>
+
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>QKV (Query, Key, Value)</h1>
+                <p>Transformer「注意力機制」的運作核心。</p>
+                <ul>
+                    <li><b>Query (查詢)：</b>你的「問題」。</li>
+                    <li><b>Key (鍵)：</b>每本書的「標籤」或「索引」。</li>
+                    <li><b>Value (價值)：</b>書的「真正內容」。</li>
+                </ul>
+                <p style="font-weight: 600;">QKV 就是 AI 用來「在上下文中快速索引」的機制。</p>
+            </div>
+        </section>
+
+        <!-- 投影片：QKV 數學原理 -->
+        <section class="layout-default scrollable">
+            <div class="slide-content">
+                <h1>QKV 數學原理：用「暴君的廚師」來理解</h1>
+
+                <h2 style="font-size: clamp(1.4rem, 2.8vw, 1.8rem); font-weight: 600; color: var(--accent-color); margin-top: 2rem; margin-bottom: 1rem;">生活化類比：暴君的廚師</h2>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 2rem 0;">
+                    <div style="background: linear-gradient(135deg, rgba(154, 148, 140, 0.8), rgba(154, 148, 140, 0.6)); padding: 2rem; border-radius: 10px; text-align: center; border: 1px solid var(--line-color);">
+                        <h4 style="color: white; margin: 0 0 1.5rem 0; font-size: clamp(1.8rem, 3.5vw, 2.2rem);">🔍 Query (Q)</h4>
+                        <p style="color: white; margin: 0; font-size: clamp(1.3rem, 2.5vw, 1.6rem);"><strong>「暴君今天想吃什麼？」</strong></p>
+                        <p style="color: white; margin: 1rem 0 0 0; font-size: clamp(1.1rem, 2vw, 1.3rem);">搜尋的目標</p>
+                    </div>
+                    <div style="background: linear-gradient(135deg, rgba(140, 134, 123, 0.8), rgba(140, 134, 123, 0.6)); padding: 2rem; border-radius: 10px; text-align: center; border: 1px solid var(--line-color);">
+                        <h4 style="color: white; margin: 0 0 1.5rem 0; font-size: clamp(1.8rem, 3.5vw, 2.2rem);">🏷️ Key (K)</h4>
+                        <p style="color: white; margin: 0; font-size: clamp(1.3rem, 2.5vw, 1.6rem);"><strong>「這個食材適合做什麼？」</strong></p>
+                        <p style="color: white; margin: 1rem 0 0 0; font-size: clamp(1.1rem, 2vw, 1.3rem);">被搜尋的標籤</p>
+                    </div>
+                    <div style="background: linear-gradient(135deg, rgba(107, 139, 164, 0.8), rgba(107, 139, 164, 0.6)); padding: 2rem; border-radius: 10px; text-align: center; border: 1px solid var(--line-color);">
+                        <h4 style="color: white; margin: 0 0 1.5rem 0; font-size: clamp(1.8rem, 3.5vw, 2.2rem);">🍽️ Value (V)</h4>
+                        <p style="color: white; margin: 0; font-size: clamp(1.3rem, 2.5vw, 1.6rem);"><strong>「實際的料理內容」</strong></p>
+                        <p style="color: white; margin: 1rem 0 0 0; font-size: clamp(1.1rem, 2vw, 1.3rem);">內容的價值</p>
+                    </div>
+                </div>
+
+                <!-- <h2 style="font-size: clamp(1.4rem, 2.8vw, 1.8rem); font-weight: 600; color: var(--accent-color); margin-top: 2rem; margin-bottom: 1rem;">數學原理：</h2>
+                <p>• 先確認暴君的今天的口味（使用者的問題即是 Query）</p>
+                <p>• 每個食材（詞彙嵌入 $X$）就像一塊生肉，有無限的料理可能性（產生向量）</p>
+                <p>• 透過不同的「料理手法」（權重矩陣），我們可以從同一塊肉做出不同的料理（產出回應）</p> -->
+
+                <h2 style="font-size: clamp(1.4rem, 2.8vw, 1.8rem); font-weight: 600; color: var(--accent-color); margin-top: 2rem; margin-bottom: 1rem; cursor: pointer;">數學原理：縮放點積注意力 （參考資訊）</h2>
+                <div class="reveal-text reveal-block">
+                    <p>• Transformer 採用的是「縮放點積注意力」（Scaled Dot-Product Attention）。</p>
+                    <p>• 注意力分數計算 ( $Q K^T$ )：將 Query 矩陣與 Key 矩陣的轉置相乘 (點積)，計算出所有詞彙之間的相似度或相關性。</p>
+                    <p>• 公式：</p>
+                    <div style="text-align: center; margin: 2rem 0;">
+                        <div style="font-size: clamp(1.5rem, 3vw, 2rem);">
+                            $$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right) V$$
+                        </div>
+                    </div>
+
+                    <table style="margin-top: 2rem;">
+                        <thead>
+                            <tr>
+                                <th>數學符號</th>
+                                <th>意義</th>
+                                <th>白話解釋</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>$Q K^T$</td>
+                                <td>點積相似度</td>
+                                <td>查詢 (Q) 與所有標題 (K) 的比對結果。</td>
+                            </tr>
+                            <tr>
+                                <td>$\sqrt{d_k}$</td>
+                                <td>縮放因子</td>
+                                <td>用於防止向量維度 $d_k$ 過大時，點積結果也變得太大，導致 Softmax 運算後梯度變得不穩定。</td>
+                            </tr>
+                            <tr>
+                                <td>Softmax</td>
+                                <td>正規化</td>
+                                <td>將相似度分數轉換成總和為 1 的加權機率分佈。</td>
+                            </tr>
+                            <tr>
+                                <td>$\times V$</td>
+                                <td>加權求和</td>
+                                <td>根據機率權重，從 Value (內容) 中提取上下文資訊。</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>AI 科普 (三)：術語與關鍵應用</h1>
+                <!-- <p>好，有了基礎原理和核心架構，我們來看看 AI 界的術語和應用。</p> -->
+            </div>
+        </section>
+
+        <section class="layout-title">
+            <div class="slide-content">
+                <h2 style="font-size: clamp(2rem, 3vw, 1.75rem); font-weight: 400; color: var(--accent-color); margin-top: 2rem; margin-bottom: 1rem;">想一下，假如要製作一個大腦代理人，它需要具備哪些核心功能？</h2>
+            </div>
+        </section>
+
+        <section class="layout-iframe">
+            <iframe src="ai-agent-figure.html"
+                        title="代理人大腦本體"
+                        frameborder="0"
+                        allowfullscreen
+                        sandbox="allow-scripts allow-same-origin allow-forms">
+            </iframe>
+        </section>
+
+        <section class="layout-default scrollable">
+            <div class="slide-content">
+                <h1>Vector Database (向量資料庫)</h1>
+                <p><b>支援「語意搜尋」（semantic search）</b>、儲存與比較的向量的資料庫。</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>術語</th>
+                            <th>功能</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Token</td>
+                            <td>模型讀取文字、圖像、音訊的最小單位</td>
+                        </tr>
+                        <tr>
+                            <td>Vector Embedding</td>
+                            <td>把文字轉成數字語意向量</td>
+                        </tr>
+                        <tr>
+                            <td>Vector Database</td>
+                            <td>儲存與搜尋向量</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!-- 嵌入 SVG -->
+                <div style="width: 100%; max-width: 1100px; margin: 2rem auto; overflow: visible; transform: translateX(-30px);">
+                    <svg viewBox="0 0 780 260" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: auto;" xmlns="http://www.w3.org/2000/svg" font-family="Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif">
+                        <!-- 定義箭頭 -->
+                        <defs>
+                            <marker id="arrow-vector-db" markerWidth="10" markerHeight="10" refX="10" refY="5" orient="auto">
+                                <path d="M0,0 L10,5 L0,10 Z" fill="#9A948C"/>
+                            </marker>
+                        </defs>
+
+                        <!-- Tokens -->
+                        <rect x="40" y="80" width="200" height="100" rx="12" ry="12" fill="#EAEBE6" stroke="#6B8BA4" stroke-width="2"/>
+                        <text x="140" y="115" text-anchor="middle" font-size="16" fill="#3D3A37" font-weight="500">Tokens</text>
+                        <text x="140" y="140" text-anchor="middle" font-size="12" fill="#5c5855">(e.g. "Chat", "GPT", "is")</text>
+
+                        <!-- Arrow 1 -->
+                        <line x1="240" y1="130" x2="310" y2="130" stroke="#9A948C" stroke-width="2" marker-end="url(#arrow-vector-db)"/>
+                        <text x="275" y="115" text-anchor="middle" font-size="12" fill="#5c5855">Embedding</text>
+
+                        <!-- Embedding -->
+                        <rect x="310" y="80" width="200" height="100" rx="12" ry="12" fill="#F5F4F0" stroke="#8c867b" stroke-width="2"/>
+                        <text x="410" y="115" text-anchor="middle" font-size="16" fill="#3D3A37" font-weight="500">Vector Embedding</text>
+                        <text x="410" y="140" text-anchor="middle" font-size="12" fill="#5c5855">[0.12, -0.45, 0.77, ...]</text>
+
+                        <!-- Arrow 2 -->
+                        <line x1="510" y1="130" x2="580" y2="130" stroke="#9A948C" stroke-width="2" marker-end="url(#arrow-vector-db)"/>
+                        <text x="545" y="115" text-anchor="middle" font-size="12" fill="#5c5855">Store/Search</text>
+
+                        <!-- Vector Database -->
+                        <rect x="580" y="80" width="200" height="100" rx="12" ry="12" fill="#d1d1c2" stroke="#9A948C" stroke-width="2"/>
+                        <text x="680" y="110" text-anchor="middle" font-size="16" fill="#3D3A37" font-weight="500">Vector Database</text>
+                        <text x="680" y="135" text-anchor="middle" font-size="12" fill="#5c5855">Semantic Search</text>
+                        <text x="680" y="155" text-anchor="middle" font-size="12" fill="#5c5855">("pet" → finds "dog")</text>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-two-column reverse">
+            <div class="slide-content">
+                <div class="text-column">
+                    <h1>Token 計算方式</h1>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>語言</th>
+                                <th>1 token 約為</th>
+                                <th>範例</th>
+                                <th>說明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>英文</td>
+                                <td> 4 個字母、0.75 個單字</td>
+                                <td>"ChatGPT is smart" ≈ 5 tokens</td>
+                                <td>拆成子字根或常見片段</td>
+                            </tr>
+                            <tr>
+                                <td>中文（繁體）</td>
+                                <td> 1~1.2 個中文字</td>
+                                <td>「我喜歡學習」 ≈ 5 tokens</td>
+                                <td>幾乎逐字切分</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <blockquote>結論：中文比較耗資源</blockquote>
+                </div>
+                <div class="image-column">
+                    <img src="../pic/1115/token-per-month.jpg"
+                         alt="Token"
+                         loading="lazy">
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <div style="text-align: center; width: 100%;">
+                    <img src="../pic/w5-thanks.jpg"
+                         alt="感謝圖片"
+                         style="width: 100%; max-width: clamp(250px, 40vw, 500px); height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);"
+                         loading="lazy">
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>ChatGPT 每週用戶增長趨勢</h1>
+                <div class="chart-container" style="position: relative; width: 100%; max-width: 1000px; margin: 2rem auto; height: clamp(300px, 50vw, 500px);">
+                    <canvas id="chatgpt-growth-chart"></canvas>
+                </div>
+                <p style="text-align: center; color: var(--accent-color); font-size: clamp(0.9rem, 1.5vw, 1.1rem); margin-top: 1rem;">
+                    數據來源：<a href="https://nerdynav.com/chatgpt-statistics/" target="_blank" rel="noopener noreferrer">Nerdynav</a>
+                </p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>禮貌成本</h1>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-top: 2rem; align-items: start;">
+                    <div style="cursor: pointer;" class="reveal-trigger">
+                        <p><strong>一年會花多少資源在這些禮貌詞彙上？</strong></p>
+                        <ul style="font-size: clamp(1rem, 1.8vw, 1.3rem); margin-top: 1rem;">
+                            <li style="margin-bottom: 0.8rem;">ChatGPT 日均活躍用戶：1億人</li>
+                            <li style="margin-bottom: 0.8rem;">每人每日平均對話輪數：20輪</li>
+                            <li style="margin-bottom: 0.8rem;">每輪中平均含 1 次「請」或「謝謝」類字眼</li>
+                            <li style="margin-bottom: 0.8rem;">每次「請 / 謝謝」觸發模型多產生 10 個 token（模型會回一句「不客氣」或「當然可以」）</li>
+                            <li style="margin-bottom: 0.8rem;">每 token 產生的平均能耗約 0.00003 kWh（度）</li>
+                        </ul>
+                    </div>
+                    <div class="reveal-text reveal-block" id="politeness-cost-result">
+                        <p style="font-size: clamp(1rem, 1.8vw, 1.3rem); margin-bottom: 1rem;"><strong>全年額外能源消耗：</strong><br>
+                        7.3兆 × 0.00003 kWh ≈ 219,000,000 kWh / 年</p>
+                        <p style="font-size: clamp(1rem, 1.8vw, 1.3rem); margin-bottom: 2rem;"><strong>折算為電費成本（以每度電 3 台幣估）：</strong><br>
+                        219M kWh × 3 台幣 ≈ </p>
+                        <p style="text-align: center; margin-top: 2rem;">
+                            <span style="font-size: clamp(3rem, 8vw, 5rem); color: rgba(180, 120, 120, 1); font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">65.7億 / 年</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>大推理模型<span style="font-size: 50%;">（Large Reasoning Model, LRM）</span></h1>
+                <p>進階版的 LLM，專門針對多步邏輯推理、結構化思考與複雜問題求解而設計。</p>
+                <p>它擅長「思維鏈」(Chain of Thought)，也就是把一個大問題，拆解成好幾個邏輯清晰的小步驟，然後一步一步去解決。</p>
+                <blockquote>如果 LLM 是「博學的作家」，<br>LRM 就是「冷靜的策略家」。</blockquote>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>MoE <span style="font-size: 50%;">(Mixture of Experts)</span></h1>
+                <p>一種讓大型語言模型<b>內部分工協作</b>的架構。</p>
+                <p>在語言模型內選擇最適的「子專家網路」參與運算，以最小的資源達成最大的效果。</p>
+                <blockquote>(e.g., 數學專家、歷史專家、程式碼專家...)</blockquote>
+                <p><b>運作：</b>一個「路由器」(Router) 先判斷問題類型，再交給對應的「專家」處理。</p>
+                <p style="font-weight: 600;">像是人類不同腦區負責不同功能，既能保持功能運作，又能大幅降低運算成本、加快速度。</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>RAG <span style="font-size: 50%;">(Retrieval-Augmented Generation，檢索增強生成)</span></h1>
+                <p>一種讓大型語言模型在生成答案前，先從外部資料庫搜尋（Retrieval）再生成回應（Generation） 的技術，<b>部分解決「幻覺」和「知識過時」的問題</b></p>
+                <p><b>RAG 概念：</b>讓 AI 進行「開書考試」(Open-book Test)。</p>
+                <blockquote><b>Step 1 (檢索): </b>先去內部資料庫「找出」原文。
+                <br><b>Step 2 (生成): </b>看著原文「總結」答案給你。
+                </blockquote>
+            </div>
+        </section>
+
+        <section class="layout-title">
+            <div class="slide-content">
+                <h2 style="font-weight: 600;">如果要讓 AI 代理人去使用別人開發的工具或是和其他 AI 溝通？</h2>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>Agentic AI (代理式人工智慧) </h1>
+                <p><b>現今主流 AI：</b>「被動的回應者」。</p>
+                <p><b>Agentic AI：</b>「主動的執行者」。（正在發生）</p>
+                <p style="font-size: 1.2rem;">你不再是給它「問題」，你是給它「目標」，它會自己「推理」、「行動」、「呼叫工具」。<br><b style="color: #92a247;">在你的授權下 (Human-in-the-loop)，主動執行任務。</b></p>
+            </div>
+        </section>
+
+        <section class="layout-default scrollable">
+            <div class="slide-content">
+                <h2><b style="color: #70a8d4;">MCP</b> (<b style="color: #70a8d4;">Model Context Protocol</b>, from Anthropic)：專注於單一代理與外部工具、資料的連接</h2>
+                <h2><b style="color: #d9a548;">A2A</b> (<b style="color: #d9a548;">Agent2Agent Protocol</b>, from Google)：專注於 AI 代理與 AI 代理之間的溝通協作</h2>
+                <div class="mermaid">
+                    flowchart TD
+                    subgraph AgentA["Agent A"]
+                           A["Agent A"]
+                           A_DB[("資料庫")]
+                           A_API[("HTTP API")]
+                     end
+                    subgraph AgentB["Agent B"]
+                           B["Agent B"]
+                           B_FS[("檔案系統")]
+                           B_QUEUE[("工作佇列")]
+                     end
+                    subgraph AgentC["Agent C"]
+                           C["Agent C"]
+                           C_VEC[("Vector DB")]
+                           C_FUNC[("內部函式")]
+                     end
+                       A -- MCP --> A_DB & A_API
+                       B -- MCP --> B_FS & B_QUEUE
+                       C -- MCP --> C_VEC & C_FUNC
+                       A <-- A2A --> B
+                       B <-- A2A --> C
+
+                        A:::agent
+                        A_DB:::tool
+                        A_API:::tool
+                        B:::agent
+                        B_FS:::tool
+                        B_QUEUE:::tool
+                        C:::agent
+                        C_VEC:::tool
+                        C_FUNC:::tool
+                       classDef agent fill:#EAEBE6,stroke:#d9a548,stroke-width:2
+                       classDef tool fill:#F5F4F0,stroke:#70a8d4,stroke-width:2
+                       classDef link fill:none,stroke:#70a8d4,stroke-width:2,stroke-dasharray:6 4
+                       linkStyle 0 stroke:#70a8d4,fill:none
+                       linkStyle 1 stroke:#70a8d4,fill:none
+                       linkStyle 2 stroke:#70a8d4,fill:none
+                       linkStyle 3 stroke:#70a8d4,fill:none
+                       linkStyle 4 stroke:#70a8d4,fill:none
+                       linkStyle 5 stroke:#70a8d4,fill:none
+                       linkStyle 6 stroke:#d9a548,fill:none
+                       linkStyle 7 stroke:#d9a548,fill:none
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-two-column">
+            <div class="slide-content">
+                <div class="image-column">
+                    <iframe src="a2a-mcp-interaction.html"
+                            title="範例分享：輸入座標搜尋方圓 2 公里內好評價餐廳"
+                            frameborder="0"
+                            allowfullscreen
+                            sandbox="allow-scripts allow-same-origin allow-forms"
+                            style="width: 100%; height: 600px; border-radius: 4px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+                    </iframe>
+                </div>
+                <div class="text-column">
+                    <div class="mermaid">
+                        flowchart TD
+                        User["使用者<br/>User"] -->|"輸入座標與需求"| RootAgent["root_agent<br/>(A2A 協調者)"]
+                        RootAgent -->|"A2A 委派"| MapAgent["map_agent<br/>(地圖搜尋)"]
+                        MapAgent -->|"MCP 呼叫"| MapTool["地圖服務<br/>Google Maps API"]
+                        MapTool -->|"回傳餐廳清單"| MapAgent
+                        MapAgent -->|"A2A 回報"| RootAgent
+                        RootAgent -->|"A2A 委派"| ReviewAgent["review_agent<br/>(評價篩選)"]
+                        ReviewAgent -->|"MCP 呼叫"| ReviewTool["評論服務<br/>Google Reviews API"]
+                        ReviewTool -->|"回傳評價資料"| ReviewAgent
+                        ReviewAgent -->|"A2A 回報"| RootAgent
+                        RootAgent -->|"回覆使用者"| User
+
+                        style User fill:#f9f9f9,stroke:#3D3A37,stroke-width:2px,color:#3D3A37
+                        style RootAgent fill:#a67c7c,stroke:#3D3A37,stroke-width:2px,color:#3D3A37
+                        style MapAgent fill:#7a8570,stroke:#3D3A37,stroke-width:2px,color:#3D3A37
+                        style ReviewAgent fill:#b89a6f,stroke:#3D3A37,stroke-width:2px,color:#3D3A37
+                        style MapTool fill:#e8e8e8,stroke:#3D3A37,stroke-width:1px,color:#3D3A37
+                        style ReviewTool fill:#e8e8e8,stroke:#3D3A37,stroke-width:1px,color:#3D3A37
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>世界的新競技場</h1>
+                <p>AI 產業現況</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <div style="width: 100%; max-width: 1200px; margin: 0 auto;">
+                    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: auto;" xmlns="http://www.w3.org/2000/svg" font-family="Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif">
+
+                        <defs>
+                            <filter id="wabiSabi" x="-5%" y="-5%" width="110%" height="110%">
+                                <feTurbulence type="fractalNoise" baseFrequency="0.03 0.05" numOctaves="1" seed="5" result="turbulence"/>
+                                <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="2.5" xChannelSelector="R" yChannelSelector="G"/>
+                            </filter>
+                        </defs>
+
+                        <rect width="1920" height="1080" fill="#F5F4F0" />
+
+                        <text x="960" y="220" font-size="90px" fill="#3D3A37" text-anchor="middle" font-weight="300" filter="url(#wabiSabi)">
+                            全球 AI 競賽
+                        </text>
+
+                        <g transform="translate(480, 500)" text-anchor="middle">
+                            <g transform="scale(1.8) translate(0, -90)" fill="none" stroke="#5E6C6A" stroke-width="3" filter="url(#wabiSabi)">
+                                <path d="M-20,0 C-20-33.1, 20-33.1, 20,0 C20,18.8, 5,25, 0,40 C-5,25, -20,18.8, -20,0 Z" fill="#C2B8A3" stroke="#A9B2AE" />
+                                <path d="M-10,40 L10,40" stroke-linecap="round" />
+                                <path d="M-12,45 L12,45" stroke-linecap="round" />
+                                <path d="M-10,50 L10,50" stroke-linecap="round" />
+                                <path d="M-8,10 C-5,15, 5,15, 8,10" stroke-width="2" />
+                                <path d="M-5,15 C0,20, 0,20, 5,15" stroke-width="2" />
+                            </g>
+                            <text y="150" font-size="60px" fill="#5E6C6A" font-weight="600" filter="url(#wabiSabi)">
+                                創新者
+                            </text>
+                            <text y="230" font-size="45px" fill="#9A948C" font-weight="400">
+                                美國
+                            </text>
+                        </g>
+
+                        <g transform="translate(960, 500)" text-anchor="middle">
+                            <g transform="scale(1.8) translate(0, -90)" fill="none" stroke="#5E6C6A" stroke-width="3" filter="url(#wabiSabi)">
+                                <path d="M0,-30 C15,-15, 15,30, 0,50 C-15,30, -15,-15, 0,-30 Z" fill="#F5F4F0" />
+                                <path d="M0,-30 C15,-15, 15,30, 0,50" />
+                                <path d="M0,-30 C-15,-15, -15,30, 0,50" />
+                                <path d="M-15,30 C-20,40, -10,40, 0,50" fill="#C2B8A3" stroke="#A9B2AE" />
+                                <path d="M15,30 C20,40, 10,40, 0,50" fill="#C2B8A3" stroke="#A9B2AE" />
+                                <circle cx="0" cy="0" r="6" fill="#F5F4F0" stroke-width="2" />
+                            </g>
+                            <text y="150" font-size="60px" fill="#5E6C6A" font-weight="600" filter="url(#wabiSabi)">
+                                挑戰者
+                            </text>
+                            <text y="230" font-size="45px" fill="#9A948C" font-weight="400">
+                                中國
+                            </text>
+                        </g>
+
+                        <g transform="translate(1440, 500)" text-anchor="middle">
+                            <g transform="scale(1.8) translate(0, -90)" fill="none" stroke="#5E6C6A" stroke-width="3" filter="url(#wabiSabi)">
+                                <path d="M-25,-20 C-25,10, 0,40, 0,50 C0,40, 25,10, 25,-20 L25,-25 C25,-40, -25,-40, -25,-25 Z" fill="#C2B8A3" stroke="#A9B2AE" />
+                                <path d="M-18,-15 C-18,5, 0,30, 0,40 C0,30, 18,5, 18,-15 L18,-20 C18,-30, -18,-30, -18,-20 Z" stroke-width="2.5" />
+                            </g>
+                            <text y="150" font-size="60px" fill="#5E6C6A" font-weight="600" filter="url(#wabiSabi)">
+                                監管者
+                            </text>
+                            <text y="230" font-size="45px" fill="#9A948C" font-weight="400">
+                                歐盟
+                            </text>
+                        </g>
+
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-default scrollable">
+            <div class="slide-content">
+                <h1>全球 AI 競爭力指標比較</h1>
+
+                <!-- 競爭力指標表格 -->
+                <div style="max-width: 1400px; margin: 0 auto;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: clamp(0.85rem, 1.5vw, 1.1rem);">
+                        <thead>
+                            <tr>
+                                <th style="border: 1px solid var(--header-bg); padding: 1rem; background-color: var(--header-bg); font-weight: 600; text-align: left; width: 25%;">指標</th>
+                                <th style="border: 1px solid var(--header-bg); padding: 1rem; background-color: rgba(107, 139, 164, 0.2); font-weight: 600; text-align: center; width: 25%;">US</th>
+                                <th style="border: 1px solid var(--header-bg); padding: 1rem; background-color: rgba(154, 148, 140, 0.2); font-weight: 600; text-align: center; width: 25%;">CN</th>
+                                <th style="border: 1px solid var(--header-bg); padding: 1rem; background-color: rgba(209, 209, 194, 0.3); font-weight: 600; text-align: center; width: 25%;">EU</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; background-color: rgba(255, 255, 255, 0.4); font-weight: 500; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">私人 AI 投資總額 (2024)</td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-weight: 600; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">$1091 億美元</td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">$93 億美元</td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">英國：$45 億美元</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; background-color: rgba(255, 255, 255, 0.4); font-weight: 500; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">AI 專利總數 (2023)</td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">14.2%</td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-weight: 600; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">69.7%<br><small style="color: var(--accent-color);">(全球第一)</small></td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">2.77%</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; background-color: rgba(255, 255, 255, 0.4); font-weight: 500; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">AI 論文發表總數 (2023)</td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">9.2%</td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-weight: 600; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">23.2%<br><small style="color: var(--accent-color);">(全球第一)</small></td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">15.2%</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; background-color: rgba(255, 255, 255, 0.4); font-weight: 500; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">高影響力研究 (2021-2023 Top 100)</td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-weight: 600; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">50%<br><small style="color: var(--accent-color);">數量最多</small></td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">31%<br><small style="color: #5c5855;">與美國差距縮小</small></td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">--</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; background-color: rgba(255, 255, 255, 0.4); font-weight: 500; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">知名 AI 模型數量 (2024)</td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-weight: 600; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">40 個</td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-weight: 600; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">15 個</td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-weight: 600; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">3 個</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; background-color: rgba(255, 255, 255, 0.4); font-weight: 500; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">政府重大投資承諾</td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">$52 億美元<br><small style="color: #5c5855;">(2013-2023 合約總額)</small></td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-weight: 600; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">$475 億美元<br><small style="color: #5c5855;">(半導體基金)</small></td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-weight: 600; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">€1090 億歐元<br><small style="color: #5c5855;">(法國基礎設施)</small></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p style="text-align: left; color: var(--accent-color); font-size: clamp(0.75rem, 1.2vw, 0.9rem); margin-top: 1rem; margin-bottom: 0;">
+                        數據來源：<a href="https://aiindex.stanford.edu/" target="_blank" rel="noopener noreferrer">HAI AI Index Report 2025</a>
+                    </p>
+                </div>
+
+                <p style="text-align: center; margin-top: 2rem; font-size: clamp(0.9rem, 1.5vw, 1.1rem); color: #5c5855; font-style: italic;">
+                </p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h2 style="font-size: clamp(1.5rem, 3vw, 2.5rem); margin-bottom: 1rem; color: var(--text-color);">Top 100 學術研究數量</h2>
+                <!-- <p style="font-size: clamp(0.9rem, 1.5vw, 1.1rem); color: #5c5855; margin-bottom: 2rem; text-align: center; max-width: 90%;">
+                    （請注意，由於一篇論文可能有多個不同部門或國家的作者，因此總數可能會超過 100）：
+                </p> -->
+
+                <div class="chart-container" style="position: relative; width: 100%; max-width: 1000px; margin: 2rem auto;">
+                    <canvas id="sector-distribution-chart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-default scrollable">
+            <div class="slide-content">
+                <h2 style="font-size: clamp(1.8rem, 3.5vw, 2.8rem); margin-bottom: 2rem; color: var(--text-color); text-align: center; font-weight: 600;">
+                    AI 模型開發的大競賽時代
+                </h2>
+
+                <div style="max-width: 1400px; margin: 0 auto; background-color: rgba(255, 255, 255, 0.6); border-radius: 8px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+                    <table style="width: 100%; border-collapse: collapse; font-size: clamp(1.2rem, 1.8vw, 1.425rem);">
+                        <thead>
+                            <tr style="background-color: var(--header-bg);">
+                                <th style="border: 1px solid var(--line-color); padding: 0.6rem; text-align: left; font-weight: 600; width: 12%;">國家</th>
+                                <th style="border: 1px solid var(--line-color); padding: 0.6rem; text-align: left; font-weight: 600;">企業/機構</th>
+                                <th style="border: 1px solid var(--line-color); padding: 0.6rem; text-align: center; font-weight: 600; width: 12%;">模型數量</th>
+                                <th style="border: 1px solid var(--line-color); padding: 0.6rem; text-align: left; font-weight: 600;">代表模型</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 美國 -->
+                            <tr>
+                                <td rowspan="3" style="border: 1px solid var(--line-color); padding: 0.6rem; text-align: center; vertical-align: middle; font-weight: 600; font-size: clamp(1.3rem, 2vw, 1.6rem); color: var(--accent-color); background-color: rgba(107, 139, 164, 0.1);">
+                                    <span style="font-size: 1.5em; margin-right: 0.3em;">🇺🇸</span><br>
+                                    US
+                                </td>
+                                <td style="border: 1px solid var(--line-color); padding: 0.6rem;">
+                                    <img src="../pic/1115/logos/google.png" alt="Google" style="height: 1em; vertical-align: middle; margin-right: 0.5em; display: inline-block;">
+                                    Google + DeepMind
+                                </td>
+                                <td style="border: 1px solid var(--line-color); padding: 0.6rem; text-align: center;">7</td>
+                                <td style="border: 1px solid var(--line-color); padding: 0.6rem; font-size: clamp(1.125rem, 1.5vw, 1.275rem); color: #5c5855;">
+                                    Gemini 2.5 Pro, Nano Banana
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid var(--line-color); padding: 0.6rem;">
+                                    <img src="../pic/1115/logos/openai.png" alt="OpenAI" style="height: 1em; vertical-align: middle; margin-right: 0.5em; display: inline-block;">
+                                    OpenAI
+                                </td>
+                                <td style="border: 1px solid var(--line-color); padding: 0.6rem; text-align: center;">7</td>
+                                <td style="border: 1px solid var(--line-color); padding: 0.6rem; font-size: clamp(1.125rem, 1.5vw, 1.275rem); color: #5c5855;">
+                                    GPT-5, Sora
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid var(--line-color); padding: 0.6rem;">
+                                    <img src="../pic/1115/logos/anthropic.png" alt="Anthropic" style="height: 1em; vertical-align: middle; margin-right: 0.5em; display: inline-block;">
+                                    Anthropic
+                                </td>
+                                <td style="border: 1px solid var(--line-color); padding: 0.6rem; text-align: center;">2</td>
+                                <td style="border: 1px solid var(--line-color); padding: 0.6rem; font-size: clamp(1.125rem, 1.5vw, 1.275rem); color: #5c5855;">
+                                    Claude 3
+                                </td>
+                            </tr>
+
+                            <!-- 中國 -->
+                            <tr>
+                                <td rowspan="3" style="border: 1px solid var(--line-color); padding: 0.6rem; text-align: center; vertical-align: middle; font-weight: 600; font-size: clamp(1.3rem, 2vw, 1.6rem); color: var(--accent-color); background-color: rgba(154, 148, 140, 0.1); border-top: 2px solid var(--line-color);">
+                                    <span style="font-size: 1.5em; margin-right: 0.3em;">🇨🇳</span><br>
+                                    CN
+                                </td>
+                                <td style="border: 1px solid var(--line-color); padding: 0.6rem; border-top: 2px solid var(--line-color);">
+                                    <img src="../pic/1115/logos/zhipu.png" alt="Zhipu AI" style="height: 1em; vertical-align: middle; margin-right: 0.5em; display: inline-block;">
+                                    Zhipu AI
+                                </td>
+                                <td style="border: 1px solid var(--line-color); padding: 0.6rem; text-align: center; border-top: 2px solid var(--line-color);">7</td>
+                                <td style="border: 1px solid var(--line-color); padding: 0.6rem; font-size: clamp(1.125rem, 1.5vw, 1.275rem); color: #5c5855; border-top: 2px solid var(--line-color);">
+                                    GLM-4.6
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid var(--line-color); padding: 0.6rem;">
+                                    <img src="../pic/1115/logos/alibaba.png" alt="Alibaba" style="height: 1em; vertical-align: middle; margin-right: 0.5em; display: inline-block;">
+                                    Alibaba
+                                </td>
+                                <td style="border: 1px solid var(--line-color); padding: 0.6rem; text-align: center;">6</td>
+                                <td style="border: 1px solid var(--line-color); padding: 0.6rem; font-size: clamp(1.125rem, 1.5vw, 1.275rem); color: #5c5855;">
+                                    Qwen2，Qwen2.5
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid var(--line-color); padding: 0.6rem;">
+                                    <img src="../pic/1115/logos/deepseek.png" alt="DeepSeek" style="height: 1em; vertical-align: middle; margin-right: 0.5em; display: inline-block;">
+                                    DeepSeek
+                                </td>
+                                <td style="border: 1px solid var(--line-color); padding: 0.6rem; text-align: center;">4</td>
+                                <td style="border: 1px solid var(--line-color); padding: 0.6rem; font-size: clamp(1.125rem, 1.5vw, 1.275rem); color: #5c5855;">
+                                    DeepSeek-V3
+                                </td>
+                            </tr>
+
+                            <!-- 歐洲 -->
+                            <tr>
+                                <td rowspan="2" style="border: 1px solid var(--line-color); padding: 0.6rem; text-align: center; vertical-align: middle; font-weight: 600; font-size: clamp(1.3rem, 2vw, 1.6rem); color: var(--accent-color); background-color: rgba(209, 209, 194, 0.2); border-top: 2px solid var(--line-color);">
+                                    <span style="font-size: 1.5em; margin-right: 0.3em;">🇪🇺</span><br>
+                                    EU
+                                </td>
+                                <td style="border: 1px solid var(--line-color); padding: 0.6rem; border-top: 2px solid var(--line-color);">
+                                    <img src="../pic/1115/logos/mistral.png" alt="Mistral AI" style="height: 1em; vertical-align: middle; margin-right: 0.5em; display: inline-block;">
+                                    Mistral AI
+                                </td>
+                                <td style="border: 1px solid var(--line-color); padding: 0.6rem; text-align: center; border-top: 2px solid var(--line-color);">3</td>
+                                <td style="border: 1px solid var(--line-color); padding: 0.6rem; font-size: clamp(1.125rem, 1.5vw, 1.275rem); color: #5c5855; border-top: 2px solid var(--line-color);">
+                                    Ministral
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid var(--line-color); padding: 0.6rem;">
+                                    <img src="../pic/1115/logos/isomorphic.png" alt="Isomorphic Laboratories" style="height: 1em; vertical-align: middle; margin-right: 0.5em; display: inline-block;">
+                                    Isomorphic Laboratories
+                                </td>
+                                <td style="border: 1px solid var(--line-color); padding: 0.6rem; text-align: center;">-</td>
+                                <td style="border: 1px solid var(--line-color); padding: 0.6rem; font-size: clamp(1.125rem, 1.5vw, 1.275rem); color: #5c5855;">
+                                    AlphaFold 3
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p style="text-align: left; color: var(--accent-color); font-size: clamp(0.75rem, 1.2vw, 0.9rem); margin-top: 1.5rem; margin-bottom: 0;">
+                    數據來源：<a href="https://epoch.ai/" target="_blank" rel="noopener noreferrer">Epoch AI</a>
+                </p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content" style="width: 100%; max-width: 100%; padding: 0;">
+                <div style="width: 100%; max-width: 100%; margin: 0 auto; overflow: hidden;">
+                    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: auto; max-width: 100%; display: block;" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <defs>
+                          <filter id="scribbleFilter-taiwan" x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox">
+                            <feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="3" result="noise" />
+                            <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G" />
+                          </filter>
+
+                          <!-- 顏色濾鏡：將橙色轉換為黑色，黑色背景變透明 -->
+                          <filter id="taiwanColorFilter" x="-10%" y="-10%" width="120%" height="120%">
+                            <!-- 將圖片轉為灰階以統一處理 -->
+                            <feColorMatrix type="saturate" values="0" result="grayscale"/>
+                            <!-- 使用 component transfer：將非黑色像素轉為黑色，黑色像素變透明 -->
+                            <feComponentTransfer in="grayscale">
+                              <!-- Alpha 通道：黑色（亮度低）變透明，其他變不透明 -->
+                              <feFuncA type="linear" slope="10" intercept="-9"/>
+                              <!-- RGB 通道：全部設為 0（黑色） -->
+                              <feFuncR type="discrete" tableValues="0"/>
+                              <feFuncG type="discrete" tableValues="0"/>
+                              <feFuncB type="discrete" tableValues="0"/>
+                            </feComponentTransfer>
+                          </filter>
+
+                          <rect id="softBrush" width="500" height="80" rx="10" fill="#C2B8A3" opacity="0.3"/>
+
+                          <style>
+                            .h1-taiwan {
+                              font-family: 'Handwritten', 'Noto Sans TC', sans-serif;
+                              font-size: 90px;
+                              font-weight: 700;
+                              fill: #5E6C6A;
+                              filter: url(#scribbleFilter-taiwan); /* 應用輕微手繪濾鏡 */
+                            }
+                            .h2-taiwan {
+                              font-family: 'Handwritten', 'Noto Sans TC', sans-serif;
+                              font-size: 60px;
+                              font-weight: 400;
+                              fill: #A9B2AE;
+                            }
+                          </style>
+                        </defs>
+
+                        <rect width="1920" height="1080" fill="#F4F2EF"/>
+
+                        <g transform="translate(450, 0)">
+                          <use href="#taiwanOutline" fill="#F4F2EF" stroke="#A9B2AE" stroke-width="6" opacity="0.8" filter="url(#scribbleFilter-taiwan)" />
+
+                          <use href="#taiwanOutline" fill="none" stroke="#5E6C6A" stroke-width="8" filter="url(#scribbleFilter-taiwan)" />
+
+                          <circle cx="1150" cy="550" r="100" fill="#C2B8A3" opacity="0.2" filter="url(#scribbleFilter-taiwan)" />
+                          <circle cx="950" cy="800" r="70" fill="#A9B2AE" opacity="0.15" filter="url(#scribbleFilter-taiwan)" />
+                        </g>
+
+                        <text x="200" y="450" class="h1-taiwan">那台灣的 AI 定位？</text>
+
+                        <text x="200" y="550" class="h2-taiwan">— 思考台灣的全球角色</text>
+
+                        <!-- 插入台灣輪廓圖片，應用顏色濾鏡：黑色線條，透明背景 -->
+                        <image href="../pic/1115/taiwan-mainland-curve.png" x="1000" y="300" width="750" height="600" filter="url(#taiwanColorFilter)" opacity="1" preserveAspectRatio="xMidYMid meet"/>
+                      </svg>
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content" style="position: relative;">
+                <h1>台灣 AI 伺服器市場</h1>
+
+                <!-- Heatmap 視覺化 -->
+                <div style="margin-top: 3rem; display: flex; justify-content: center; align-items: center;">
+                    <svg width="1000" height="500" viewBox="0 0 1000 500" style="max-width: 100%; height: auto;">
+                        <defs>
+                            <style>
+                                .heatmap-text {
+                                    font-family: 'Calibri', 'Segoe UI', sans-serif;
+                                    fill: #3D3A37;
+                                }
+                                .heatmap-label {
+                                    font-size: 18px;
+                                    font-weight: 600;
+                                    fill: #5E6C6A;
+                                }
+                                .heatmap-value {
+                                    font-size: 48px;
+                                    font-weight: 700;
+                                    fill: #3D3A37;
+                                }
+                                .heatmap-desc {
+                                    font-size: 14px;
+                                    fill: #9A948C;
+                                }
+                            </style>
+                        </defs>
+
+                        <!-- 80% - 最大、最深色 -->
+                        <rect x="50" y="50" width="500" height="400" rx="8" fill="#5E6C6A" opacity="0.9"/>
+                        <text x="300" y="210" class="heatmap-value" text-anchor="middle" style="fill: #FFFFFF; font-size: 62px;">80%</text>
+                        <text x="300" y="245" class="heatmap-label" text-anchor="middle" style="fill: #FFFFFF; font-size: 23px;">全球 AI 伺服器製造市佔率</text>
+                        <text x="300" y="275" class="heatmap-desc" text-anchor="middle" style="fill: #edcca8; font-size: 18px;">台灣已成為全球 AI 硬體</text>
+                        <text x="300" y="295" class="heatmap-desc" text-anchor="middle" style="fill: #edcca8; font-size: 18px;">製造的核心樞紐</text>
+
+                        <!-- 15 億 - 中等大小、中等顏色 -->
+                        <rect x="600" y="100" width="300" height="250" rx="8" fill="#9A948C" opacity="0.75"/>
+                        <text x="750" y="200" class="heatmap-value" text-anchor="middle" fill="#F5F4F0" style="font-size: 50px;">15 億</text>
+                        <text x="750" y="230" class="heatmap-label" text-anchor="middle" fill="#F5F4F0" style="font-size: 22px;">美元外移投資</text>
+                        <text x="750" y="260" class="heatmap-desc" text-anchor="middle" style="fill: #F0F1EE; font-size: 17px;">廣達 10 億（墨西哥）</text>
+                        <text x="750" y="280" class="heatmap-desc" text-anchor="middle" style="fill: #F0F1EE; font-size: 17px;">緯創 5 億（美國）</text>
+                        <text x="750" y="300" class="heatmap-desc" text-anchor="middle" style="fill: #F0F1EE; font-size: 17px;">鴻海同步擴建雙生產線</text>
+
+                        <!-- 92.7% - 最小、最淺色 -->
+                        <rect x="600" y="370" width="200" height="70" rx="8" fill="#C2B8A3" opacity="0.7"/>
+                        <text x="700" y="405" class="heatmap-value" text-anchor="middle" fill="#3D3A37" style="font-size: 28px;">92.7%</text>
+                        <text x="700" y="425" class="heatmap-label" text-anchor="middle" fill="#5E6C6A" style="font-size: 14px;">最高年增率</text>
+
+                        <!-- 92.7% 詳細資訊（在右側） -->
+                        <rect x="820" y="370" width="130" height="70" rx="8" fill="#EAEBE6" opacity="0.8"/>
+                        <text x="885" y="390" class="heatmap-desc" text-anchor="middle" fill="#1F1D1B" style="font-size: 11px;">緯創 +92.7%</text>
+                        <text x="885" y="405" class="heatmap-desc" text-anchor="middle" fill="#1F1D1B" style="font-size: 11px;">廣達 +65.6%</text>
+                        <text x="885" y="420" class="heatmap-desc" text-anchor="middle" fill="#1F1D1B" style="font-size: 11px;">鴻海 +27%</text>
+                    </svg>
+                </div>
+
+                <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #EAEBE6;">
+                    <!-- <p style="font-size: clamp(1rem, 1.5vw, 1.2rem); color: #9A948C; line-height: 1.8; text-align: center; max-width: 900px; margin: 0 auto;">
+                        這場「硬體重組」不僅是技術浪潮，更是全球經濟結構轉變的信號。<br>
+                        AI 硬體已從商業議題躍升為國家安全與地緣戰略核心。
+                    </p> -->
+                </div>
+
+                <!-- 出處連結：左下角 -->
+                <div style="position: absolute; bottom: 2rem; left: 2rem;">
+                    <a href="https://moderndiplomacy.eu/2025/08/26/taiwan-powers-ai-the-hardware-realignment/"
+                       target="_blank"
+                       style="font-size: clamp(0.75rem, 1vw, 0.9rem); color: #A9B2AE; text-decoration: none; border-bottom: 1px dotted #A9B2AE; transition: color 0.2s ease;">
+                        資料來源：Modern Diplomacy
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-default scrollable">
+            <div class="slide-content">
+                <h1>鴻海營收結構變化 (2024 → 2025)</h1>
+
+                <div class="chart-container" style="position: relative; width: 100%; max-width: 1400px; margin: 2rem auto; min-height: clamp(400px, 50vw, 600px);">
+                    <div id="honhai-sankey-chart" style="width: 100%; height: clamp(400px, 50vw, 600px);"></div>
+                </div>
+
+                <p style="text-align: left; color: var(--accent-color); font-size: clamp(0.75rem, 1.2vw, 0.9rem); margin-top: 1rem;">
+                    資料來源：<a href="https://finance.yahoo.com/quote/2317.TW/" target="_blank" rel="noopener noreferrer">Yahoo Finance - 鴻海 (2317.TW)</a>
+                </p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>當今人類物種，我..該做什麼？</h1>
+            </div>
+        </section>
+
+
+        <section class="layout-quote">
+            <div class="slide-content" style="text-align: center; margin: 0 auto;">
+                <h1 style="font-size: clamp(2rem, 5vw, 4rem);">就一件事</h1>
+                <h1 style="font-size: clamp(7rem, 10vw, 8rem);">問好問題</h1>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1 stylye = "text-align: center;">提示工程四大原則</h1>
+                <table style="table-layout: fixed;">
+                    <thead>
+                        <tr>
+                            <th style="width: 50%;">原則</th>
+                            <th style="width: 50%;">白話文解釋</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1. 角色</td>
+                            <td>你希望AI扮演誰？</td>
+                        </tr>
+                        <tr>
+                            <td>2. 目標</td>
+                            <td>你要 AI完成什麼任務？</td>
+                        </tr>
+                        <tr>
+                            <td>3. 輸出格式</td>
+                            <td>回應應該長什麼樣？</td>
+                        </tr>
+                        <tr>
+                            <td>4. 範圍限制</td>
+                            <td>有哪些規則和界線？</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>原則一：角色</h1>
+                <p style="font-size: clamp(1.5rem, 1.5vw, 1.2rem);">為AI指定特定身份（如：編輯、分析師），以產生更具針對性、更符合情境的回應。</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>原則二：目標</h1>
+                <p style="font-size: clamp(1.5rem, 1.5vw, 1.2rem);">具體、詳細地描述期望的結果與風格。<br>不只說「寫一首詩」，而是「用特定風格寫一首勵志短詩」。</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>原則三：輸出格式</h1>
+                <p style="font-size: clamp(1.5rem, 1.5vw, 1.2rem);">清晰定義期望的回應結構（如列表或逗號隔開，用 markdown 格式輸出）。</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>原則四：範圍限制</h1>
+                <p style="font-size: clamp(1.5rem, 1.5vw, 1.2rem);">設定清晰規則，說明「該做什麼」而非「不該做什麼」，<br>並具體規定長度（例如最多 50 字）。</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>"幫我做一份有關[生成式 AI]的投影片。"</h1>
+                <pre><code>【角色】你是一位資深的簡報教練。
+【目標】產出 8–10 頁的簡報大綱與每頁要點，主題「生成式 AI 對大學生學習的影響」，用於 10 分鐘口頭報告；成功標準：有開場、問題定義、三個論點、反方觀點、結論與參考文獻，並能被同組同學直接分工製作。
+【脈絡】對象是非資工背景同學；不允許杜撰研究；可使用 2023–2025 的公開報導/期刊作佐證（列出 3–5 則來源）。
+【輸出格式】Markdown 列出 (1) 封面 (2) 目錄 (3) 每頁標題＋3–5 個要點 (4) 引用/連結清單。
+【範圍與限制】語氣中立，每頁要點小於 60 字；列出 2 個可被質疑的點與如何回應。
+【樣例】頁面格式示例：
+- p3〈論點一：學習效率〉：要點(1)..... (2)..... (3).....
+【評分規則】完整性、可驗證來源、可分工性、時間可控（10 分鐘）。</code></pre>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>"幫我把履歷寫得更厲害。"</h1>
+                <pre><code>【角色】你是連鎖咖啡店的人資招募專員，熟悉學生打工履歷。
+【目標】將下列原始經歷優化為 1 頁中文履歷的「工作經歷」段落；成功標準：每點含動詞＋任務＋量化成果＋工具/技能。
+【脈絡】職缺：門市夥伴（重服務、收銀、補貨、衛生、內外場協作）。投遞對象：店長，閱覽時間<30 秒。
+【輸出格式】列出 4–6 條要點，每條小於 30 字。
+【範圍與限制】語氣務實精煉。
+【樣例】「高峰期 4 小時維持平均候位 <5 分鐘，與 3 位夥伴輪替補貨與收銀」。</code></pre>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>進階提示技巧</h1>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>情感提示 (Emotion Prompting)</h1>
+                <p style="font-size: clamp(1.5rem, 1.5vw, 1.2rem);">在提示中加入<strong>情感語言</strong>，利用AI的情感豐富訓練資料，以提高準確度和回應品質。</p>
+            </div>
+        </section>
+
+        <section class="layout-quote">
+            <div class="slide-content">
+                <h1 style="font-weight: bold; font-size: clamp(3rem, 1.5vw, 1.2rem);">「這對我來說<em>非常重要</em>，請務必準確回答。」</h1>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>少數樣本提示 (Few-shot)</h1>
+                <p style="font-size: clamp(1.5rem, 1.5vw, 1.2rem);">在提示中提供一或多個「輸入/輸出」範例，讓模型模仿該模式來完成任務。</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>重讀 (Re-reading)</h1>
+                <p style="font-size: clamp(1.5rem, 1.5vw, 1.2rem);">最後要求模型在回答前重新閱讀提示，以確保不會錯過關鍵細節。</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>重點整理</h1>
+                <ul style="list-style-type: none; text-align: left; padding-left: 0;">
+                    <li style="margin-bottom: 1rem;"><strong>核心四原則</strong>：始終定義角色、目標、格式、限制。</li>
+                    <li style="margin-bottom: 1rem;"><strong>進階1（情感提示）</strong>：加入情感以提高專注度。</li>
+                    <li style="margin-bottom: 1rem;"><strong>進階2（少數樣本）</strong>：提供你想要的格式。</li>
+                    <li style="margin-bottom: 1rem;"><strong>進階3（重讀）</strong>：要求 AI 再次確認你的指令。</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="layout-default scrollable">
+            <div class="slide-content" style="position: relative;">
+                <button id="copy-prompt-btn"
+                        style="position: absolute; top: 0; right: 0; padding: 0.4rem 0.8rem; background: rgba(210, 205, 185, 0.1); color: var(--accent-color); border: 1px solid rgba(210, 205, 185, 0.3); border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-family: var(--font-family); transition: all 0.2s ease; z-index: 10;">
+                    Copy to clipboard
+                </button>
+                <div id="copy-feedback"
+                     style="position: absolute; top: 2.5rem; right: 0; font-size: 0.7rem; color: var(--accent-color); opacity: 0; transition: opacity 0.3s; pointer-events: none;">
+                    Copied!
+                </div>
+                <h1>"如何向 AI 問一個好問題？"</h1>
+                <pre><code id="prompt-text">【角色】你是一位資深的教學設計專家，專精於溝通技巧與提問方法，擁有 15 年以上的教學經驗。這對我來說<strong>非常重要</strong>，因為我即將在重要的場合使用這個技巧，請務必提供準確且實用的建議。
+
+【目標】產出一份「如何向 AI 問一個好問題」的完整指南，包含：(1) 核心提問原則（3-5 點）(2) 常見錯誤範例與修正對照 (3) 實戰練習題（2-3 題）。成功標準：內容清晰易懂、適合初學者、可直接應用於 ChatGPT/Claude 等主流 AI 工具。
+
+【輸出格式】使用 Markdown 格式，分為三個區塊：
+1. 核心原則（編號列表）
+2. 錯誤 vs 正確範例對照表
+3. 實戰練習（每題包含「題目」和「參考答案」）
+
+【範圍與限制】每個原則說明不超過 50 字；範例必須具體且貼近日常生活；語氣親切專業，避免過於學術化；總長度控制在 800-1000 字。
+
+【少數樣本】以下是一個好的提問範例：
+錯誤：「幫我寫作業」
+正確：「【角色】你是我的學習夥伴【目標】幫我理解線性代數的矩陣運算，用生活化例子解釋【輸出】用 3 個步驟說明，每步驟不超過 2 句話」
+
+【重讀】在回答前，請重新閱讀以上所有要求，確保你的回答完全符合：角色定位、目標設定、格式規範、範圍限制，並包含情感提示的效果。這對我來說<strong>極其重要</strong>，請仔細檢查後再回應。</code></pre>
+            </div>
+        </section>
+
+
+        <section class="layout-default hidden">
+            <div class="slide-content">
+                <h1>你的「入場券」</h1>
+                <p>我秀出這張表，不是要製造焦慮，而是要點出「價值」。</p>
+                <p style="font-weight: 600;">我們還要回頭處理那兩個最大的焦慮：「我跟不上了」和「我會被取代」。</p>
+            </div>
+        </section>
+
+        <section class="layout-title">
+            <div class="slide-content">
+                <h1>最後，我想分享一些個人經驗</h1>
+                <h2 style="color: var(--text-color); font-size: 2rem;">職場、生活心法分享</h2>
+            </div>
+        </section>
+
+
+        <section class="layout-two-column scrollable" id="speed-running-section">
+            <div class="slide-content">
+                <div class="image-column">
+                    <img src="../pic/1115/speed-running-promotion.jpg"
+                         alt=""
+                         class="reveal-trigger"
+                         style="cursor: pointer; transform: scale(0.8);">
+                </div>
+                <div class="text-column">
+                    <div class="reveal-text reveal-block" style="margin-top: 230px; margin-left: -100px;">
+                        <p>努力只是門票，<br>選擇和機運..都很重要。</p>
+
+                        <iframe src="../1115-rotary-club/linkedin-short.html"
+                                frameborder="0"
+                                style="width: 130%; height: 900px; border: none; border-radius: 4px; box-shadow: 0 4px 12px rgba(187, 174, 174, 0.1);">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>第一性原則 (First Principles)</h1>
+                <p>跳脫現有慣例，從物理性意義的「基本真理」出發。</p>
+                <blockquote>「把一個問題拆解回它最基礎、最不可否認的真相，然後從那裡開始重新建構解決方案。」</blockquote>
+            </div>
+        </section>
+
+        <section class="layout-default scrollable">
+            <div class="slide-content">
+                <h1>Elon Musk <span style="font-size: 1.5rem;">First Principles in Practice</span></h1>
+                <ol style="font-size: clamp(1.2rem, 2.5vw, 1.75rem); margin-left: 2rem; margin-top: 1.5rem;">
+                    <li style="margin-bottom: 1.5rem;">
+                        <b>質疑要求（Question the Requirements）</b>
+                        <p style="font-size: clamp(1rem, 1.8vw, 1.3rem); color: #5c5855; margin-top: 0.5rem;">任何要求在某種程度上是「愚蠢的」（dumb），因此要減少要求數量，確保你不會完美地回答一個錯誤的問題。</p>
+                    </li>
+                    <li style="margin-bottom: 1.5rem;">
+                        <b>刪除步驟（Delete Steps）</b>
+                        <p style="font-size: clamp(1rem, 1.8vw, 1.3rem); color: #5c5855; margin-top: 0.5rem;">嘗試將某個步驟、零件或流程完全刪除。如果在刪除後沒有被迫放回至少 10% 的內容，那麼刪得就不夠多。</p>
+                    </li>
+                    <li style="margin-bottom: 1.5rem;">
+                        <b>最佳化（Optimize/Simplify）</b>
+                        <p style="font-size: clamp(1rem, 1.8vw, 1.3rem); color: #5c5855; margin-top: 0.5rem;">只有在確定該事物應該存在之後，才去簡化或最佳化它。聰明工程師最常見的錯誤就是最佳化一個本不該存在的東西。</p>
+                    </li>
+                    <li style="margin-bottom: 1.5rem;">
+                        <b>加速（Speed Up）</b>
+                        <p style="font-size: clamp(1rem, 1.8vw, 1.3rem); color: #5c5855; margin-top: 0.5rem;">無論你認為某事可以多快完成，它總可以更快。但必須在刪除和最佳化之後才能進行加速，否則你加速了荒謬的存在。</p>
+                    </li>
+                    <li style="margin-bottom: 1.5rem;">
+                        <b>自動化（Automate）</b>
+                        <p style="font-size: clamp(1rem, 1.8vw, 1.3rem); color: #5c5855; margin-top: 0.5rem;">最後才是實現自動化。</p>
+                    </li>
+                </ol>
+                <p style="margin-top: 2rem; font-size: clamp(0.9rem, 1.5vw, 1.1rem); color: var(--accent-color);">
+                    參考來源：<a href="https://youtu.be/Kbk9BiPhm7o?list=TLGGRvt5DTdVUe4wOTExMjAyNQ" target="_blank" rel="noopener noreferrer">Elon Musk: Neuralink and the Future of Humanity | Lex Fridman</a>
+                </p>
+            </div>
+        </section>
+
+        <section class="layout-default scrollable">
+            <div class="slide-content">
+                <h1>YD 版本 <span style="font-size: 1.5rem;">First Principles in Practice</span></h1>
+                <ol class="reveal-trigger" style="font-size: clamp(1.2rem, 2.5vw, 1.75rem); margin-left: 2rem; margin-top: 1.5rem; cursor: pointer;">
+                    <li style="margin-bottom: 1.5rem;">
+                        <b>確認需求背後的需求（Confirm the Hidden Requirements）</b>
+                        <p style="font-size: clamp(1rem, 1.8vw, 1.3rem); color: #5c5855; margin-top: 0.5rem;">是「想要」還是「必要」？</p>
+                    </li>
+                    <li style="margin-bottom: 1.5rem;">
+                        <b>風險控管（Manage the Risks）</b>
+                        <p style="font-size: clamp(1rem, 1.8vw, 1.3rem); color: #5c5855; margin-top: 0.5rem;">如果沒有_ _ _ _會怎樣？</p>
+                    </li>
+                    <li style="margin-bottom: 1.5rem;">
+                        <b>調整（Make it Simpler）</b>
+                        <p style="font-size: clamp(1rem, 1.8vw, 1.3rem); color: #5c5855; margin-top: 0.5rem;">有沒有比現在更簡單一點的方式？</p>
+                    </li>
+                    <li style="margin-bottom: 1.5rem;">
+                        <b>精益求精（Make it Better）</b>
+                        <p style="font-size: clamp(1rem, 1.8vw, 1.3rem); color: #5c5855; margin-top: 0.5rem;">還有沒有更好的方式？</p>
+                    </li>
+                </ol>
+                <p class="reveal-text reveal-block" style="margin-top: 2rem; font-size: clamp(5rem, 1.5vw, 2.5rem); color: var(--accent-color); text-align: center; font-weight: 500;">意義感 + 專注力 = 效率</p>
+            </div>
+        </section>
+
+        <section class="layout-quote">
+            <div class="slide-content">
+                <h1 style="font-size: clamp(2rem, 5vw, 4rem);">原則一：</h1>
+                <h1 style="font-size: clamp(2.5rem, 6vw, 5rem);">是「想要」還是「需要」？</h1>
+            </div>
+        </section>
+
+        <section class="layout-default hidden">
+            <div class="slide-content">
+                <h1>「想要」vs.「需要」</h1>
+                <p>我們之所以會「跟不上」，之所以會 FOMO，是因為我們花了太多時間在追逐「想要」的工具，卻沒有花時間釐清「需要」解決的問題。</p>
+                <blockquote>你今天「想要」學 Sora，明天「想要」學 Suno，你永遠追不完。</blockquote>
+                <p>你必須做的，是「回到你自己身上」。</p>
+                <p style="font-weight: 600;">回到你的科系、你的工作、你的生活。問自己一個最根本的問題：「我周遭最需要被解決的問題是什麼？」</p>
+                <p>「那個問題，真的需要 AI 嗎？」</p>
+            </div>
+        </section>
+
+        <section class="layout-quote">
+            <div class="slide-content">
+                <h1 style="font-size: clamp(2rem, 5vw, 4rem);">原則二：</h1>
+                <h1 style="font-size: clamp(2.5rem, 6vw, 5rem);">先「高薪」還是「奴一下」？</h1>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content" style="overflow-y: auto; justify-content: flex-start; padding-top: 10vh;">
+                <h1>台灣科技業薪資架構 2025</h1>
+                <div style="width: 100%; margin-top: 2rem; display: flex; justify-content: center;">
+                    <svg width="100%" height="400" viewBox="0 0 800 400" style="max-width: 900px;">
+                        <!-- 定義模糊濾鏡 -->
+                        <defs>
+                            <filter id="blurFilter" x="-50%" y="-50%" width="200%" height="200%">
+                                <feGaussianBlur in="SourceGraphic" stdDeviation="6"/>
+                            </filter>
+                        </defs>
+
+                        <!-- 表格背景 -->
+                        <rect x="0" y="0" width="800" height="400" fill="#F5F4F0" stroke="#EAEBE6" stroke-width="2"/>
+
+                        <!-- 表頭背景 -->
+                        <rect x="0" y="0" width="800" height="60" fill="#EAEBE6"/>
+
+                        <!-- 表頭分隔線 -->
+                        <line x1="266.67" y1="0" x2="266.67" y2="60" stroke="#d1d1c2" stroke-width="1"/>
+                        <line x1="533.33" y1="0" x2="533.33" y2="60" stroke="#d1d1c2" stroke-width="1"/>
+                        <line x1="0" y1="60" x2="800" y2="60" stroke="#d1d1c2" stroke-width="1"/>
+
+                        <!-- 表頭文字 -->
+                        <text x="133.33" y="40" text-anchor="middle" font-family="Calibri, sans-serif" font-size="20" font-weight="600" fill="#3D3A37">職位</text>
+                        <text x="400" y="40" text-anchor="middle" font-family="Calibri, sans-serif" font-size="20" font-weight="600" fill="#3D3A37">經驗</text>
+                        <text x="666.67" y="40" text-anchor="middle" font-family="Calibri, sans-serif" font-size="20" font-weight="600" fill="#3D3A37">月薪範圍 (TWD)</text>
+
+                        <!-- 第一行資料 -->
+                        <line x1="0" y1="140" x2="800" y2="140" stroke="#d1d1c2" stroke-width="1"/>
+                        <line x1="266.67" y1="60" x2="266.67" y2="140" stroke="#d1d1c2" stroke-width="1"/>
+                        <line x1="533.33" y1="60" x2="533.33" y2="140" stroke="#d1d1c2" stroke-width="1"/>
+                        <text x="133.33" y="120" text-anchor="middle" font-family="Calibri, sans-serif" font-size="18" fill="#3D3A37" filter="url(#blurFilter)">後端工程師</text>
+                        <text x="400" y="120" text-anchor="middle" font-family="Calibri, sans-serif" font-size="18" fill="#3D3A37">1-3 年</text>
+                        <text x="666.67" y="120" text-anchor="middle" font-family="Calibri, sans-serif" font-size="18" fill="#3D3A37" filter="url(#blurFilter)">60k ~ 90k</text>
+
+                        <!-- 第二行資料 -->
+                        <line x1="0" y1="220" x2="800" y2="220" stroke="#d1d1c2" stroke-width="1"/>
+                        <line x1="266.67" y1="140" x2="266.67" y2="220" stroke="#d1d1c2" stroke-width="1"/>
+                        <line x1="533.33" y1="140" x2="533.33" y2="220" stroke="#d1d1c2" stroke-width="1"/>
+                        <text x="133.33" y="200" text-anchor="middle" font-family="Calibri, sans-serif" font-size="18" fill="#3D3A37" filter="url(#blurFilter)">資深後端工程師</text>
+                        <text x="400" y="200" text-anchor="middle" font-family="Calibri, sans-serif" font-size="18" fill="#3D3A37">3-5 年</text>
+                        <text x="666.67" y="200" text-anchor="middle" font-family="Calibri, sans-serif" font-size="18" fill="#3D3A37" filter="url(#blurFilter)">90k ~ 180k</text>
+
+                        <!-- 第三行資料（粗體） -->
+                        <line x1="0" y1="300" x2="800" y2="300" stroke="#d1d1c2" stroke-width="1"/>
+                        <line x1="266.67" y1="220" x2="266.67" y2="300" stroke="#d1d1c2" stroke-width="1"/>
+                        <line x1="533.33" y1="220" x2="533.33" y2="300" stroke="#d1d1c2" stroke-width="1"/>
+                        <text x="133.33" y="280" text-anchor="middle" font-family="Calibri, sans-serif" font-size="18" font-weight="600" fill="#3D3A37" filter="url(#blurFilter)">資料科學家 (Data Scientist)</text>
+                        <text x="400" y="280" text-anchor="middle" font-family="Calibri, sans-serif" font-size="18"  fill="#3D3A37">5-8 年</text>
+                        <text x="666.67" y="280" text-anchor="middle" font-family="Calibri, sans-serif" font-size="18" font-weight="600" fill="#3D3A37" filter="url(#blurFilter)">70k ~ 150k</text>
+
+                        <!-- 第四行資料（粗體） -->
+                        <line x1="0" y1="400" x2="800" y2="400" stroke="#d1d1c2" stroke-width="1"/>
+                        <line x1="266.67" y1="300" x2="266.67" y2="400" stroke="#d1d1c2" stroke-width="1"/>
+                        <line x1="533.33" y1="300" x2="533.33" y2="400" stroke="#d1d1c2" stroke-width="1"/>
+                        <text x="133.33" y="360" text-anchor="middle" font-family="Calibri, sans-serif" font-size="18" font-weight="600" fill="#3D3A37" filter="url(#blurFilter)">雲端架構師 (Cloud Architect)</text>
+                        <text x="400" y="360" text-anchor="middle" font-family="Calibri, sans-serif" font-size="18"  fill="#3D3A37">10+ 年</text>
+                        <text x="666.67" y="360" text-anchor="middle" font-family="Calibri, sans-serif" font-size="18" font-weight="600" fill="#3D3A37" filter="url(#blurFilter)">100k ~ 180k+</text>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>先別急著吃棉花糖</h1>
+                <p>換位思考，還沒有籌碼之前，最該專注的，是「證明價值」。</p>
+                <ul>
+                    <li><b>樂觀實在：</b>在不傷天害理害人的情況下，多多嘗試。</li>
+                    <li><b>物超所值：</b>比老闆期待的多做一點。</li>
+                    <li><b>累積底氣：</b>建立自己的做事原則，並堅持下去。</li>
+                    <li><b>成為標竿：</b>讓好的影響力會影響文化。</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="layout-quote">
+            <div class="slide-content">
+                <h1 style="font-size: clamp(2rem, 5vw, 4rem);">原則三：</h1>
+                <h1 style="font-size: clamp(2.5rem, 6vw, 5rem);">職場打團體戰</h1>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>對事也對人</h1>
+
+                <h2 style="font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 600; color: var(--accent-color); margin-top: 2rem; margin-bottom: 1rem;">管事</h2>
+                <ul style="font-size: clamp(1.2rem, 2.5vw, 1.75rem); margin-left: 2rem; margin-bottom: 2rem;">
+                    <li style="margin-bottom: 1rem;">
+                        <b class="reveal-trigger" style="cursor: pointer; user-select: none; transition: opacity 0.3s ease;" data-target="reveal-content-1">專案管理    </b><span class="reveal-content" id="reveal-content-1" style="display: none;">範圍、資源、時程</span>
+                    </li>
+                    <li style="margin-bottom: 1rem;">
+                        <b class="reveal-trigger" style="cursor: pointer; user-select: none; transition: opacity 0.3s ease;" data-target="reveal-content-2">概念驗證（Proof of Concept）  </b><span class="reveal-content" id="reveal-content-2" style="display: none;">人不用多，先確認可行性，並證明管理能力。</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content" style="width: 100%; max-width: 100%; padding: 0;">
+                <div style="width: 100%; max-width: 100%; margin: 0 auto; overflow: hidden;">
+                    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: auto; max-width: 100%; display: block;" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" font-family="Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif">
+                        <defs>
+                            <filter id="wabisabiFilter-triangle" x="-50%" y="-50%" width="200%" height="200%">
+                                <feTurbulence type="fractalNoise" baseFrequency="0.005" numOctaves="3" result="noise"/>
+                                <feDiffuseLighting in="noise" lightingColor="#F5F4F0" surfaceScale="5" result="light">
+                                    <feDistantLight azimuth="235" elevation="60"/>
+                                </feDiffuseLighting>
+                                <feComposite in="SourceGraphic" in2="light" operator="arithmetic" k1="0" k2="1" k3="0.8" k4="0.2"/>
+                            </filter>
+
+                            <filter id="shaky-triangle">
+                                <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" result="turbulence"/>
+                                <feDisplacementMap in2="turbulence" in="SourceGraphic" scale="5" xChannelSelector="R" yChannelSelector="G"/>
+                            </filter>
+                        </defs>
+
+                        <text x="960" y="140" font-size="90" fill="#3D3A37" text-anchor="middle" font-weight="600">
+                            專案管理三角形
+                        </text>
+                        <line x1="600" y1="170" x2="1320" y2="170" stroke="#9A948C" stroke-width="4" filter="url(#shaky-triangle)"/>
+
+                        <path d="M960 370 L1450 900 L470 900 Z" stroke="#8c867b" stroke-width="6" fill="rgba(194, 184, 163, 0.2)" filter="url(#shaky-triangle)"/>
+
+                        <circle cx="960" cy="370" r="15" fill="#8c867b"/>
+                        <text x="960" y="320" font-size="60" fill="#3D3A37" text-anchor="middle" dy="-30" font-weight="600">
+                            範圍
+                        </text>
+                        <text x="960" y="320" font-size="40" fill="#3D3A37" text-anchor="middle" dy="25" filter="url(#shaky-triangle)">
+                            「做什麼」
+                        </text>
+
+                        <circle cx="1450" cy="900" r="15" fill="#8c867b"/>
+                        <text x="1450" y="900" font-size="60" fill="#3D3A37" text-anchor="middle" dx="80" dy="-10" font-weight="600">
+                            時程
+                        </text>
+                        <text x="1450" y="900" font-size="40" fill="#3D3A37" text-anchor="start" dx="130" dy="40" filter="url(#shaky-triangle)">
+                            「花多久」
+                        </text>
+
+                        <circle cx="470" cy="900" r="15" fill="#8c867b"/>
+                        <text x="470" y="900" font-size="60" fill="#3D3A37" text-anchor="middle" dx="-80" dy="-10" font-weight="600">
+                            資源
+                        </text>
+                        <text x="470" y="900" font-size="40" fill="#3D3A37" text-anchor="end" dx="-130" dy="40" filter="url(#shaky-triangle)">
+                            「要多少」
+                        </text>
+
+                        <g transform="translate(960, 700)">
+                            <circle cx="0" cy="0" r="150" fill="#C2B8A3" opacity="0.4" filter="url(#shaky-triangle)"/>
+                            <circle cx="0" cy="0" r="145" fill="#F5F4F0" opacity="0.6" filter="url(#shaky-triangle)"/>
+                            <circle cx="0" cy="0" r="130" fill="#C2B8A3" opacity="0.8" filter="url(#shaky-triangle)"/>
+
+                            <text x="0" y="0" font-size="70" fill="#3D3A37" text-anchor="middle" dy="30" font-weight="600">
+                                品質
+                            </text>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>對事也對人</h1>
+                <h2 style="font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 600; color: var(--accent-color); margin-top: 2rem; margin-bottom: 1rem; cursor: pointer;">管人 <span class="reveal-text">（第一性原理思考）</span></h2>
+                <ul style="font-size: clamp(1.2rem, 2.5vw, 1.75rem); margin-left: 2rem;">
+                    <li style="margin-bottom: 1rem; cursor: pointer;">
+                        <b>一無所知：</b>缺乏消息 <span class="reveal-text">（解法：常態性的資訊更新）</span>
+                    </li>
+                    <li style="margin-bottom: 1rem; cursor: pointer;">
+                        <b>知而不能：</b>缺資源、能力<span class="reveal-text">（解法：找同儕協助或指導）</span>
+                    </li>
+                    <li style="margin-bottom: 1rem; cursor: pointer;">
+                        <b>知而不為：</b>缺乏動機、共識<span class="reveal-text">（解法：利益交換、向上管理）</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="layout-title">
+            <div class="slide-content">
+                <h1>關於 AI，我最後想說..</h1>
+            </div>
+        </section>
+
+        <section class="layout-default" style="padding: 0;">
+            <img src="../pic/1115/on-the-beach-16-9.png" alt="五感體驗" style="width: 100vw; height: 100vh; object-fit: cover; display: block;">
+        </section>
+
+        <section class="layout-title hidden">
+            <div class="slide-content">
+                <h1>一個感性的高潮</h1>
+                <p style="margin-top: 2rem; font-size: 1.5rem;">我想邀請大家，再跟我做一個小小的練習。</p>
+                <p style="font-size: 1.5rem;">請大家，輕輕地閉上你的眼睛。</p>
+            </div>
+        </section>
+
+        <section class="layout-default hidden">
+            <div class="slide-content">
+                <h1>感受海風</h1>
+                <p style="font-size: 1.5rem;"><em>現在，請你想像一下...</em></p>
+                <p style="font-size: 1.5rem;"><em>你正站在一片沙灘上。</em></p>
+                <p style="font-size: 1.5rem;"><em>你赤著腳，踩著有點暖暖的、乾燥的沙子。</em></p>
+                <p style="font-size: 1.5rem;"><em>現在是傍晚，夕陽西下，你正看著遠方的海平線。</em></p>
+                <p style="font-size: 1.5rem;"><em>一陣海風，輕輕地吹過你的臉頰。</em></p>
+                <p style="font-size: 1.5rem;"><em>你聽著海浪，一波、一波，拍打在沙灘上的聲音。</em></p>
+                <p style="font-size: 1.5rem;"><em>你就只是，靜靜地，站在那裡。</em></p>
+                <p style="margin-top: 2rem; font-size: 1.5rem;">好，請大家慢慢睜開眼睛。</p>
+            </div>
+        </section>
+
+        <section class="layout-default hidden">
+            <div class="slide-content">
+                <h1>主觀感受</h1>
+                <p>剛剛那個畫面，那五感的連結——你腳底的溫度、風的觸感、海浪的聲音—— 這一切混在一起，交織而成的那種「舒服」的體驗...</p>
+                <p>AI 可以「描述」它嗎？可以，AI 可以寫出比我剛剛講的，更華麗一百倍的詞藻。</p>
+                <p>AI 可以「生成」它嗎？可以，Sora 可以生成一個 4K 畫質、無比逼真的影片。</p>
+                <p style="font-weight: 600; font-size: 1.8rem; margin-top: 1rem;">但是，AI 能「體會」到那個舒服的感覺嗎？</p>
+            </div>
+        </section>
+
+        <section class="layout-default hidden">
+            <div class="slide-content">
+                <h1>身體 vs. 大腦</h1>
+                <p>AI 能「感受」到那個，因為海風而平靜下來的心跳嗎？</p>
+                <p style="font-weight: 600; font-size: 1.8rem;">不行。</p>
+                <p>這就是「主觀感受」。這就是我們碳基生命，獨一無二的、不可取代的核心。</p>
+                <p>我們常常焦慮 AI 要取代我們的「大腦」。 但我們忘了，我們最強大的，是我們的「身體」和我們的「感受」。</p>
+            </div>
+        </section>
+
+        <section class="layout-default hidden">
+            <div class="slide-content">
+                <h1>計算 vs. 感動</h1>
+                <p>AI 很會「計算」，但它不會「感動」。</p>
+                <p>AI 很會「分析」，但它不會「安慰」。</p>
+                <p>AI 很會「生成」，但它不會「體會」。</p>
+                <p style="margin-top: 2rem;">所以，在 AI 時代，你越往「效率」、「計算」、「分析」那邊靠攏，你就越容易被取代。</p>
+                <p style="font-weight: 600;">你越往「人性」、「感受」、「體驗」、「關懷」、「美感」這邊移動，你就越不可取代。</p>
+            </div>
+        </section>
+
+        <section class="layout-title hidden">
+            <div class="slide-content">
+                <h1>主軸 5：結語</h1>
+                <h2 style="color: var(--text-color); font-size: 2rem;">成為定義者</h2>
+            </div>
+        </section>
+
+        <section class="layout-quote hidden">
+            <div class="slide-content">
+                <h1 style="font-size: clamp(2.5rem, 6vw, 5rem);">成為定義者，</h1>
+                <h1 style="font-size: clamp(2.5rem, 6vw, 5rem);">而非跟風者</h1>
+            </div>
+        </section>
+
+        <section class="layout-default hidden">
+            <div class="slide-content">
+                <h1>重新校準你自己</h1>
+                <p>AI 時代，最強大的能力，不是你會用多少工具，而是你的「品味」、「價值觀」和「判斷力」。</p>
+                <p>AI 是一個史上最強的「執行者」，但它需要一個「校準者」。</p>
+            </div>
+        </section>
+
+        <section class="layout-default hidden">
+            <div class="slide-content">
+                <h1>回去好好生活</h1>
+                <p>所以，不要再焦慮了。</p>
+                <p>回去好好生活、好好感受。</p>
+                <p>去愛你所愛的人、去做你熱愛的事。 去跑步、去做家事、去感受海風。</p>
+                <p style="margin-top: 2rem;">因為那些 AI 無法體會的「主觀感受」，正在幫你打造你的「品味」，而你的「品味」，決定了你「校準」AI 的高度。</p>
+            </div>
+        </section>
+
+        <section class="layout-title hidden">
+            <div class="slide-content">
+                <h1 style="font-size: clamp(5rem, 15vw, 12rem);">Q & A</h1>
+                <h2 style="margin-top: 3rem;">[您的姓名]</h2>
+                <h2 style="font-size: 1.5rem;">[您的聯絡方式或社群]</h2>
+            </div>
+        </section>
+
+        <section class="layout-quote hidden">
+            <div class="slide-content">
+                <h1 style="font-size: clamp(2rem, 4vw, 3.5rem);">不要成為 AI 的使用者。</h1>
+                <h1 style="font-size: clamp(2.5rem, 5vw, 4.5rem); margin-top: 1rem;">要成為，</h1>
+                <h1 style="font-size: clamp(2.5rem, 5vw, 4.5rem);">利用 AI 達到你目標的——</h1>
+                <h1 style="font-size: clamp(2.5rem, 5vw, 4.5rem);">問題定義者。</h1>
+                <p style="text-align: center; margin-top: 3rem; font-size: 1.5rem;">謝謝大家。</p>
+            </div>
+        </section>
+
     </div>
     <!-- ============================================
          投影片容器結束
