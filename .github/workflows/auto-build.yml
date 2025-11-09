@@ -37,16 +37,17 @@ jobs:
             echo "{}" > package.json
           fi
 
-      - name: Build slides (extract, inject)
+      - name: Build slides (extract, inject, remove content)
         working-directory: ./1115-rotary-club
         run: |
           echo "🚀 開始自動建置（簡化版）..."
-
+          
           # 執行簡化版建置流程（不加密）
           node scripts/extract-content.js
           node scripts/inject-loader-simple.js
+          node scripts/remove-content-from-html.js
           node scripts/prepare-production.js
-
+          
           echo "✅ 建置完成"
 
       - name: Check for changes and commit
