@@ -18,8 +18,12 @@ try {
     console.log('\n📄 步驟 2: 注入簡化版載入器...');
     execSync('node scripts/inject-loader-simple.js', { stdio: 'inherit' });
 
-    // 步驟 3: 準備生產版本（移除開發模式標記）
-    console.log('\n🚀 步驟 3: 準備生產版本...');
+    // 步驟 3: 移除 HTML 中的實際內容
+    console.log('\n🗑️  步驟 3: 移除 HTML 中的實際內容...');
+    execSync('node scripts/remove-content-from-html.js', { stdio: 'inherit' });
+    
+    // 步驟 4: 準備生產版本（移除開發模式標記）
+    console.log('\n🚀 步驟 4: 準備生產版本...');
     execSync('node scripts/prepare-production.js', { stdio: 'inherit' });
 
     console.log('\n✅ 簡化版建置完成！');
