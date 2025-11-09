@@ -73,29 +73,79 @@ const loaderScript = `
                         return response.text();
                     })
                     .then(encrypted => {
-                        // 解密內容
-                        const decrypted = decryptContent(encrypted);
-                        const content = JSON.parse(decrypted);
+                        try {
+                            // 解密內容
+                            const decrypted = decryptContent(encrypted);
+                            const content = JSON.parse(decrypted);
 
-                        // 清空現有內容並動態載入
-                        deck.innerHTML = '';
-                        renderSlides(content.slides, deck);
+                            // 確認內容有效
+                            if (!content || !content.slides || !Array.isArray(content.slides)) {
+                                throw new Error('無效的內容格式');
+                            }
+
+                            // 先渲染到臨時容器，確認成功後再替換
+                            const tempContainer = document.createElement('div');
+                            tempContainer.style.display = 'none';
+                            document.body.appendChild(tempContainer);
+                            
+                            renderSlides(content.slides, tempContainer);
+                            
+                            // 確認渲染成功後，再替換原內容
+                            if (tempContainer.children.length > 0) {
+                                deck.innerHTML = '';
+                                // 移動所有子元素到 deck
+                                while (tempContainer.firstChild) {
+                                    deck.appendChild(tempContainer.firstChild);
+                                }
+                                document.body.removeChild(tempContainer);
+                            } else {
+                                throw new Error('渲染失敗，沒有生成投影片');
+                            }
+                            
+                            console.log('✅ 成功載入加密內容，共 ' + content.slides.length + ' 個投影片');
+                        } catch (error) {
+                            console.error('解密或解析內容失敗：', error);
+                            throw error; // 重新拋出錯誤，讓 catch 處理
+                        }
                     })
                     .catch(error => {
                         console.error('載入加密內容失敗，使用原始內容', error);
                         // 如果載入失敗，恢復原始內容
                         if (originalContent) {
                             deck.innerHTML = originalContent;
+                            console.log('✅ 已恢復原始內容');
+                        } else {
+                            console.error('❌ 無法恢復原始內容，originalContent 為空');
                         }
                     });
                 }
 
-                // 確保 DOM 已載入
+                // 確保 DOM 已載入，並且等待其他腳本執行完成
+                function initLoader() {
+                    // 使用 window.load 事件，確保所有資源都已載入
+                    if (document.readyState === 'complete') {
+                        // 頁面已完全載入，延遲執行確保其他腳本已完成
+                        setTimeout(() => {
+                            loadEncryptedContent();
+                        }, 200);
+                    } else {
+                        // 等待頁面完全載入
+                        window.addEventListener('load', () => {
+                            setTimeout(() => {
+                                loadEncryptedContent();
+                            }, 200);
+                        });
+                    }
+                }
+                
                 if (document.readyState === 'loading') {
-                    document.addEventListener('DOMContentLoaded', loadEncryptedContent);
+                    // DOM 還在載入，等待 DOMContentLoaded 後再等待 load
+                    document.addEventListener('DOMContentLoaded', () => {
+                        initLoader();
+                    });
                 } else {
                     // DOM 已經載入，直接執行
-                    loadEncryptedContent();
+                    initLoader();
                 }
             }
 
@@ -128,16 +178,43 @@ const loaderScript = `
 
             // 渲染投影片
             function renderSlides(slides, container) {
-                slides.forEach(slide => {
-                    const section = document.createElement('section');
-                    section.className = slide.classes || slide.layout || 'layout-default';
-                    section.innerHTML = slide.content;
-                    container.appendChild(section);
-                });
+                try {
+                    if (!slides || !Array.isArray(slides)) {
+                        throw new Error('slides 不是有效的陣列');
+                    }
+                    
+                    slides.forEach((slide, index) => {
+                        try {
+                            const section = document.createElement('section');
+                            section.className = slide.classes || slide.layout || 'layout-default';
+                            section.innerHTML = slide.content || '';
+                            container.appendChild(section);
+                        } catch (error) {
+                            console.error('渲染投影片 ' + index + ' 失敗：', error);
+                        }
+                    });
 
-                // 觸發初始化（如果需要的話）
-                if (typeof initSlides === 'function') {
-                    initSlides();
+                    // 觸發初始化（如果需要的話）
+                    // 延遲執行，確保 DOM 已更新
+                    setTimeout(() => {
+                        // 觸發自定義事件，通知其他腳本內容已載入
+                        window.dispatchEvent(new CustomEvent('slidesLoaded', { 
+                            detail: { slideCount: slides.length } 
+                        }));
+                        
+                        // 如果導航腳本需要重新初始化，觸發重新初始化
+                        if (typeof window.reinitSlideNavigation === 'function') {
+                            window.reinitSlideNavigation();
+                        }
+                        
+                        // 觸發 resize 事件，讓圖表等重新計算
+                        window.dispatchEvent(new Event('resize'));
+                    }, 300);
+                    
+                    console.log('✅ 成功渲染 ' + slides.length + ' 個投影片');
+                } catch (error) {
+                    console.error('渲染投影片失敗：', error);
+                    throw error;
                 }
             }
         })();
