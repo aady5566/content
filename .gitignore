@@ -1,2 +1,25 @@
 style.md
 style*.md
+
+# macOS 系統檔案
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# 臨時檔案
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+
+# 環境變數檔案
+.env
+*.env
+.env.local
+.env.*.local
