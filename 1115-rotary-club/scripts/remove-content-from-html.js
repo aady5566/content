@@ -42,11 +42,11 @@ if (!navMatch) {
         process.exit(0);
     }
     const deckEnd = deckStart + lastDivIndex + '</div>'.length;
-    
+
     // 保留 deck 的開始和結束標籤，但清空內容
     const emptyDeck = deckStartTag + '\n        <!-- 內容由 JavaScript 從 JSON 動態載入 -->\n    </div>';
-    htmlContent = htmlContent.substring(0, deckStart) + 
-                  emptyDeck + 
+    htmlContent = htmlContent.substring(0, deckStart) +
+                  emptyDeck +
                   htmlContent.substring(deckEnd);
 } else {
     // 找到導航控制之前的最後一個 </div>
@@ -57,11 +57,11 @@ if (!navMatch) {
         process.exit(0);
     }
     const deckEnd = deckStart + lastDivIndex + '</div>'.length;
-    
+
     // 保留 deck 的開始和結束標籤，但清空內容
     const emptyDeck = deckStartTag + '\n        <!-- 內容由 JavaScript 從 JSON 動態載入 -->\n    </div>';
-    htmlContent = htmlContent.substring(0, deckStart) + 
-                  emptyDeck + 
+    htmlContent = htmlContent.substring(0, deckStart) +
+                  emptyDeck +
                   htmlContent.substring(deckEnd);
 }
 
