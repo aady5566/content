@@ -1,0 +1,18 @@
+{
+  "name": "1115-slide-protection",
+  "version": "1.0.0",
+  "description": "投影片內容保護工具",
+  "scripts": {
+    "extract": "node scripts/extract-content.js",
+    "encrypt": "node scripts/encrypt-content.js",
+    "build": "node scripts/build.js",
+    "dev": "node scripts/setup-dev-mode.js",
+    "inject": "node scripts/inject-loader.js",
+    "restore": "node scripts/restore-original.js",
+    "remove-automation": "node scripts/remove-automation.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
+

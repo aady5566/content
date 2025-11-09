@@ -1,6 +1,6 @@
 <!-- from gemini: AI 時代的思維變革：定義者 -->
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-Hant" >
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,11 +18,15 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
     <style>
-        /* * Wabi-Sabi Minimalist Slide Deck
-         * Font: Calibri
-         * Palette: Low-saturation, organic, earthy
-         */
+        /* ============================================
+           CSS 樣式表 - Wabi-Sabi Minimalist Slide Deck
+           Font: Calibri
+           Palette: Low-saturation, organic, earthy
+           ============================================ */
 
+        /* ============================================
+           CSS 變數定義 (CSS Variables)
+           ============================================ */
         :root {
             --bg-color: #F5F4F0; /* Warm, off-white, like aged paper */
             --text-color: #3D3A37; /* Dark, soft brown/gray */
@@ -34,12 +38,18 @@
             --highlight-color: #8c867b; /* For highlights */
         }
 
+        /* ============================================
+           全域重置 (Global Reset)
+           ============================================ */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
 
+        /* ============================================
+           基礎 HTML/Body 樣式
+           ============================================ */
         html, body {
             width: 100%;
             height: 100%;
@@ -51,13 +61,16 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
+        /* ============================================
+           投影片容器 (Deck Container)
+           ============================================ */
         #deck {
             position: relative;
             width: 100%;
             height: 100%;
         }
 
-        /* Ensure hidden slides are removed from layout */
+        /* 確保隱藏的投影片從佈局中移除 */
         #deck > section.hidden {
             display: none !important;
             visibility: hidden !important;
@@ -65,6 +78,9 @@
             pointer-events: none !important;
         }
 
+        /* ============================================
+           投影片區塊基礎樣式 (Section Base Styles)
+           ============================================ */
         section {
             position: absolute;
             top: 0;
@@ -83,13 +99,17 @@
             z-index: 0;
         }
 
+        /* 活動中的投影片 */
         section.active {
             opacity: 1;
             pointer-events: auto;
             z-index: 10;
         }
 
-        /* Scrollable content - for long images or content */
+        /* ============================================
+           可滾動內容樣式 (Scrollable Content)
+           適用於長圖片或長內容
+           ============================================ */
         section.scrollable {
             justify-content: flex-start;
             overflow-y: auto;
@@ -129,7 +149,10 @@
             padding-bottom: 2rem;
         }
 
-        /* Hidden class - hide sections completely */
+        /* ============================================
+           隱藏類別 (Hidden Class)
+           完全隱藏區塊
+           ============================================ */
         .hidden {
             display: none !important;
             position: absolute !important;
@@ -157,7 +180,9 @@
             flex-grow: 0 !important;
         }
 
-        /* Slide Layouts */
+        /* ============================================
+           投影片佈局系統 (Slide Layouts)
+           ============================================ */
         .slide-content {
             width: 100%;
             max-width: 1000px;
@@ -504,6 +529,43 @@
             color: #5c5855;
         }
 
+        /* Code 和 Pre 樣式 - 符合簡報風格 */
+        pre {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid var(--line-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            overflow-x: hidden;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            word-break: break-word;
+            white-space: pre-wrap;
+            max-width: 100%;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: clamp(0.85rem, 1.5vw, 1rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin: 1.5rem 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        code {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid var(--line-color);
+            border-radius: 4px;
+            padding: 0.2rem 0.4rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+            color: var(--text-color);
+        }
+
+        pre code {
+            background: transparent;
+            border: none;
+            padding: 0;
+            font-size: inherit;
+        }
+
         /* 超連結樣式 - 符合簡報風格 */
         a {
             color: var(--current-blue);
@@ -536,7 +598,9 @@
             font-weight: 600;
         }
 
-        /* Navigation */
+        /* ============================================
+           導航控制 (Navigation Controls)
+           ============================================ */
         .nav-control {
             position: fixed;
             top: 50%;
@@ -583,7 +647,9 @@
             opacity: 0.5;
         }
 
-        /* Timeline Styles */
+        /* ============================================
+           時間軸樣式 (Timeline Styles)
+           ============================================ */
         .timeline-container {
             width: 100%;
             max-width: 1000px;
@@ -693,7 +759,10 @@
             color: var(--current-blue) !important;
         }
 
-        /* Grid Layout - 2 rows x 3 columns */
+        /* ============================================
+           網格佈局 (Grid Layout)
+           2 行 x 3 列
+           ============================================ */
         .grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -762,7 +831,9 @@
             }
         }
 
-        /* Reveal text animation */
+        /* ============================================
+           文字顯示動畫 (Reveal Text Animation)
+           ============================================ */
         .reveal-text {
             opacity: 0;
             visibility: hidden;
@@ -807,7 +878,9 @@
             transform: translateX(4px);
         }
 
-        /* 3D Neural Network Background */
+        /* ============================================
+           3D 神經網路背景 (3D Neural Network Background)
+           ============================================ */
         .layout-default.neural-bg {
             position: relative;
             overflow: hidden;
@@ -836,7 +909,10 @@
             max-width: calc(100% - 10vw);
         }
 
-        /* Interactive Diagram and Summary Box Styles - from w4-transformer.html */
+        /* ============================================
+           互動圖表與摘要框樣式 (Interactive Diagram & Summary Box)
+           來源：w4-transformer.html
+           ============================================ */
         .interactive-diagram {
             width: 100%;
             max-width: 800px;
@@ -852,7 +928,10 @@
             position: relative;
         }
 
-        /* Summary Box 樣式 - 基於 style.md 風格 */
+        /* ============================================
+           摘要框樣式 (Summary Box Styles)
+           基於 style.md 風格
+           ============================================ */
         .summary-box-container {
             width: 100%;
             max-width: 800px;
@@ -923,7 +1002,9 @@
             margin-bottom: 0;
         }
 
-        /* Game Button Styles */
+        /* ============================================
+           遊戲按鈕樣式 (Game Button Styles)
+           ============================================ */
         .game-button {
             background: var(--accent-color);
             color: var(--bg-color);
@@ -947,7 +1028,9 @@
             transform: translateY(0);
         }
 
-        /* Math Container Styles */
+        /* ============================================
+           數學容器樣式 (Math Container Styles)
+           ============================================ */
         .math-container {
             background: rgba(255, 255, 255, 0.8);
             border: 2px solid var(--line-color);
@@ -968,7 +1051,10 @@
             margin-bottom: 0;
         }
 
-        /* Mermaid Diagram Styles - Wabi-Sabi Minimalist */
+        /* ============================================
+           Mermaid 圖表樣式 (Mermaid Diagram Styles)
+           Wabi-Sabi Minimalist 風格
+           ============================================ */
         .mermaid {
             width: 100%;
             max-width: 100%;
@@ -1019,7 +1105,10 @@
             font-weight: 600 !important;
         }
 
-        /* Chart Container Styles - Wabi-Sabi Minimalist */
+        /* ============================================
+           圖表容器樣式 (Chart Container Styles)
+           Wabi-Sabi Minimalist 風格
+           ============================================ */
         .chart-container {
             background: rgba(255, 255, 255, 0.6);
             border: 1px solid var(--line-color);
@@ -1035,10 +1124,125 @@
                 gap: 1.5rem !important;
             }
         }
+
+        /* ============================================
+           複製按鈕樣式 (Copy Button Styles)
+           右上角，低調設計
+           ============================================ */
+        #copy-prompt-btn {
+            padding: 0.4rem 0.8rem;
+            background: rgba(107, 139, 164, 0.1);
+            color: var(--accent-color);
+            border: 1px solid rgba(107, 139, 164, 0.3);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-family: var(--font-family);
+            transition: all 0.2s ease;
+        }
+
+        #copy-prompt-btn:hover {
+            background: rgba(107, 139, 164, 0.2);
+            border-color: rgba(107, 139, 164, 0.5);
+        }
+
+        #copy-prompt-btn:active {
+            transform: scale(0.95);
+        }
     </style>
+
+    
+
+    <!-- CONTENT-LOADER-INJECTED -->
+    <script>
+        /**
+         * 內容載入器：自動檢測開發/生產模式
+         */
+        (function() {
+            // 檢測是否為開發模式
+            const isDevMode =
+                document.documentElement.hasAttribute('data-dev-mode') ||
+                window.location.hostname === 'localhost' ||
+                window.location.hostname === '127.0.0.1' ||
+                window.location.hostname === '' ||
+                window.location.search.includes('dev=true');
+
+            // 如果是生產模式，動態載入加密內容
+            if (!isDevMode) {
+                // 讀取路徑映射
+                fetch('data-path.json')
+                    .then(response => response.json())
+                    .then(mapping => {
+                        // 載入加密內容
+                        return fetch('data/' + mapping.filename);
+                    })
+                    .then(response => response.text())
+                    .then(encrypted => {
+                        // 解密內容
+                        const decrypted = decryptContent(encrypted);
+                        const content = JSON.parse(decrypted);
+
+                        // 清空現有內容並動態載入
+                        const deck = document.getElementById('deck');
+                        if (deck) {
+                            deck.innerHTML = '';
+                            renderSlides(content.slides, deck);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('載入加密內容失敗，使用原始內容', error);
+                    });
+            }
+
+            // 解密函數（與 encrypt-content.js 對應）
+            function decryptContent(encrypted) {
+                // 反向字元替換
+                const unshifted = encrypted.split('').map(char => {
+                    const code = char.charCodeAt(0);
+                    if ((code >= 51 && code <= 60) || (code >= 68 && code <= 93) || (code >= 100 && code <= 125)) {
+                        return String.fromCharCode(code - 3);
+                    }
+                    return char;
+                }).join('');
+
+                // Base64 解碼（瀏覽器環境）
+                try {
+                    // 使用 atob（瀏覽器原生 API）
+                    const binaryString = atob(unshifted);
+                    // 將 binary string 轉換為 UTF-8
+                    const bytes = new Uint8Array(binaryString.length);
+                    for (let i = 0; i < binaryString.length; i++) {
+                        bytes[i] = binaryString.charCodeAt(i);
+                    }
+                    return new TextDecoder('utf-8').decode(bytes);
+                } catch (e) {
+                    // 降級方案：直接使用 decodeURIComponent
+                    return decodeURIComponent(escape(atob(unshifted)));
+                }
+            }
+
+            // 渲染投影片
+            function renderSlides(slides, container) {
+                slides.forEach(slide => {
+                    const section = document.createElement('section');
+                    section.className = slide.classes || slide.layout || 'layout-default';
+                    section.innerHTML = slide.content;
+                    container.appendChild(section);
+                });
+
+                // 觸發初始化（如果需要的話）
+                if (typeof initSlides === 'function') {
+                    initSlides();
+                }
+            }
+        })();
+    </script>
+
 </head>
 <body>
-
+    <!-- ============================================
+         投影片容器開始
+         ============================================ -->
     <div id="deck">
 
         <section class="layout-title">
@@ -1046,6 +1250,25 @@
                 <h1><b>AI 時代的思維變革</b></h1>
                 <h2>YD Huang</h2>
                 <p style="margin-top: 2rem; color: var(--accent-color);">2025-11-15</p>
+            </div>
+        </section>
+
+        <section class="layout-default scrollable">
+            <div class="slide-content">
+                <h1 style="text-align: center; margin-bottom: 3rem;">大綱</h1>
+                <div style="max-width: 900px; margin: 0 auto;">
+                    <ol style="font-size: clamp(1.3rem, 2.5vw, 1.8rem); line-height: 2.5; margin-left: 2rem;">
+                        <li style="margin-bottom: 2rem;">
+                            <strong>認識與焦慮</strong>
+                        </li>
+                        <li style="margin-bottom: 2rem;">
+                            <strong>AI 本質與全球競賽</strong>
+                        </li>
+                        <li style="margin-bottom: 2rem;">
+                            <strong>實踐與心法</strong>
+                        </li>
+                    </ol>
+                </div>
             </div>
         </section>
 
@@ -1059,10 +1282,10 @@
                             <div class="timeline-year">2009-2016</div>
                             <div class="timeline-content">
                                 <div class="title">台灣大學</div>
-                                <div class="subtitle">心理學士 (B98..)</div>
-                                <div class="text">大專生科技部計劃</div>
-                                <div class="subtitle">心理碩士一般組</div>
-                                <div class="text">情緒對賭局決策的影響</div>
+                                <div class="subtitle">心理學士</div>
+                                <!-- <div class="text">大專生科技部計劃</div> -->
+                                <div class="subtitle">心理碩士認知計量</div>
+                                <!-- <div class="text">情緒對賭局決策的影響</div> -->
                             </div>
                         </div>
                         <div class="timeline-item timeline-item-large">
@@ -1218,20 +1441,11 @@
         <section class="layout-default">
             <div class="slide-content">
                 <h1>真正的我 (The Person)</h1>
-                <p>我想這樣介紹自己。</p>
                 <ul>
                     <li>錯把家事當成舒壓的先生</li>
                     <li style="cursor: pointer;">熱愛模組化思考的探索者 <span class="reveal-text" style="font-size: 3rem; font-weight: 600;">INTJ-A</span></li>
                     <li>AI 實踐的狂熱者</li>
                 </ul>
-            </div>
-        </section>
-
-        <section class="layout-default">
-            <div class="slide-content">
-                <h1>我對工作的真實原則</h1>
-                <p>基於「真正的我」，分享比頭銜更重要的「真實原則」</p>
-                <p style="margin-top: 1.5rem;">不過，都會連結到我們今天要談的核心：<strong style="font-size: 5rem;">AI</strong></p>
             </div>
         </section>
 
@@ -1260,7 +1474,7 @@
                 </div>
                 <div class="text-column">
                     <h1>碳基生命 vs. 矽基電體</h1>
-                    <p>Biological vs. Artificial Intelligence</p>
+                    <p style="font-size: 1.5rem;">Biological vs. Artificial Intelligence</p>
                     <blockquote>
                         <p>當 AI 外包了計算、記憶、閱讀、理解、甚至創造...</p>
                         <p>那 人類 ... 還剩下什麼？</p>
@@ -1448,11 +1662,8 @@
         <section class="layout-default">
             <div class="slide-content">
                 <h1>1. 機器學習 (Machine Learning)</h1>
-                <p><b>傳統程式：</b>人類寫「規則」，電腦「執行」。</p>
-                <blockquote>(e.g., 如果金額 > 1000, 就亮紅燈)</blockquote>
-                <p><b>機器學習：</b>人類給「資料」，電腦自己「找出規則」。</p>
-                <blockquote>(e.g., 給 10 萬張貓的照片，電腦自己學會「貓」的規則)</blockquote>
-                <p style="font-weight: 600;">核心是「從資料中學習模式」。</p>
+                <p><b>傳統程式：</b>人類寫「規則」，電腦「執行」。（計算機）</p>
+                <p><b>機器學習：</b>人類給「資料」，電腦自己「找出規則」</p>
             </div>
         </section>
 
@@ -1828,7 +2039,7 @@
 
         <section class="layout-default">
             <div class="slide-content">
-                <h1>ChatGPT 用戶增長趨勢</h1>
+                <h1>ChatGPT 每週用戶增長趨勢</h1>
                 <div class="chart-container" style="position: relative; width: 100%; max-width: 1000px; margin: 2rem auto; height: clamp(300px, 50vw, 500px);">
                     <canvas id="chatgpt-growth-chart"></canvas>
                 </div>
@@ -1900,6 +2111,15 @@
         <section class="layout-title">
             <div class="slide-content">
                 <h2 style="font-weight: 600;">如果要讓 AI 代理人去使用別人開發的工具或是和其他 AI 溝通？</h2>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>Agentic AI (代理式人工智慧) </h1>
+                <p><b>現今主流 AI：</b>「被動的回應者」。</p>
+                <p><b>Agentic AI：</b>「主動的執行者」。（正在發生）</p>
+                <p style="font-size: 1.2rem;">你不再是給它「問題」，你是給它「目標」，它會自己「推理」、「行動」、「呼叫工具」。<br><b style="color: #92a247;">在你的授權下 (Human-in-the-loop)，主動執行任務。</b></p>
             </div>
         </section>
 
@@ -1989,16 +2209,6 @@
                 </div>
             </div>
         </section>
-
-        <section class="layout-default">
-            <div class="slide-content">
-                <h1>Agentic AI (代理式人工智慧) </h1>
-                <p><b>現今主流 AI：</b>「被動的回應者」。</p>
-                <p><b>Agentic AI：</b>「主動的執行者」。（正在發生）</p>
-                <p style="font-size: 1.2rem;">你不再是給它「問題」，你是給它「目標」，它會自己「推理」、「行動」、「呼叫工具」。<br><b style="color: #92a247;">在你的授權下 (Human-in-the-loop)，主動執行任務。</b></p>
-            </div>
-        </section>
-
 
         <section class="layout-default">
             <div class="slide-content">
@@ -2094,40 +2304,40 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; background-color: rgba(255, 255, 255, 0.4); font-weight: 500;">私人 AI 投資總額 (2024)</td>
-                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-weight: 600;">$1091 億美元</td>
-                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center;">$93 億美元</td>
-                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center;">英國：$45 億美元</td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; background-color: rgba(255, 255, 255, 0.4); font-weight: 500; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">私人 AI 投資總額 (2024)</td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-weight: 600; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">$1091 億美元</td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">$93 億美元</td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">英國：$45 億美元</td>
                             </tr>
                             <tr>
-                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; background-color: rgba(255, 255, 255, 0.4); font-weight: 500;">AI 專利總數 (2023)</td>
-                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center;">14.2%</td>
-                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-weight: 600;">69.7%<br><small style="color: var(--accent-color);">(全球第一)</small></td>
-                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center;">2.77%</td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; background-color: rgba(255, 255, 255, 0.4); font-weight: 500; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">AI 專利總數 (2023)</td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">14.2%</td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-weight: 600; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">69.7%<br><small style="color: var(--accent-color);">(全球第一)</small></td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">2.77%</td>
                             </tr>
                             <tr>
-                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; background-color: rgba(255, 255, 255, 0.4); font-weight: 500;">AI 論文發表總數 (2023)</td>
-                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center;">9.2%</td>
-                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-weight: 600;">23.2%<br><small style="color: var(--accent-color);">(全球第一)</small></td>
-                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center;">15.2%</td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; background-color: rgba(255, 255, 255, 0.4); font-weight: 500; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">AI 論文發表總數 (2023)</td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">9.2%</td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-weight: 600; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">23.2%<br><small style="color: var(--accent-color);">(全球第一)</small></td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">15.2%</td>
                             </tr>
                             <tr>
-                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; background-color: rgba(255, 255, 255, 0.4); font-weight: 500;">高影響力研究 (2021-2023 Top 100)</td>
-                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-weight: 600;">50%<br><small style="color: var(--accent-color);">數量最多</small></td>
-                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center;">31%<br><small style="color: #5c5855;">與美國差距縮小</small></td>
-                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center;">--</td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; background-color: rgba(255, 255, 255, 0.4); font-weight: 500; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">高影響力研究 (2021-2023 Top 100)</td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-weight: 600; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">50%<br><small style="color: var(--accent-color);">數量最多</small></td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">31%<br><small style="color: #5c5855;">與美國差距縮小</small></td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">--</td>
                             </tr>
                             <tr>
-                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; background-color: rgba(255, 255, 255, 0.4); font-weight: 500;">知名 AI 模型數量 (2024)</td>
-                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-weight: 600;">40 個</td>
-                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-weight: 600;">15 個</td>
-                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-weight: 600;">3 個</td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; background-color: rgba(255, 255, 255, 0.4); font-weight: 500; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">知名 AI 模型數量 (2024)</td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-weight: 600; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">40 個</td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-weight: 600; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">15 個</td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-weight: 600; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">3 個</td>
                             </tr>
                             <tr>
-                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; background-color: rgba(255, 255, 255, 0.4); font-weight: 500;">政府重大投資承諾</td>
-                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center;">$52 億美元<br><small style="color: #5c5855;">(2013-2023 合約總額)</small></td>
-                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-weight: 600;">$475 億美元<br><small style="color: #5c5855;">(半導體基金)</small></td>
-                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-weight: 600;">€1090 億歐元<br><small style="color: #5c5855;">(法國基礎設施)</small></td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; background-color: rgba(255, 255, 255, 0.4); font-weight: 500; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">政府重大投資承諾</td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">$52 億美元<br><small style="color: #5c5855;">(2013-2023 合約總額)</small></td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-weight: 600; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">$475 億美元<br><small style="color: #5c5855;">(半導體基金)</small></td>
+                                <td style="border: 1px solid var(--header-bg); padding: 0.75rem 1rem; text-align: center; font-weight: 600; font-size: clamp(1.02rem, 1.8vw, 1.32rem);">€1090 億歐元<br><small style="color: #5c5855;">(法國基礎設施)</small></td>
                             </tr>
                         </tbody>
                     </table>
@@ -2436,7 +2646,303 @@
 
         <section class="layout-default">
             <div class="slide-content">
-                <h1>身為當今的人類物種，我..該做什麼？</h1>
+                <h1>當今人類物種，我..該做什麼？</h1>
+            </div>
+        </section>
+
+
+        <section class="layout-quote">
+            <div class="slide-content" style="text-align: center; margin: 0 auto;">
+                <h1 style="font-size: clamp(2rem, 5vw, 4rem);">就一件事</h1>
+                <h1 style="font-size: clamp(7rem, 10vw, 8rem);">問好問題</h1>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1 stylye = "text-align: center;">提示工程四大原則</h1>
+                <table style="table-layout: fixed;">
+                    <thead>
+                        <tr>
+                            <th style="width: 50%;">原則</th>
+                            <th style="width: 50%;">白話文解釋</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1. 角色</td>
+                            <td>你希望AI扮演誰？</td>
+                        </tr>
+                        <tr>
+                            <td>2. 目標</td>
+                            <td>你要 AI完成什麼任務？</td>
+                        </tr>
+                        <tr>
+                            <td>3. 輸出格式</td>
+                            <td>回應應該長什麼樣？</td>
+                        </tr>
+                        <tr>
+                            <td>4. 範圍限制</td>
+                            <td>有哪些規則和界線？</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>原則一：角色</h1>
+                <p style="font-size: clamp(1.5rem, 1.5vw, 1.2rem);">為AI指定特定身份（如：編輯、分析師），以產生更具針對性、更符合情境的回應。</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>原則二：目標</h1>
+                <p style="font-size: clamp(1.5rem, 1.5vw, 1.2rem);">具體、詳細地描述期望的結果與風格。<br>不只說「寫一首詩」，而是「用特定風格寫一首勵志短詩」。</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>原則三：輸出格式</h1>
+                <p style="font-size: clamp(1.5rem, 1.5vw, 1.2rem);">清晰定義期望的回應結構（如列表或逗號隔開，用 markdown 格式輸出）。</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>原則四：範圍限制</h1>
+                <p style="font-size: clamp(1.5rem, 1.5vw, 1.2rem);">設定清晰規則，說明「該做什麼」而非「不該做什麼」，<br>並具體規定長度（例如最多 50 字）。</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>"幫我做一份有關[生成式 AI]的投影片。"</h1>
+                <pre><code>【角色】你是一位資深的簡報教練。
+【目標】產出 8–10 頁的簡報大綱與每頁要點，主題「生成式 AI 對大學生學習的影響」，用於 10 分鐘口頭報告；成功標準：有開場、問題定義、三個論點、反方觀點、結論與參考文獻，並能被同組同學直接分工製作。
+【脈絡】對象是非資工背景同學；不允許杜撰研究；可使用 2023–2025 的公開報導/期刊作佐證（列出 3–5 則來源）。
+【輸出格式】Markdown 列出 (1) 封面 (2) 目錄 (3) 每頁標題＋3–5 個要點 (4) 引用/連結清單。
+【範圍與限制】語氣中立，每頁要點小於 60 字；列出 2 個可被質疑的點與如何回應。
+【樣例】頁面格式示例：
+- p3〈論點一：學習效率〉：要點(1)..... (2)..... (3).....
+【評分規則】完整性、可驗證來源、可分工性、時間可控（10 分鐘）。</code></pre>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>"幫我把履歷寫得更厲害。"</h1>
+                <pre><code>【角色】你是連鎖咖啡店的人資招募專員，熟悉學生打工履歷。
+【目標】將下列原始經歷優化為 1 頁中文履歷的「工作經歷」段落；成功標準：每點含動詞＋任務＋量化成果＋工具/技能。
+【脈絡】職缺：門市夥伴（重服務、收銀、補貨、衛生、內外場協作）。投遞對象：店長，閱覽時間<30 秒。
+【輸出格式】列出 4–6 條要點，每條小於 30 字。
+【範圍與限制】語氣務實精煉。
+【樣例】「高峰期 4 小時維持平均候位 <5 分鐘，與 3 位夥伴輪替補貨與收銀」。</code></pre>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>進階提示技巧</h1>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>情感提示 (Emotion Prompting)</h1>
+                <p style="font-size: clamp(1.5rem, 1.5vw, 1.2rem);">在提示中加入<strong>情感語言</strong>，利用AI的情感豐富訓練資料，以提高準確度和回應品質。</p>
+            </div>
+        </section>
+
+        <section class="layout-quote">
+            <div class="slide-content">
+                <h1 style="font-weight: bold; font-size: clamp(3rem, 1.5vw, 1.2rem);">「這對我來說<em>非常重要</em>，請務必準確回答。」</h1>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>少數樣本提示 (Few-shot)</h1>
+                <p style="font-size: clamp(1.5rem, 1.5vw, 1.2rem);">在提示中提供一或多個「輸入/輸出」範例，讓模型模仿該模式來完成任務。</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>重讀 (Re-reading)</h1>
+                <p style="font-size: clamp(1.5rem, 1.5vw, 1.2rem);">最後要求模型在回答前重新閱讀提示，以確保不會錯過關鍵細節。</p>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>重點整理</h1>
+                <ul style="list-style-type: none; text-align: left; padding-left: 0;">
+                    <li style="margin-bottom: 1rem;"><strong>核心四原則</strong>：始終定義角色、目標、格式、限制。</li>
+                    <li style="margin-bottom: 1rem;"><strong>進階1（情感提示）</strong>：加入情感以提高專注度。</li>
+                    <li style="margin-bottom: 1rem;"><strong>進階2（少數樣本）</strong>：提供你想要的格式。</li>
+                    <li style="margin-bottom: 1rem;"><strong>進階3（重讀）</strong>：要求 AI 再次確認你的指令。</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="layout-default scrollable">
+            <div class="slide-content" style="position: relative;">
+                <button id="copy-prompt-btn"
+                        style="position: absolute; top: 0; right: 0; padding: 0.4rem 0.8rem; background: rgba(210, 205, 185, 0.1); color: var(--accent-color); border: 1px solid rgba(210, 205, 185, 0.3); border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-family: var(--font-family); transition: all 0.2s ease; z-index: 10;">
+                    Copy to clipboard
+                </button>
+                <div id="copy-feedback"
+                     style="position: absolute; top: 2.5rem; right: 0; font-size: 0.7rem; color: var(--accent-color); opacity: 0; transition: opacity 0.3s; pointer-events: none;">
+                    Copied!
+                </div>
+                <h1>"如何向 AI 問一個好問題？"</h1>
+                <pre><code id="prompt-text">【角色】你是一位資深的教學設計專家，專精於溝通技巧與提問方法，擁有 15 年以上的教學經驗。這對我來說<strong>非常重要</strong>，因為我即將在重要的場合使用這個技巧，請務必提供準確且實用的建議。
+
+【目標】產出一份「如何向 AI 問一個好問題」的完整指南，包含：(1) 核心提問原則（3-5 點）(2) 常見錯誤範例與修正對照 (3) 實戰練習題（2-3 題）。成功標準：內容清晰易懂、適合初學者、可直接應用於 ChatGPT/Claude 等主流 AI 工具。
+
+【輸出格式】使用 Markdown 格式，分為三個區塊：
+1. 核心原則（編號列表）
+2. 錯誤 vs 正確範例對照表
+3. 實戰練習（每題包含「題目」和「參考答案」）
+
+【範圍與限制】每個原則說明不超過 50 字；範例必須具體且貼近日常生活；語氣親切專業，避免過於學術化；總長度控制在 800-1000 字。
+
+【少數樣本】以下是一個好的提問範例：
+錯誤：「幫我寫作業」
+正確：「【角色】你是我的學習夥伴【目標】幫我理解線性代數的矩陣運算，用生活化例子解釋【輸出】用 3 個步驟說明，每步驟不超過 2 句話」
+
+【重讀】在回答前，請重新閱讀以上所有要求，確保你的回答完全符合：角色定位、目標設定、格式規範、範圍限制，並包含情感提示的效果。這對我來說<strong>極其重要</strong>，請仔細檢查後再回應。</code></pre>
+            </div>
+        </section>
+
+
+        <section class="layout-default hidden">
+            <div class="slide-content">
+                <h1>你的「入場券」</h1>
+                <p>我秀出這張表，不是要製造焦慮，而是要點出「價值」。</p>
+                <p style="font-weight: 600;">我們還要回頭處理那兩個最大的焦慮：「我跟不上了」和「我會被取代」。</p>
+            </div>
+        </section>
+
+        <section class="layout-title">
+            <div class="slide-content">
+                <h1>最後，我想分享一些個人經驗</h1>
+                <h2 style="color: var(--text-color); font-size: 2rem;">職場、生活心法分享</h2>
+            </div>
+        </section>
+
+
+        <section class="layout-two-column scrollable" id="speed-running-section">
+            <div class="slide-content">
+                <div class="image-column">
+                    <img src="../pic/1115/speed-running-promotion.jpg"
+                         alt=""
+                         class="reveal-trigger"
+                         style="cursor: pointer; transform: scale(0.8);">
+                </div>
+                <div class="text-column">
+                    <div class="reveal-text reveal-block" style="margin-top: 230px; margin-left: -100px;">
+                        <p>努力只是門票，<br>選擇和機運..都很重要。</p>
+
+                        <iframe src="../1115-rotary-club/linkedin-short.html"
+                                frameborder="0"
+                                style="width: 130%; height: 900px; border: none; border-radius: 4px; box-shadow: 0 4px 12px rgba(187, 174, 174, 0.1);">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>第一性原則 (First Principles)</h1>
+                <p>跳脫現有慣例，從物理性意義的「基本真理」出發。</p>
+                <blockquote>「把一個問題拆解回它最基礎、最不可否認的真相，然後從那裡開始重新建構解決方案。」</blockquote>
+            </div>
+        </section>
+
+        <section class="layout-default scrollable">
+            <div class="slide-content">
+                <h1>Elon Musk <span style="font-size: 1.5rem;">First Principles in Practice</span></h1>
+                <ol style="font-size: clamp(1.2rem, 2.5vw, 1.75rem); margin-left: 2rem; margin-top: 1.5rem;">
+                    <li style="margin-bottom: 1.5rem;">
+                        <b>質疑要求（Question the Requirements）</b>
+                        <p style="font-size: clamp(1rem, 1.8vw, 1.3rem); color: #5c5855; margin-top: 0.5rem;">任何要求在某種程度上是「愚蠢的」（dumb），因此要減少要求數量，確保你不會完美地回答一個錯誤的問題。</p>
+                    </li>
+                    <li style="margin-bottom: 1.5rem;">
+                        <b>刪除步驟（Delete Steps）</b>
+                        <p style="font-size: clamp(1rem, 1.8vw, 1.3rem); color: #5c5855; margin-top: 0.5rem;">嘗試將某個步驟、零件或流程完全刪除。如果在刪除後沒有被迫放回至少 10% 的內容，那麼刪得就不夠多。</p>
+                    </li>
+                    <li style="margin-bottom: 1.5rem;">
+                        <b>最佳化（Optimize/Simplify）</b>
+                        <p style="font-size: clamp(1rem, 1.8vw, 1.3rem); color: #5c5855; margin-top: 0.5rem;">只有在確定該事物應該存在之後，才去簡化或最佳化它。聰明工程師最常見的錯誤就是最佳化一個本不該存在的東西。</p>
+                    </li>
+                    <li style="margin-bottom: 1.5rem;">
+                        <b>加速（Speed Up）</b>
+                        <p style="font-size: clamp(1rem, 1.8vw, 1.3rem); color: #5c5855; margin-top: 0.5rem;">無論你認為某事可以多快完成，它總可以更快。但必須在刪除和最佳化之後才能進行加速，否則你加速了荒謬的存在。</p>
+                    </li>
+                    <li style="margin-bottom: 1.5rem;">
+                        <b>自動化（Automate）</b>
+                        <p style="font-size: clamp(1rem, 1.8vw, 1.3rem); color: #5c5855; margin-top: 0.5rem;">最後才是實現自動化。</p>
+                    </li>
+                </ol>
+                <p style="margin-top: 2rem; font-size: clamp(0.9rem, 1.5vw, 1.1rem); color: var(--accent-color);">
+                    參考來源：<a href="https://youtu.be/Kbk9BiPhm7o?list=TLGGRvt5DTdVUe4wOTExMjAyNQ" target="_blank" rel="noopener noreferrer">Elon Musk: Neuralink and the Future of Humanity | Lex Fridman</a>
+                </p>
+            </div>
+        </section>
+
+        <section class="layout-default scrollable">
+            <div class="slide-content">
+                <h1>YD 版本 <span style="font-size: 1.5rem;">First Principles in Practice</span></h1>
+                <ol class="reveal-trigger" style="font-size: clamp(1.2rem, 2.5vw, 1.75rem); margin-left: 2rem; margin-top: 1.5rem; cursor: pointer;">
+                    <li style="margin-bottom: 1.5rem;">
+                        <b>確認需求背後的需求（Confirm the Hidden Requirements）</b>
+                        <p style="font-size: clamp(1rem, 1.8vw, 1.3rem); color: #5c5855; margin-top: 0.5rem;">是「想要」還是「必要」？</p>
+                    </li>
+                    <li style="margin-bottom: 1.5rem;">
+                        <b>風險控管（Manage the Risks）</b>
+                        <p style="font-size: clamp(1rem, 1.8vw, 1.3rem); color: #5c5855; margin-top: 0.5rem;">如果沒有_ _ _ _會怎樣？</p>
+                    </li>
+                    <li style="margin-bottom: 1.5rem;">
+                        <b>調整（Make it Simpler）</b>
+                        <p style="font-size: clamp(1rem, 1.8vw, 1.3rem); color: #5c5855; margin-top: 0.5rem;">有沒有比現在更簡單一點的方式？</p>
+                    </li>
+                    <li style="margin-bottom: 1.5rem;">
+                        <b>精益求精（Make it Better）</b>
+                        <p style="font-size: clamp(1rem, 1.8vw, 1.3rem); color: #5c5855; margin-top: 0.5rem;">還有沒有更好的方式？</p>
+                    </li>
+                </ol>
+                <p class="reveal-text reveal-block" style="margin-top: 2rem; font-size: clamp(5rem, 1.5vw, 2.5rem); color: var(--accent-color); text-align: center; font-weight: 500;">意義感 + 專注力 = 效率</p>
+            </div>
+        </section>
+
+        <section class="layout-quote">
+            <div class="slide-content">
+                <h1 style="font-size: clamp(2rem, 5vw, 4rem);">原則一：</h1>
+                <h1 style="font-size: clamp(2.5rem, 6vw, 5rem);">是「想要」還是「需要」？</h1>
+            </div>
+        </section>
+
+        <section class="layout-default hidden">
+            <div class="slide-content">
+                <h1>「想要」vs.「需要」</h1>
+                <p>我們之所以會「跟不上」，之所以會 FOMO，是因為我們花了太多時間在追逐「想要」的工具，卻沒有花時間釐清「需要」解決的問題。</p>
+                <blockquote>你今天「想要」學 Sora，明天「想要」學 Suno，你永遠追不完。</blockquote>
+                <p>你必須做的，是「回到你自己身上」。</p>
+                <p style="font-weight: 600;">回到你的科系、你的工作、你的生活。問自己一個最根本的問題：「我周遭最需要被解決的問題是什麼？」</p>
+                <p>「那個問題，真的需要 AI 嗎？」</p>
+            </div>
+        </section>
+
+        <section class="layout-quote">
+            <div class="slide-content">
+                <h1 style="font-size: clamp(2rem, 5vw, 4rem);">原則二：</h1>
+                <h1 style="font-size: clamp(2.5rem, 6vw, 5rem);">先「高薪」還是「奴一下」？</h1>
             </div>
         </section>
 
@@ -2481,7 +2987,7 @@
                         <line x1="266.67" y1="140" x2="266.67" y2="220" stroke="#d1d1c2" stroke-width="1"/>
                         <line x1="533.33" y1="140" x2="533.33" y2="220" stroke="#d1d1c2" stroke-width="1"/>
                         <text x="133.33" y="200" text-anchor="middle" font-family="Calibri, sans-serif" font-size="18" fill="#3D3A37" filter="url(#blurFilter)">資深後端工程師</text>
-                        <text x="400" y="200" text-anchor="middle" font-family="Calibri, sans-serif" font-size="18" fill="#3D3A37">4-8 年</text>
+                        <text x="400" y="200" text-anchor="middle" font-family="Calibri, sans-serif" font-size="18" fill="#3D3A37">3-5 年</text>
                         <text x="666.67" y="200" text-anchor="middle" font-family="Calibri, sans-serif" font-size="18" fill="#3D3A37" filter="url(#blurFilter)">90k ~ 180k</text>
 
                         <!-- 第三行資料（粗體） -->
@@ -2489,7 +2995,7 @@
                         <line x1="266.67" y1="220" x2="266.67" y2="300" stroke="#d1d1c2" stroke-width="1"/>
                         <line x1="533.33" y1="220" x2="533.33" y2="300" stroke="#d1d1c2" stroke-width="1"/>
                         <text x="133.33" y="280" text-anchor="middle" font-family="Calibri, sans-serif" font-size="18" font-weight="600" fill="#3D3A37" filter="url(#blurFilter)">資料科學家 (Data Scientist)</text>
-                        <text x="400" y="280" text-anchor="middle" font-family="Calibri, sans-serif" font-size="18"  fill="#3D3A37">3+ 年</text>
+                        <text x="400" y="280" text-anchor="middle" font-family="Calibri, sans-serif" font-size="18"  fill="#3D3A37">5-8 年</text>
                         <text x="666.67" y="280" text-anchor="middle" font-family="Calibri, sans-serif" font-size="18" font-weight="600" fill="#3D3A37" filter="url(#blurFilter)">70k ~ 150k</text>
 
                         <!-- 第四行資料（粗體） -->
@@ -2497,164 +3003,24 @@
                         <line x1="266.67" y1="300" x2="266.67" y2="400" stroke="#d1d1c2" stroke-width="1"/>
                         <line x1="533.33" y1="300" x2="533.33" y2="400" stroke="#d1d1c2" stroke-width="1"/>
                         <text x="133.33" y="360" text-anchor="middle" font-family="Calibri, sans-serif" font-size="18" font-weight="600" fill="#3D3A37" filter="url(#blurFilter)">雲端架構師 (Cloud Architect)</text>
-                        <text x="400" y="360" text-anchor="middle" font-family="Calibri, sans-serif" font-size="18"  fill="#3D3A37">5+ 年</text>
+                        <text x="400" y="360" text-anchor="middle" font-family="Calibri, sans-serif" font-size="18"  fill="#3D3A37">10+ 年</text>
                         <text x="666.67" y="360" text-anchor="middle" font-family="Calibri, sans-serif" font-size="18" font-weight="600" fill="#3D3A37" filter="url(#blurFilter)">100k ~ 180k+</text>
                     </svg>
                 </div>
             </div>
         </section>
 
-        <section class="layout-default hidden">
-            <div class="slide-content">
-                <h1>你的「入場券」</h1>
-                <p>我秀出這張表，不是要製造焦慮，而是要點出「價值」。</p>
-                <p style="font-weight: 600;">我們還要回頭處理那兩個最大的焦慮：「我跟不上了」和「我會被取代」。</p>
-            </div>
-        </section>
-
-        <section class="layout-title">
-            <div class="slide-content">
-                <h1>我想分享一些經驗</h1>
-                <h2 style="color: var(--text-color); font-size: 2rem;">職場、生活心法分享</h2>
-            </div>
-        </section>
-
-
-        <section class="layout-two-column scrollable" id="speed-running-section">
-            <div class="slide-content">
-                <div class="image-column">
-                    <img src="../pic/1115/speed-running-promotion.jpg"
-                         alt=""
-                         class="reveal-trigger"
-                         style="cursor: pointer; transform: scale(0.8);">
-                </div>
-                <div class="text-column">
-                    <div class="reveal-text reveal-block" style="margin-top: 230px; margin-left: -100px;">
-                        <p>努力只是門票，<br>選擇和機運..都很重要。</p>
-
-                        <iframe src="../1115-rotary-club/linkedin-short.html"
-                                frameborder="0"
-                                style="width: 130%; height: 900px; border: none; border-radius: 4px; box-shadow: 0 4px 12px rgba(187, 174, 174, 0.1);">
-                        </iframe>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="layout-quote">
-            <div class="slide-content">
-                <h1 style="font-size: clamp(2rem, 5vw, 4rem);">原則一：</h1>
-                <h1 style="font-size: clamp(2.5rem, 6vw, 5rem);">是「想要」還是「需要」？</h1>
-            </div>
-        </section>
-
-        <section class="layout-default">
-            <div class="slide-content">
-                <h1>「想要」vs.「需要」</h1>
-                <p>我們之所以會「跟不上」，之所以會 FOMO，是因為我們花了太多時間在追逐「想要」的工具，卻沒有花時間釐清「需要」解決的問題。</p>
-                <blockquote>你今天「想要」學 Sora，明天「想要」學 Suno，你永遠追不完。</blockquote>
-                <p>你必須做的，是「回到你自己身上」。</p>
-                <p style="font-weight: 600;">回到你的科系、你的工作、你的生活。問自己一個最根本的問題：「我周遭最需要被解決的問題是什麼？」</p>
-                <p>「那個問題，真的需要 AI 嗎？」</p>
-            </div>
-        </section>
-
-        <section class="layout-default">
-            <div class="slide-content">
-                找出你的「需要」
-                用 NotebookLM 進行
-            </div>
-        </section>
-
-        <section class="layout-default hidden">
-            <div class="slide-content">
-                <h1>我的工具箱：第一性原則</h1>
-                <p>這個工具，就是「第一性原則」(First Principles Thinking)。</p>
-                <p>這個詞被馬斯克講到爛了，但它的核心很簡單：</p>
-                <blockquote>「把一個問題，拆解回它最基礎、最不可否認的真相，然後從那裡開始重新建構解決方案。」</blockquote>
-                <p>不要被「現狀」或「流行」綁架。不要因為「別人都在用 Agent AI」，所以你也要用。</p>
-                <p>你要回到問題的「物理本質」。</p>
-            </div>
-        </section>
-
-        <section class="layout-default hidden">
-            <div class="slide-content">
-                <h1>我的產品故事：</h1>
-                <h2 style="font-size: clamp(1.5rem, 4vw, 2.5rem); margin-top: 1rem;">效率 vs. 故事</h2>
-            </div>
-        </section>
-
-        <section class="layout-default hidden">
-            <div class="slide-content">
-                <h1>效率 vs. 故事 (一)</h1>
-                <p>身為一個產品人，我最近面臨一個挑戰：公司內部的所有產品線，都要導入現在最紅的「Agentic AI」。</p>
-                <p>這時候，問題就來了：「所有的商業情境，都適合用 Agentic AI 嗎？」</p>
-                <p>如果你不思考，你就會陷入「跟風」，每個地方都硬加一個 Agent，然後搞得四不像。</p>
-                <p>但如果我用「第一性原則」來拆解這個問題...</p>
-            </div>
-        </section>
-
-        <section class="layout-default hidden">
-            <div class="slide-content">
-                <h1>效率 vs. 故事 (二)</h1>
-                <p>我會先把所有要解決的商業問題攤開來，定義它們的「本質」。</p>
-                <ul>
-                    <li>
-                        <b>第一類：策略性問題</b>
-                        <p style="font-size: 1.2rem; color: #5c5855;">(e.g., "下一季的市場藍圖？")<br>
-                        <b>→ 適合 Agent AI。</b> (需要發想、評估、輔助決策)</p>
-                    </li>
-                    <li style="margin-top: 1.5rem;">
-                        <b>第二類：執行面問題</b>
-                        <p style="font-size: 1.2rem; color: #5c5855;">(e.g., "把 A 欄位資料搬到 B 資料庫")<br>
-                        <b>→ 不適合 Agent AI。</b> (需要速度、效率，用簡單腳本即可)</p>
-                    </li>
-                </ul>
-                <p style="margin-top: 1.5rem;">這就是用第一性原則去拆解「真需求」。</p>
-            </div>
-        </section>
-
-        <section class="layout-default hidden">
-            <div class="slide-content">
-                <h1>效率 vs. 故事 (三)</h1>
-                <p>但是，故事還沒完。</p>
-                <p>剛剛我講的，是純粹客觀、物理性質的「效率」討論。</p>
-                <p>但在真實的商場上，你還必須考慮另一個維度：「人的主觀因素」。</p>
-                <p>有時候，你的老闆或客戶，他要的「價值」，不只是「客觀的效率」。</p>
-                <p style="font-weight: 600;">他可能要的是「公設門面」，是「策略性行銷」。他需要一個「看起來很酷的東西」，來寫進財報裡、寫進新聞稿裡。</p>
-            </div>
-        </section>
-
-        <section class="layout-default hidden">
-            <div class="slide-content">
-                <h1>效率 vs. 故事 (四)</h1>
-                <p>這個「酷東西」，它不一定真的帶來了 10 倍的效率，但它帶來了「產品故事」。</p>
-                <p>在這種情況下，你身為一個產品人，你的「價值」就體現出來了：</p>
-                <blockquote>你必須去判斷，我的老闆，他這次要的，到底是一個「客觀有效的方式」？還是一個「能說故事的題材」？</blockquote>
-                <p>AI 時代，專業人士的價值，就是看懂這種複雜性，然後做出「最適合的判斷」。</p>
-            </div>
-        </section>
-
-        <section class="layout-quote">
-            <div class="slide-content">
-                <h1 style="font-size: clamp(2rem, 5vw, 4rem);">原則二：</h1>
-                <h1 style="font-size: clamp(2.5rem, 6vw, 5rem);">先「高薪」還是「奴一下」？</h1>
-            </div>
-        </section>
 
         <section class="layout-default">
             <div class="slide-content">
                 <h1>先別急著吃棉花糖</h1>
-                <p>這兩個選項可能都是陷阱。</p>
-                <p>我更信奉的是：「先別急著吃棉花糖。」</p>
-                <p>在你還沒有籌碼之前，你最該專注的，是「證明你的價值」。</p>
+                <p>換位思考，還沒有籌碼之前，最該專注的，是「證明價值」。</p>
                 <ul>
-                    <li><b>樂觀實在：</b>多去嘗試。</li>
+                    <li><b>樂觀實在：</b>在不傷天害理害人的情況下，多多嘗試。</li>
                     <li><b>物超所值：</b>比老闆期待的多做一點。</li>
-                    <li><b>累積底氣：</b>直到你有一天可以勇敢地說 No。</li>
+                    <li><b>累積底氣：</b>建立自己的做事原則，並堅持下去。</li>
+                    <li><b>成為標竿：</b>讓好的影響力會影響文化。</li>
                 </ul>
-                <p style="margin-top: 1.5rem;">在 AI 時代，你的「價值」是什麼？</p>
-                <p style="font-weight: 600;">不是你「會用」多少工具。而是你能不能「定義問題」、「做出判斷」。</p>
             </div>
         </section>
 
@@ -2667,32 +3033,110 @@
 
         <section class="layout-default">
             <div class="slide-content">
+                <h1>對事也對人</h1>
 
-管事：
-- PoC 游擊戰一開始專案人不用多，先確認可行性，並證明能力。
-- 專案管理用三角形、scope, resource, timeline, quality
-管人：
-- 不知，知而不能（缺資源、缺能力，指導，找 peer），知而不為（缺乏動機、共識利益交換）
+                <h2 style="font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 600; color: var(--accent-color); margin-top: 2rem; margin-bottom: 1rem;">管事</h2>
+                <ul style="font-size: clamp(1.2rem, 2.5vw, 1.75rem); margin-left: 2rem; margin-bottom: 2rem;">
+                    <li style="margin-bottom: 1rem;">
+                        <b class="reveal-trigger" style="cursor: pointer; user-select: none; transition: opacity 0.3s ease;" data-target="reveal-content-1">專案管理    </b><span class="reveal-content" id="reveal-content-1" style="display: none;">範圍、資源、時程</span>
+                    </li>
+                    <li style="margin-bottom: 1rem;">
+                        <b class="reveal-trigger" style="cursor: pointer; user-select: none; transition: opacity 0.3s ease;" data-target="reveal-content-2">概念驗證（Proof of Concept）  </b><span class="reveal-content" id="reveal-content-2" style="display: none;">人不用多，先確認可行性，並證明管理能力。</span>
+                    </li>
+                </ul>
             </div>
         </section>
 
-        <section class="layout-quote hidden">
-            <div class="slide-content">
-                <h1 style="font-size: clamp(2rem, 5vw, 4rem);">原則四：</h1>
-                <h1 style="font-size: clamp(2.5rem, 6vw, 5rem);">人類的不可取代性</h1>
+        <section class="layout-default">
+            <div class="slide-content" style="width: 100%; max-width: 100%; padding: 0;">
+                <div style="width: 100%; max-width: 100%; margin: 0 auto; overflow: hidden;">
+                    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: auto; max-width: 100%; display: block;" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" font-family="Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif">
+                        <defs>
+                            <filter id="wabisabiFilter-triangle" x="-50%" y="-50%" width="200%" height="200%">
+                                <feTurbulence type="fractalNoise" baseFrequency="0.005" numOctaves="3" result="noise"/>
+                                <feDiffuseLighting in="noise" lightingColor="#F5F4F0" surfaceScale="5" result="light">
+                                    <feDistantLight azimuth="235" elevation="60"/>
+                                </feDiffuseLighting>
+                                <feComposite in="SourceGraphic" in2="light" operator="arithmetic" k1="0" k2="1" k3="0.8" k4="0.2"/>
+                            </filter>
+
+                            <filter id="shaky-triangle">
+                                <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" result="turbulence"/>
+                                <feDisplacementMap in2="turbulence" in="SourceGraphic" scale="5" xChannelSelector="R" yChannelSelector="G"/>
+                            </filter>
+                        </defs>
+
+                        <text x="960" y="140" font-size="90" fill="#3D3A37" text-anchor="middle" font-weight="600">
+                            專案管理三角形
+                        </text>
+                        <line x1="600" y1="170" x2="1320" y2="170" stroke="#9A948C" stroke-width="4" filter="url(#shaky-triangle)"/>
+
+                        <path d="M960 370 L1450 900 L470 900 Z" stroke="#8c867b" stroke-width="6" fill="rgba(194, 184, 163, 0.2)" filter="url(#shaky-triangle)"/>
+
+                        <circle cx="960" cy="370" r="15" fill="#8c867b"/>
+                        <text x="960" y="320" font-size="60" fill="#3D3A37" text-anchor="middle" dy="-30" font-weight="600">
+                            範圍
+                        </text>
+                        <text x="960" y="320" font-size="40" fill="#3D3A37" text-anchor="middle" dy="25" filter="url(#shaky-triangle)">
+                            「做什麼」
+                        </text>
+
+                        <circle cx="1450" cy="900" r="15" fill="#8c867b"/>
+                        <text x="1450" y="900" font-size="60" fill="#3D3A37" text-anchor="middle" dx="80" dy="-10" font-weight="600">
+                            時程
+                        </text>
+                        <text x="1450" y="900" font-size="40" fill="#3D3A37" text-anchor="start" dx="130" dy="40" filter="url(#shaky-triangle)">
+                            「花多久」
+                        </text>
+
+                        <circle cx="470" cy="900" r="15" fill="#8c867b"/>
+                        <text x="470" y="900" font-size="60" fill="#3D3A37" text-anchor="middle" dx="-80" dy="-10" font-weight="600">
+                            資源
+                        </text>
+                        <text x="470" y="900" font-size="40" fill="#3D3A37" text-anchor="end" dx="-130" dy="40" filter="url(#shaky-triangle)">
+                            「要多少」
+                        </text>
+
+                        <g transform="translate(960, 700)">
+                            <circle cx="0" cy="0" r="150" fill="#C2B8A3" opacity="0.4" filter="url(#shaky-triangle)"/>
+                            <circle cx="0" cy="0" r="145" fill="#F5F4F0" opacity="0.6" filter="url(#shaky-triangle)"/>
+                            <circle cx="0" cy="0" r="130" fill="#C2B8A3" opacity="0.8" filter="url(#shaky-triangle)"/>
+
+                            <text x="0" y="0" font-size="70" fill="#3D3A37" text-anchor="middle" dy="30" font-weight="600">
+                                品質
+                            </text>
+                        </g>
+                    </svg>
+                </div>
             </div>
         </section>
 
-        <section class="layout-default hidden">
+        <section class="layout-default">
             <div class="slide-content">
-                <h1>不可取代性</h1>
-                <p>當 AI 外包了計算、記憶、甚至創造力... 我們碳基生命，到底還剩下什麼？</p>
-                <p>如果學生問我：「在 AI 時代，人類還保有什麼不可取代性？」</p>
-                <p>我會回答兩個字：「人性」。</p>
-                <p>這聽起來很空泛，什麼是人性？</p>
-                <p style="font-weight: 600; font-size: 1.8rem;">如果我再具體一點，我會說，是「主觀感受」。</p>
-                <p>這是 AI 永遠無法體會到的東西。</p>
+                <h1>對事也對人</h1>
+                <h2 style="font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 600; color: var(--accent-color); margin-top: 2rem; margin-bottom: 1rem; cursor: pointer;">管人 <span class="reveal-text">（第一性原理思考）</span></h2>
+                <ul style="font-size: clamp(1.2rem, 2.5vw, 1.75rem); margin-left: 2rem;">
+                    <li style="margin-bottom: 1rem; cursor: pointer;">
+                        <b>一無所知：</b>缺乏消息 <span class="reveal-text">（解法：常態性的資訊更新）</span>
+                    </li>
+                    <li style="margin-bottom: 1rem; cursor: pointer;">
+                        <b>知而不能：</b>缺資源、能力<span class="reveal-text">（解法：找同儕協助或指導）</span>
+                    </li>
+                    <li style="margin-bottom: 1rem; cursor: pointer;">
+                        <b>知而不為：</b>缺乏動機、共識<span class="reveal-text">（解法：利益交換、向上管理）</span>
+                    </li>
+                </ul>
             </div>
+        </section>
+
+        <section class="layout-title">
+            <div class="slide-content">
+                <h1>關於 AI，我最後想說..</h1>
+            </div>
+        </section>
+
+        <section class="layout-default" style="padding: 0;">
+            <img src="../pic/1115/on-the-beach-16-9.png" alt="五感體驗" style="width: 100vw; height: 100vh; object-fit: cover; display: block;">
         </section>
 
         <section class="layout-title hidden">
@@ -2748,17 +3192,6 @@
             </div>
         </section>
 
-        <section class="layout-default hidden">
-            <div class="slide-content">
-                <h1>重新定義你的價值</h1>
-                <p>如果你的工作，是 80% 的重複性執行，和 20% 的人性判斷...</p>
-                <p>過去，你 80% 的薪水來自於你的「執行力」。</p>
-                <p>未來，AI 會接管那 80% 的執行。</p>
-                <p style="font-weight: 600; font-size: 1.8rem; margin-top: 1rem;">你剩下的 20% 的「人性判斷」、「美感體驗」、「策略洞察」、「主觀感受」...</p>
-                <p style="font-weight: 600; font-size: 1.8rem;">將會重新定義你 100% 的價值。</p>
-            </div>
-        </section>
-
         <section class="layout-title hidden">
             <div class="slide-content">
                 <h1>主軸 5：結語</h1>
@@ -2766,14 +3199,14 @@
             </div>
         </section>
 
-        <section class="layout-quote">
+        <section class="layout-quote hidden">
             <div class="slide-content">
                 <h1 style="font-size: clamp(2.5rem, 6vw, 5rem);">成為定義者，</h1>
                 <h1 style="font-size: clamp(2.5rem, 6vw, 5rem);">而非跟風者</h1>
             </div>
         </section>
 
-        <section class="layout-default">
+        <section class="layout-default hidden">
             <div class="slide-content">
                 <h1>重新校準你自己</h1>
                 <p>AI 時代，最強大的能力，不是你會用多少工具，而是你的「品味」、「價值觀」和「判斷力」。</p>
@@ -2810,17 +3243,26 @@
         </section>
 
     </div>
+    <!-- ============================================
+         投影片容器結束
+         ============================================ -->
 
+    <!-- ============================================
+         導航控制按鈕 (Navigation Controls)
+         ============================================ -->
     <button id="nav-prev" class="nav-control" title="Previous Slide">‹</button>
     <button id="nav-next" class="nav-control" title="Next Slide">›</button>
     <div id="counter"></div>
 
+    <!-- ============================================
+         主要投影片導航腳本 (Main Slide Navigation Script)
+         ============================================ -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const deck = document.getElementById('deck');
             const allSlides = document.querySelectorAll('#deck > section');
 
-            // Force hide all hidden slides immediately on load
+            // 強制隱藏所有標記為 hidden 的投影片（載入時立即執行）
             allSlides.forEach(slide => {
                 if (slide.classList.contains('hidden')) {
                     slide.style.display = 'none';
@@ -2830,19 +3272,29 @@
                 }
             });
 
+            // 取得導航控制元素
             const prevBtn = document.getElementById('nav-prev');
             const nextBtn = document.getElementById('nav-next');
             const counter = document.getElementById('counter');
 
+            // 當前投影片索引
             let currentSlide = 0;
 
-            // 動態獲取可見投影片陣列（每次調用時重新計算）
+            /**
+             * 動態獲取可見投影片陣列
+             * 每次調用時重新計算，確保 hidden 投影片不會被包含
+             * @returns {Array} 可見投影片陣列
+             */
             function getVisibleSlides() {
                 return Array.from(allSlides).filter(slide => !slide.classList.contains('hidden'));
             }
 
+            /**
+             * 更新投影片顯示狀態
+             * 確保所有 hidden 投影片在轉換前完全隱藏
+             */
             function updateDeck() {
-                // Force ensure all hidden slides are truly hidden before transition
+                // 強制確保所有 hidden 投影片在轉換前完全隱藏
                 allSlides.forEach(slide => {
                     if (slide.classList.contains('hidden')) {
                         slide.style.display = 'none';
@@ -2920,6 +3372,10 @@
                 window.location.hash = `slide-${currentSlide + 1}`;
             }
 
+            /**
+             * 跳轉到指定投影片
+             * @param {number} slideNumber - 目標投影片索引（從 0 開始）
+             */
             function goToSlide(slideNumber) {
                 // 重新計算可見投影片以獲取最新的總數
                 const slides = getVisibleSlides();
@@ -2931,7 +3387,9 @@
                 }
             }
 
-            // Navigation Event Listeners
+            // ============================================
+            // 導航事件監聽器 (Navigation Event Listeners)
+            // ============================================
             prevBtn.addEventListener('click', () => {
                 goToSlide(currentSlide - 1);
             });
@@ -2940,7 +3398,9 @@
                 goToSlide(currentSlide + 1);
             });
 
-            // Keyboard Navigation
+            // ============================================
+            // 鍵盤導航 (Keyboard Navigation)
+            // ============================================
             document.addEventListener('keydown', (e) => {
                 // 如果按了修飾鍵（Cmd/Ctrl），讓瀏覽器處理系統快捷鍵（如 Cmd+R）
                 if (e.metaKey || e.ctrlKey) {
@@ -2982,9 +3442,12 @@
             // Listen for hash changes
             window.addEventListener('hashchange', goToHash);
 
-            // Reveal text on click - works for all reveal-text elements
+            // ============================================
+            // 點擊顯示文字功能 (Reveal Text on Click)
+            // 適用於所有 reveal-text 元素
+            // ============================================
             document.addEventListener('click', (e) => {
-                // Find if clicked element or its parent contains a reveal-text
+                // 檢查點擊的元素或其父元素是否包含 reveal-text
                 let target = e.target;
                 let revealText = null;
 
@@ -3035,7 +3498,9 @@
             });
         });
 
-        // AI 文字生成機率展示功能
+        // ============================================
+        // AI 文字生成機率展示功能 (AI Text Generation Probability Display)
+        // ============================================
         function showNextWordProbabilities() {
             const display = document.getElementById('probability-display');
             const container = document.getElementById('word-probabilities');
@@ -3118,11 +3583,13 @@
         }
     </script>
 
-    <!-- Three.js for Neural Network Background -->
+    <!-- ============================================
+         Three.js 神經網路背景 (Three.js Neural Network Background)
+         ============================================ -->
     <script src="https://cdn.jsdelivr.net/npm/three@0.110.0/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.110.0/examples/js/controls/OrbitControls.js"></script>
     <script>
-        // Fix OrbitControls path for Three.js 0.110.0
+        // 修復 Three.js 0.110.0 的 OrbitControls 路徑問題
         if (typeof THREE !== 'undefined' && typeof THREE.OrbitControls === 'undefined') {
             THREE.OrbitControls = function(camera, domElement) {
                 // Fallback: 使用手動旋轉，稍後會在初始化中處理
@@ -3132,9 +3599,14 @@
     </script>
 
     <script>
-        // Initialize 3D Neural Network Background
+        // ============================================
+        // 初始化 3D 神經網路背景 (Initialize 3D Neural Network Background)
+        // ============================================
         (function() {
-            // Wait for DOM to be ready
+            /**
+             * 初始化神經網路背景
+             * 等待 DOM 準備就緒
+             */
             function initNeuralNetwork() {
                 const canvas = document.getElementById('neural-network-canvas');
                 const section = document.getElementById('deep-learning-slide');
@@ -3379,9 +3851,14 @@
         })();
     </script>
 
-    <!-- Initialize Mermaid -->
+    <!-- ============================================
+         Mermaid 圖表初始化 (Initialize Mermaid)
+         ============================================ -->
     <script>
-        // Wait for both DOM and Mermaid script to be ready
+        /**
+         * 初始化 Mermaid 圖表
+         * 等待 DOM 和 Mermaid 腳本都準備就緒
+         */
         function initMermaid() {
             if (typeof mermaid !== 'undefined') {
                 try {
@@ -3432,8 +3909,13 @@
         }
     </script>
 
-    <!-- Initialize ChatGPT Growth Chart -->
+    <!-- ============================================
+         ChatGPT 成長圖表初始化 (Initialize ChatGPT Growth Chart)
+         ============================================ -->
     <script>
+        /**
+         * 初始化 ChatGPT 用戶增長趨勢圖表
+         */
         function initChatGPTChart() {
             const canvas = document.getElementById('chatgpt-growth-chart');
             if (!canvas) {
@@ -3587,8 +4069,14 @@
         }
     </script>
 
-    <!-- Initialize Sector Distribution Chart (100% Stacked Bar Chart) -->
+    <!-- ============================================
+         產業分佈圖表初始化 (Initialize Sector Distribution Chart)
+         100% 堆疊長條圖
+         ============================================ -->
     <script>
+        /**
+         * 初始化產業分佈圖表（100% 堆疊長條圖）
+         */
         function initSectorDistributionChart() {
             const canvas = document.getElementById('sector-distribution-chart');
             if (!canvas) {
@@ -3770,8 +4258,13 @@
         }
     </script>
 
-    <!-- Initialize Hon Hai Sankey Chart -->
+    <!-- ============================================
+         鴻海 Sankey 圖表初始化 (Initialize Hon Hai Sankey Chart)
+         ============================================ -->
     <script>
+        /**
+         * 初始化鴻海營收結構變化 Sankey 圖表
+         */
         function initHonHaiSankeyChart() {
             const chartDiv = document.getElementById('honhai-sankey-chart');
             if (!chartDiv) {
@@ -3993,6 +4486,149 @@
         } else {
             setTimeout(initHonHaiSankeyChart, 100);
         }
+    </script>
+
+    <!-- ============================================
+         複製提示詞功能 (Copy Prompt Functionality)
+         ============================================ -->
+    <script>
+        (function() {
+            /**
+             * 從 HTML 中提取純文字
+             * @param {string} html - HTML 字串
+             * @returns {string} 純文字內容
+             */
+            function extractTextFromHTML(html) {
+                // 定義純文字版本的提示詞（移除所有 HTML 標籤）
+                const cleanText = `【角色】你是一位資深的教學設計專家，專精於溝通技巧與提問方法，擁有 15 年以上的教學經驗。這對我來說非常重要，因為我即將在重要的場合使用這個技巧，請務必提供準確且實用的建議。
+
+【目標】產出一份「如何向 AI 問一個好問題」的完整指南，包含：(1) 核心提問原則（3-5 點）(2) 常見錯誤範例與修正對照 (3) 實戰練習題（2-3 題）。成功標準：內容清晰易懂、適合初學者、可直接應用於 ChatGPT/Claude 等主流 AI 工具。
+
+【輸出格式】使用 Markdown 格式，分為三個區塊：
+1. 核心原則（編號列表）
+2. 錯誤 vs 正確範例對照表
+3. 實戰練習（每題包含「題目」和「參考答案」）
+
+【範圍與限制】每個原則說明不超過 50 字；範例必須具體且貼近日常生活；語氣親切專業，避免過於學術化；總長度控制在 800-1000 字。
+
+【少數樣本】以下是一個好的提問範例：
+錯誤：「幫我寫作業」
+正確：「【角色】你是我的學習夥伴【目標】幫我理解線性代數的矩陣運算，用生活化例子解釋【輸出】用 3 個步驟說明，每步驟不超過 2 句話」
+
+【重讀】在回答前，請重新閱讀以上所有要求，確保你的回答完全符合：角色定位、目標設定、格式規範、範圍限制，並包含情感提示的效果。這對我來說極其重要，請仔細檢查後再回應。`;
+
+                return cleanText;
+            }
+
+            /**
+             * 設置複製按鈕功能
+             */
+            function setupCopyButton() {
+                const copyBtn = document.getElementById('copy-prompt-btn');
+                const feedback = document.getElementById('copy-feedback');
+                const promptElement = document.getElementById('prompt-text');
+
+                if (!copyBtn || !promptElement) return;
+
+                copyBtn.addEventListener('click', async function() {
+                    const promptText = extractTextFromHTML(promptElement.innerHTML);
+
+                    try {
+                        await navigator.clipboard.writeText(promptText);
+                        // 顯示反饋
+                        if (feedback) {
+                            feedback.style.opacity = '1';
+                            setTimeout(() => {
+                                feedback.style.opacity = '0';
+                            }, 2000);
+                        }
+                    } catch (err) {
+                        console.error('複製失敗:', err);
+                        // 降級方案：使用傳統方法
+                        const textArea = document.createElement('textarea');
+                        textArea.value = promptText;
+                        textArea.style.position = 'fixed';
+                        textArea.style.opacity = '0';
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        try {
+                            document.execCommand('copy');
+                            if (feedback) {
+                                feedback.textContent = '已複製！';
+                                feedback.style.opacity = '1';
+                                setTimeout(() => {
+                                    feedback.style.opacity = '0';
+                                }, 2000);
+                            }
+                        } catch (e) {
+                            alert('無法複製，請手動選取文字');
+                        }
+                        document.body.removeChild(textArea);
+                    }
+                });
+            }
+
+            // 頁面載入時初始化
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', setupCopyButton);
+            } else {
+                setupCopyButton();
+            }
+        })();
+    </script>
+
+    <!-- ============================================
+         Reveal Text 功能 (Click to Reveal/Hide)
+         ============================================ -->
+    <script>
+        (function() {
+            /**
+             * 設置 reveal text 功能
+             */
+            function setupRevealText() {
+                const triggers = document.querySelectorAll('.reveal-trigger');
+
+                triggers.forEach(function(trigger) {
+                    trigger.addEventListener('click', function() {
+                        const targetId = this.getAttribute('data-target');
+                        const targetElement = document.getElementById(targetId);
+
+                        if (targetElement) {
+                            // 切換顯示/隱藏
+                            if (targetElement.style.display === 'none') {
+                                targetElement.style.display = 'inline';
+                                targetElement.style.opacity = '0';
+                                // 使用 requestAnimationFrame 確保 display 改變後再動畫
+                                requestAnimationFrame(function() {
+                                    targetElement.style.transition = 'opacity 0.3s ease';
+                                    targetElement.style.opacity = '1';
+                                });
+                            } else {
+                                targetElement.style.opacity = '0';
+                                setTimeout(function() {
+                                    targetElement.style.display = 'none';
+                                }, 300); // 等待動畫完成
+                            }
+                        }
+                    });
+
+                    // 添加 hover 效果提示
+                    trigger.addEventListener('mouseenter', function() {
+                        this.style.opacity = '0.7';
+                    });
+                    trigger.addEventListener('mouseleave', function() {
+                        this.style.opacity = '1';
+                    });
+                });
+            }
+
+            // 頁面載入時初始化
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', setupRevealText);
+            } else {
+                setupRevealText();
+            }
+        })();
     </script>
 
 </body>

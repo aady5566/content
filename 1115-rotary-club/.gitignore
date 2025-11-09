@@ -1,0 +1,6 @@
+# Node modules（如果有）
+node_modules/
+
+# 注意：data/*.enc.json 和 data-path.json 需要被 commit
+# 因為 GitHub Actions 會自動生成並 commit 這些檔案
+# 這些檔案會在 GitHub 上自動管理，您不需要手動處理
