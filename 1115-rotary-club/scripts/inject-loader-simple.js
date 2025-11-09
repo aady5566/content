@@ -13,7 +13,7 @@ if (htmlContent.includes('<!-- CONTENT-LOADER-INJECTED -->')) {
     console.log('⚠️  載入器已存在，先移除舊版本...');
     const loaderStart = htmlContent.indexOf('<!-- CONTENT-LOADER-INJECTED -->');
     const loaderEnd = htmlContent.indexOf('</script>', loaderStart) + '</script>'.length;
-    
+
     if (loaderStart !== -1 && loaderEnd !== -1) {
         htmlContent = htmlContent.substring(0, loaderStart) + htmlContent.substring(loaderEnd + 1);
         console.log('✅ 已移除舊版本載入器');
@@ -44,13 +44,13 @@ const loaderScript = `
                         console.error('找不到 #deck 元素');
                         return;
                     }
-                    
+
                     // 保存原始內容作為 fallback
                     const originalContent = deck.innerHTML;
-                    
+
                     // 確定基礎路徑
                     const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
-                    
+
                     // 從 JSON 載入內容
                     fetch(basePath + 'slides-content.json')
                         .then(response => {
@@ -69,7 +69,7 @@ const loaderScript = `
                             const tempContainer = document.createElement('div');
                             tempContainer.style.display = 'none';
                             document.body.appendChild(tempContainer);
-                            
+
                             // 渲染投影片
                             data.slides.forEach((slide, index) => {
                                 try {
@@ -81,7 +81,7 @@ const loaderScript = `
                                     console.error('渲染投影片 ' + index + ' 失敗：', error);
                                 }
                             });
-                            
+
                             // 確認渲染成功後，再替換原內容
                             if (tempContainer.children.length > 0) {
                                 deck.innerHTML = '';
@@ -89,15 +89,15 @@ const loaderScript = `
                                     deck.appendChild(tempContainer.firstChild);
                                 }
                                 document.body.removeChild(tempContainer);
-                                
+
                                 // 觸發事件通知其他腳本
                                 setTimeout(() => {
-                                    window.dispatchEvent(new CustomEvent('slidesLoaded', { 
-                                        detail: { slideCount: data.slides.length } 
+                                    window.dispatchEvent(new CustomEvent('slidesLoaded', {
+                                        detail: { slideCount: data.slides.length }
                                     }));
                                     window.dispatchEvent(new Event('resize'));
                                 }, 100);
-                                
+
                                 console.log('✅ 成功載入 JSON 內容，共 ' + data.slides.length + ' 個投影片');
                             } else {
                                 throw new Error('渲染失敗，沒有生成投影片');
@@ -112,7 +112,7 @@ const loaderScript = `
                             }
                         });
                 }
-                
+
                 // 確保 DOM 已載入
                 function initLoader() {
                     if (document.readyState === 'complete') {
@@ -127,7 +127,7 @@ const loaderScript = `
                         });
                     }
                 }
-                
+
                 if (document.readyState === 'loading') {
                     document.addEventListener('DOMContentLoaded', initLoader);
                 } else {
