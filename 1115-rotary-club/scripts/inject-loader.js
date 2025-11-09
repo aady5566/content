@@ -9,10 +9,17 @@ const path = require('path');
 const htmlPath = path.join(__dirname, '../1115-slide.html');
 let htmlContent = fs.readFileSync(htmlPath, 'utf-8');
 
-// 檢查是否已經注入過
+// 檢查是否已經注入過，如果存在則先移除
 if (htmlContent.includes('<!-- CONTENT-LOADER-INJECTED -->')) {
-    console.log('⚠️  載入器已存在，跳過注入');
-    return;
+    console.log('⚠️  載入器已存在，先移除舊版本...');
+    // 找到載入器腳本的開始和結束位置
+    const loaderStart = htmlContent.indexOf('<!-- CONTENT-LOADER-INJECTED -->');
+    const loaderEnd = htmlContent.indexOf('</script>', loaderStart) + '</script>'.length;
+    
+    if (loaderStart !== -1 && loaderEnd !== -1) {
+        htmlContent = htmlContent.substring(0, loaderStart) + htmlContent.substring(loaderEnd + 1);
+        console.log('✅ 已移除舊版本載入器');
+    }
 }
 
 // 載入器腳本（在 </head> 之前注入）
@@ -33,29 +40,63 @@ const loaderScript = `
 
             // 如果是生產模式，動態載入加密內容
             if (!isDevMode) {
-                // 讀取路徑映射
-                fetch('data-path.json')
-                    .then(response => response.json())
+                // 等待 DOM 載入完成
+                function loadEncryptedContent() {
+                    const deck = document.getElementById('deck');
+                    if (!deck) {
+                        console.error('找不到 #deck 元素');
+                        return;
+                    }
+                    
+                    // 先保存原始內容作為 fallback
+                    const originalContent = deck.innerHTML;
+                    
+                    // 確定基礎路徑（處理子目錄情況）
+                    const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+                    
+                    // 讀取路徑映射
+                    fetch(basePath + 'data-path.json')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('無法載入 data-path.json: ' + response.status);
+                        }
+                        return response.json();
+                    })
                     .then(mapping => {
                         // 載入加密內容
-                        return fetch('data/' + mapping.filename);
+                        return fetch(basePath + 'data/' + mapping.filename);
                     })
-                    .then(response => response.text())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('無法載入加密檔案: ' + response.status);
+                        }
+                        return response.text();
+                    })
                     .then(encrypted => {
                         // 解密內容
                         const decrypted = decryptContent(encrypted);
                         const content = JSON.parse(decrypted);
 
                         // 清空現有內容並動態載入
-                        const deck = document.getElementById('deck');
-                        if (deck) {
-                            deck.innerHTML = '';
-                            renderSlides(content.slides, deck);
-                        }
+                        deck.innerHTML = '';
+                        renderSlides(content.slides, deck);
                     })
                     .catch(error => {
                         console.error('載入加密內容失敗，使用原始內容', error);
+                        // 如果載入失敗，恢復原始內容
+                        if (originalContent) {
+                            deck.innerHTML = originalContent;
+                        }
                     });
+                }
+                
+                // 確保 DOM 已載入
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', loadEncryptedContent);
+                } else {
+                    // DOM 已經載入，直接執行
+                    loadEncryptedContent();
+                }
             }
 
             // 解密函數（與 encrypt-content.js 對應）
