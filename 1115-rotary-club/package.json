@@ -9,7 +9,8 @@
     "dev": "node scripts/setup-dev-mode.js",
     "inject": "node scripts/inject-loader.js",
     "restore": "node scripts/restore-original.js",
-    "remove-automation": "node scripts/remove-automation.js"
+    "remove-automation": "node scripts/remove-automation.js",
+    "test-production": "node scripts/test-production.js"
   },
   "keywords": [],
   "author": "",

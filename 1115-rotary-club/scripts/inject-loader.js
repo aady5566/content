@@ -87,9 +87,9 @@ const loaderScript = `
                             const tempContainer = document.createElement('div');
                             tempContainer.style.display = 'none';
                             document.body.appendChild(tempContainer);
-                            
+
                             renderSlides(content.slides, tempContainer);
-                            
+
                             // 確認渲染成功後，再替換原內容
                             if (tempContainer.children.length > 0) {
                                 deck.innerHTML = '';
@@ -101,7 +101,7 @@ const loaderScript = `
                             } else {
                                 throw new Error('渲染失敗，沒有生成投影片');
                             }
-                            
+
                             console.log('✅ 成功載入加密內容，共 ' + content.slides.length + ' 個投影片');
                         } catch (error) {
                             console.error('解密或解析內容失敗：', error);
@@ -137,7 +137,7 @@ const loaderScript = `
                         });
                     }
                 }
-                
+
                 if (document.readyState === 'loading') {
                     // DOM 還在載入，等待 DOMContentLoaded 後再等待 load
                     document.addEventListener('DOMContentLoaded', () => {
@@ -182,7 +182,7 @@ const loaderScript = `
                     if (!slides || !Array.isArray(slides)) {
                         throw new Error('slides 不是有效的陣列');
                     }
-                    
+
                     slides.forEach((slide, index) => {
                         try {
                             const section = document.createElement('section');
@@ -198,19 +198,19 @@ const loaderScript = `
                     // 延遲執行，確保 DOM 已更新
                     setTimeout(() => {
                         // 觸發自定義事件，通知其他腳本內容已載入
-                        window.dispatchEvent(new CustomEvent('slidesLoaded', { 
-                            detail: { slideCount: slides.length } 
+                        window.dispatchEvent(new CustomEvent('slidesLoaded', {
+                            detail: { slideCount: slides.length }
                         }));
-                        
+
                         // 如果導航腳本需要重新初始化，觸發重新初始化
                         if (typeof window.reinitSlideNavigation === 'function') {
                             window.reinitSlideNavigation();
                         }
-                        
+
                         // 觸發 resize 事件，讓圖表等重新計算
                         window.dispatchEvent(new Event('resize'));
                     }, 300);
-                    
+
                     console.log('✅ 成功渲染 ' + slides.length + ' 個投影片');
                 } catch (error) {
                     console.error('渲染投影片失敗：', error);
