@@ -94,21 +94,21 @@ const loaderScript = `
                                 setTimeout(() => {
                                     // 標記內容已載入完成（先設定，讓其他腳本可以檢查）
                                     window.slidesContentLoaded = true;
-                                    
+
                                     // 觸發 slidesLoaded 事件
                                     window.dispatchEvent(new CustomEvent('slidesLoaded', {
                                         detail: { slideCount: data.slides.length }
                                     }));
-                                    
+
                                     // 觸發 resize 事件
                                     window.dispatchEvent(new Event('resize'));
-                                    
+
                                     // 觸發自定義事件，讓其他腳本知道可以初始化了
                                     window.dispatchEvent(new CustomEvent('contentReady'));
-                                    
+
                                     console.log('✅ 成功載入 JSON 內容，共 ' + data.slides.length + ' 個投影片');
                                     console.log('📢 已觸發 contentReady 事件，其他腳本可以開始初始化');
-                                    
+
                                     // 重新觸發所有等待中的 DOMContentLoaded 監聽器
                                     // 這會讓已經註冊的腳本重新執行
                                     window.dispatchEvent(new Event('DOMContentLoaded'));
