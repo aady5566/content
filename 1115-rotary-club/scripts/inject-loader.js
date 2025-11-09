@@ -15,7 +15,7 @@ if (htmlContent.includes('<!-- CONTENT-LOADER-INJECTED -->')) {
     // 找到載入器腳本的開始和結束位置
     const loaderStart = htmlContent.indexOf('<!-- CONTENT-LOADER-INJECTED -->');
     const loaderEnd = htmlContent.indexOf('</script>', loaderStart) + '</script>'.length;
-    
+
     if (loaderStart !== -1 && loaderEnd !== -1) {
         htmlContent = htmlContent.substring(0, loaderStart) + htmlContent.substring(loaderEnd + 1);
         console.log('✅ 已移除舊版本載入器');
@@ -47,13 +47,13 @@ const loaderScript = `
                         console.error('找不到 #deck 元素');
                         return;
                     }
-                    
+
                     // 先保存原始內容作為 fallback
                     const originalContent = deck.innerHTML;
-                    
+
                     // 確定基礎路徑（處理子目錄情況）
                     const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
-                    
+
                     // 讀取路徑映射
                     fetch(basePath + 'data-path.json')
                     .then(response => {
@@ -89,7 +89,7 @@ const loaderScript = `
                         }
                     });
                 }
-                
+
                 // 確保 DOM 已載入
                 if (document.readyState === 'loading') {
                     document.addEventListener('DOMContentLoaded', loadEncryptedContent);
