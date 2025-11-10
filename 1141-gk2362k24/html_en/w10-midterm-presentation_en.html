@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 10: Midterm Presentation: Showcase</title>
+    <script src="../../sidebar_tools/sidebar.js"></script>
+    <style>
+        :root {
+            --bg-color: #F4F2EF;
+            --text-color: #5a5a5a;
+            --accent-color: #78785b;
+            --line-color: #d1d1c2;
+            --highlight-color: #8c867b;
+            --font-family: 'Calibri', 'Noto Sans TC', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+        }
+
+        .slides-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: var(--bg-color);
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5vw;
+            box-sizing: border-box;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+            transform: scale(0.98);
+            text-align: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            font-size: 1.5rem;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            z-index: 1;
+        }
+
+        .slide.hidden {
+            display: none !important;
+        }
+
+        .slide.scrollable {
+            justify-content: flex-start;
+        }
+
+        h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+        }
+
+        h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 4vh;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 1rem;
+            width: 80%;
+            max-width: 800px;
+        }
+
+        h4 {
+            font-size: clamp(1.8rem, 3.3vw, 2.4rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 0.3rem;
+        }
+
+        h5 {
+            font-size: clamp(1rem, 1.8vw, 1.3rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.6rem;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            font-size: 1.5rem;
+            max-width: 80ch;
+        }
+
+        .slide-subtitle {
+            color: #888;
+            font-size: 1.8rem;
+            font-weight: 300;
+            margin-top: -1rem;
+        }
+
+        .nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 98%;
+            left: 1%;
+            display: flex;
+            justify-content: space-between;
+            z-index: 1002;
+            pointer-events: none;
+        }
+
+        .nav-btn {
+            pointer-events: all;
+            background: none;
+            border: 1px solid var(--line-color);
+            color: var(--accent-color);
+            font-size: 2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.4;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            opacity: 1;
+        }
+
+        /* Step card system */
+        .step-card {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .step-card h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .step-card p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .step-card.text-left {
+            text-align: left;
+        }
+
+        .step-card.text-center {
+            text-align: center;
+        }
+
+        /* Content grid layout */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            align-items: start;
+        }
+
+        .content-section {
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .content-section h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .content-section p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .content-section.text-left {
+            text-align: left;
+        }
+
+        /* Agenda list styles */
+        .agenda-list {
+            text-align: left;
+            max-width: 800px;
+            width: 100%;
+            margin: 2rem 0;
+        }
+
+        .agenda-item {
+            margin-bottom: 1.5rem;
+            padding-left: 1rem;
+            font-size: clamp(1.2rem, 2.2vw, 1.5rem);
+            line-height: 1.8;
+        }
+
+        .agenda-item strong {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .group-list {
+            margin-top: 1rem;
+            padding-left: 2rem;
+        }
+
+        .group-item {
+            margin-bottom: 0.8rem;
+            font-size: clamp(1.1rem, 2vw, 1.3rem);
+            color: var(--text-color);
+        }
+
+        /* Q&A cycle list */
+        .qa-list {
+            text-align: center;
+            max-width: 900px;
+            width: 100%;
+            margin: 2rem auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .qa-item {
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            padding: 1rem 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            text-align: center;
+            position: relative;
+            width: auto;
+            min-width: fit-content;
+        }
+
+        .qa-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 60%;
+            background-color: var(--accent-color);
+            border-radius: 0 2px 2px 0;
+        }
+
+        .qa-item strong {
+            color: var(--accent-color);
+            font-size: clamp(1.2rem, 2.2vw, 1.4rem);
+        }
+
+        .qa-item p {
+            margin-top: 0.5rem;
+            font-size: clamp(1rem, 1.8vw, 1.2rem);
+        }
+
+        /* Arrow styles */
+        .qa-arrow {
+            display: inline-block;
+            margin: 0 0.2em;
+            vertical-align: middle;
+            font-size: 1em;
+            color: var(--accent-color);
+            line-height: 1;
+        }
+
+        /* Scoring criteria styles */
+        .scoring-container {
+            text-align: left;
+            max-width: 1000px;
+            width: 100%;
+            margin: 2rem 0;
+        }
+
+        .scoring-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+        }
+
+        .scoring-section h4 {
+            font-size: clamp(1.4rem, 2.5vw, 1.8rem);
+            color: var(--highlight-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--highlight-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .scoring-item {
+            margin-bottom: 1.5rem;
+            padding-left: 1rem;
+        }
+
+        .scoring-item h5 {
+            font-size: clamp(1.2rem, 2vw, 1.4rem);
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .scoring-item .role-tag {
+            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+            color: var(--highlight-color);
+            font-style: italic;
+            margin-bottom: 0.5rem;
+        }
+
+        .scoring-item .key-point {
+            font-size: clamp(1rem, 1.8vw, 1.2rem);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .scoring-item .key-point strong {
+            color: var(--accent-color);
+        }
+
+        /* Link styles */
+        a {
+            color: #6b7c8a;
+            text-decoration: underline;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #5a6b7a;
+            text-decoration: underline;
+        }
+
+        a:visited {
+            color: #6b7c8a;
+            text-decoration: underline;
+        }
+
+        /* Reminder box styles */
+        .reminder-box {
+            background: rgba(120, 120, 91, 0.1);
+            border-left: 4px solid var(--accent-color);
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+            text-align: left;
+        }
+
+        .reminder-box p {
+            margin-bottom: 0.5rem;
+            font-size: clamp(1rem, 1.8vw, 1.2rem);
+        }
+
+        /* Responsive design - mobile */
+        @media (max-width: 767px) {
+            .slide {
+                padding: 3vw;
+                overflow-y: auto;
+                justify-content: center;
+            }
+
+            .slide:first-child {
+                justify-content: center;
+                overflow-y: hidden;
+            }
+
+            .slide.scrollable {
+                justify-content: flex-start;
+            }
+
+            .nav {
+                width: 95%;
+                left: 2.5%;
+                z-index: 1002;
+            }
+
+            .nav-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 1.6rem;
+                opacity: 0.6;
+            }
+
+            h1 {
+                font-size: clamp(2.5rem, 6vw, 3.5rem);
+            }
+
+            h2 {
+                font-size: clamp(2rem, 4.5vw, 2.5rem);
+                margin-bottom: 0.8rem;
+            }
+
+            h3 {
+                width: 95%;
+                font-size: clamp(1.6rem, 3.8vw, 2rem);
+            }
+
+            h4 {
+                font-size: clamp(1.3rem, 2.8vw, 1.6rem);
+            }
+
+            h5 {
+                font-size: clamp(1.1rem, 2.2vw, 1.3rem);
+            }
+
+            p {
+                font-size: clamp(1rem, 2vw, 1.2rem);
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .content-section {
+                width: 100%;
+            }
+
+            .step-card {
+                padding: 1.5rem;
+            }
+
+            .agenda-list,
+            .qa-list,
+            .scoring-container {
+                width: 100%;
+                padding: 0 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="slides-container">
+        <!-- Slide 1: Title Page -->
+        <section class="slide active">
+            <h1>Midterm Presentation: Showcase</h1>
+            <h2 class="slide-subtitle">Process Overview, Q&A Rules, and Grading Criteria</h2>
+        </section>
+
+        <!-- Slide 2: Today's Agenda -->
+        <section class="slide scrollable">
+            <h3>Today's Agenda</h3>
+            <div class="agenda-list">
+                <div class="agenda-item">
+                    <strong>Presentation Process & Q&A Instructions (10 minutes)</strong>
+                    <p style="font-size: clamp(1rem, 1.8vw, 1.2rem); margin-top: 0.5rem;">Including group order</p>
+                </div>
+
+                <div class="agenda-item">
+                    <strong>Grading Criteria Explained (5 minutes)</strong>
+                    <p style="font-size: clamp(1rem, 1.8vw, 1.2rem); margin-top: 0.5rem;">Including peer evaluation mechanism</p>
+                </div>
+
+                <div class="agenda-item">
+                    <strong>Showcase Presentations (15 minutes per group)</strong>
+                    <div class="group-list">
+                        <div class="group-item">G1 (Food Poverty)</div>
+                        <div class="group-item">G2 (Love Scripts)</div>
+                        <div class="group-item">G3 (Health Foods)</div>
+                        <div class="group-item">G4 (Dating Apps)</div>
+                        <div class="group-item">G5 (Sleep Quality)</div>
+                    </div>
+                </div>
+
+                <div class="agenda-item">
+                    <strong>Summary and Feedback</strong>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: Presentation Process -->
+        <section class="slide scrollable">
+            <h3>Presentation Process: 15 Minutes per Group</h3>
+            <div class="step-card text-left">
+                <h4>(A) 10 Minutes: Formal Presentation</h4>
+                <p style="margin-bottom: 1.5rem; font-size: clamp(1.1rem, 2vw, 1.3rem);">Please strictly adhere to the time limit.</p>
+
+                <div class="reminder-box">
+                    <p><strong>[Reminder]</strong> The presentation must include five key structures:</p>
+                    <ul style="list-style-type: none; padding-left: 1.5rem; margin-top: 0.5rem;">
+                        <li style="margin-bottom: 0.5rem; position: relative; padding-left: 1.5rem;">
+                            <span style="position: absolute; left: 0; color: var(--accent-color);">•</span>
+                            Topic Introduction
+                        </li>
+                        <li style="margin-bottom: 0.5rem; position: relative; padding-left: 1.5rem;">
+                            <span style="position: absolute; left: 0; color: var(--accent-color);">•</span>
+                            Topic Significance
+                        </li>
+                        <li style="margin-bottom: 0.5rem; position: relative; padding-left: 1.5rem;">
+                            <span style="position: absolute; left: 0; color: var(--accent-color);">•</span>
+                            Detailed Introduction (AI-Assisted)
+                        </li>
+                        <li style="margin-bottom: 0.5rem; position: relative; padding-left: 1.5rem;">
+                            <span style="position: absolute; left: 0; color: var(--accent-color);">•</span>
+                            Academic Cases/Literature Support
+                        </li>
+                        <li style="margin-bottom: 0.5rem; position: relative; padding-left: 1.5rem;">
+                            <span style="position: absolute; left: 0; color: var(--accent-color);">•</span>
+                            Core Concepts and Key Questions
+                        </li>
+                    </ul>
+                </div>
+
+                <h4 style="margin-top: 2rem;">(B) 5 Minutes: Q&A Session</h4>
+                <p style="margin-bottom: 1rem; font-size: clamp(1.1rem, 2vw, 1.3rem);">Led by the Explorer and Navigator from the "next group".</p>
+                <p style="font-size: clamp(1.1rem, 2vw, 1.3rem);">Questioners should ask in-depth questions about the "core questions" and "literature support" in the presentation.</p>
+            </div>
+        </section>
+
+        <!-- Slide 4: Q&A Rotation Order -->
+        <section class="slide scrollable">
+            <h3>Q&A Rotation Order</h3>
+            <div class="reminder-box">
+                <p>Questioning groups: Please prepare 2-3 in-depth questions.</p>
+            </div>
+            <div class="qa-list" style="text-align: center;">
+                <div class="qa-item" style="text-align: center;">
+                    <strong>G1 (Food Poverty)</strong> Presents <span class="qa-arrow">➔</span> <strong>G2 (Love Scripts)</strong> Questions
+                </div>
+                <div class="qa-item" style="text-align: center;">
+                    <strong>G2 (Love Scripts)</strong> Presents <span class="qa-arrow">➔</span> <strong>G3 (Health Foods)</strong> Questions
+                </div>
+                <div class="qa-item" style="text-align: center;">
+                    <strong>G3 (Health Foods)</strong> Presents <span class="qa-arrow">➔</span> <strong>G4 (Dating Apps)</strong> Questions
+                </div>
+                <div class="qa-item" style="text-align: center;">
+                    <strong>G4 (Dating Apps)</strong> Presents <span class="qa-arrow">➔</span> <strong>G5 (Sleep Quality)</strong> Questions
+                </div>
+                <div class="qa-item" style="text-align: center;">
+                    <strong>G5 (Sleep Quality)</strong> Presents <span class="qa-arrow">➔</span> <strong>G1 (Food Poverty)</strong> Questions
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5: Grading Criteria -->
+        <section class="slide scrollable">
+            <h3>Grading Criteria</h3>
+            <div class="scoring-container">
+                <div class="scoring-section">
+                    <h4>[Instructor Evaluation 75% - Announced Next Class]</h4>
+
+                    <div class="scoring-item">
+                        <h5>1. Content Depth and Academic Rigor (25%)</h5>
+                        <p class="role-tag">(Explorer / Navigator)</p>
+                        <p class="key-point">
+                            <strong>Key:</strong> Are arguments supported by high-quality "academic literature"? Is fact-checking rigorous?
+                        </p>
+                    </div>
+
+                    <div class="scoring-item">
+                        <h5>2. AI Skills Application (25%)</h5>
+                        <p class="role-tag">(Implementer / Explorer)</p>
+                        <p class="key-point">
+                            <strong>Key:</strong> Is AI used as a "tool" or a "dependency"? Effective use of AI for research, summarization, or creating high-quality visuals (Canva)?
+                        </p>
+                    </div>
+
+                    <div class="scoring-item">
+                        <h5>3. Presentation Structure and Oral Expression (25%)</h5>
+                        <p class="role-tag">(Spokesperson)</p>
+                        <p class="key-point">
+                            <strong>Key:</strong> Is the narrative engaging? Is time management perfect?
+                        </p>
+                    </div>
+                </div>
+
+                <div class="scoring-section">
+                    <h4>[Team Evaluation 25%]</h4>
+
+                    <div class="scoring-item">
+                        <h5>4. Team Collaboration and Q&A Performance (25%)</h5>
+                        <p class="key-point">
+                            <strong>Key:</strong> This score includes "Q&A performance" and is primarily determined by "peer evaluation" results.
+                        </p>
+                        <div style="text-align: left; margin-top: 2rem;">
+                            <p style="font-size: clamp(1.1rem, 2vw, 1.3rem); margin-bottom: 1rem;">Peer Evaluation Form:</p>
+                            <p><a href="https://forms.gle/3gdKzWpnTyKiM9b26" target="_blank" style="font-size: clamp(1.1rem, 2vw, 1.3rem);">https://forms.gle/3gdKzWpnTyKiM9b26</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="nav">
+        <button id="prev" class="nav-btn">&#8249;</button>
+        <button id="next" class="nav-btn">&#8250;</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = Array.from(document.querySelectorAll('.slide:not(.hidden)'));
+            const totalSlides = slides.length;
+            let currentSlide = 0;
+
+            function showSlide(index) {
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === index);
+                });
+            }
+
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            function prevSlide() {
+                currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            document.getElementById('next').addEventListener('click', nextSlide);
+            document.getElementById('prev').addEventListener('click', prevSlide);
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    nextSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    prevSlide();
+                }
+            });
+
+            // Touch support
+            let startX = 0;
+            let endX = 0;
+
+            document.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+            });
+
+            document.addEventListener('touchend', (e) => {
+                endX = e.changedTouches[0].clientX;
+                handleSwipe();
+            });
+
+            function handleSwipe() {
+                const threshold = 50;
+                const diff = startX - endX;
+
+                if (Math.abs(diff) > threshold) {
+                    if (diff > 0) {
+                        nextSlide();
+                    } else {
+                        prevSlide();
+                    }
+                }
+            }
+
+            showSlide(currentSlide);
+        });
+    </script>
+</body>
+</html>
+

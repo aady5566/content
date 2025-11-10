@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 10: AI 簡報期中報告：成果發表</title>
+    <script src="../../sidebar_tools/sidebar.js"></script>
+    <style>
+        :root {
+            --bg-color: #F4F2EF;
+            --text-color: #5a5a5a;
+            --accent-color: #78785b;
+            --line-color: #d1d1c2;
+            --highlight-color: #8c867b;
+            --font-family: 'Calibri', 'Noto Sans TC', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+        }
+
+        .slides-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: var(--bg-color);
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5vw;
+            box-sizing: border-box;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+            transform: scale(0.98);
+            text-align: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            font-size: 1.5rem;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            z-index: 1;
+        }
+
+        .slide.hidden {
+            display: none !important;
+        }
+
+        .slide.scrollable {
+            justify-content: flex-start;
+        }
+
+        h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+        }
+
+        h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 4vh;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 1rem;
+            width: 80%;
+            max-width: 800px;
+        }
+
+        h4 {
+            font-size: clamp(1.8rem, 3.3vw, 2.4rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 0.3rem;
+        }
+
+        h5 {
+            font-size: clamp(1rem, 1.8vw, 1.3rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.6rem;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            font-size: 1.5rem;
+            max-width: 80ch;
+        }
+
+        .slide-subtitle {
+            color: #888;
+            font-size: 1.8rem;
+            font-weight: 300;
+            margin-top: -1rem;
+        }
+
+        .nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 98%;
+            left: 1%;
+            display: flex;
+            justify-content: space-between;
+            z-index: 1002;
+            pointer-events: none;
+        }
+
+        .nav-btn {
+            pointer-events: all;
+            background: none;
+            border: 1px solid var(--line-color);
+            color: var(--accent-color);
+            font-size: 2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.4;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            opacity: 1;
+        }
+
+        /* 步驟卡片系統 */
+        .step-card {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .step-card h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .step-card p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .step-card.text-left {
+            text-align: left;
+        }
+
+        .step-card.text-center {
+            text-align: center;
+        }
+
+        /* 內容網格佈局 */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            align-items: start;
+        }
+
+        .content-section {
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .content-section h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .content-section p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .content-section.text-left {
+            text-align: left;
+        }
+
+        /* 議程列表樣式 */
+        .agenda-list {
+            text-align: left;
+            max-width: 800px;
+            width: 100%;
+            margin: 2rem 0;
+        }
+
+        .agenda-item {
+            margin-bottom: 1.5rem;
+            padding-left: 1rem;
+            font-size: clamp(1.2rem, 2.2vw, 1.5rem);
+            line-height: 1.8;
+        }
+
+        .agenda-item strong {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .group-list {
+            margin-top: 1rem;
+            padding-left: 2rem;
+        }
+
+        .group-item {
+            margin-bottom: 0.8rem;
+            font-size: clamp(1.1rem, 2vw, 1.3rem);
+            color: var(--text-color);
+        }
+
+        /* QA 循環列表 */
+        .qa-list {
+            text-align: center;
+            max-width: 900px;
+            width: 100%;
+            margin: 2rem auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .qa-item {
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            padding: 1rem 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            text-align: center;
+            position: relative;
+            width: auto;
+            min-width: fit-content;
+        }
+
+        .qa-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 60%;
+            background-color: var(--accent-color);
+            border-radius: 0 2px 2px 0;
+        }
+
+        .qa-item strong {
+            color: var(--accent-color);
+            font-size: clamp(1.2rem, 2.2vw, 1.4rem);
+        }
+
+        .qa-item p {
+            margin-top: 0.5rem;
+            font-size: clamp(1rem, 1.8vw, 1.2rem);
+        }
+
+        /* 箭頭樣式 */
+        .qa-arrow {
+            display: inline-block;
+            margin: 0 0.2em;
+            vertical-align: middle;
+            font-size: 1em;
+            color: var(--accent-color);
+            line-height: 1;
+        }
+
+        /* 評分標準樣式 */
+        .scoring-container {
+            text-align: left;
+            max-width: 1000px;
+            width: 100%;
+            margin: 2rem 0;
+        }
+
+        .scoring-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+        }
+
+        .scoring-section h4 {
+            font-size: clamp(1.4rem, 2.5vw, 1.8rem);
+            color: var(--highlight-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--highlight-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .scoring-item {
+            margin-bottom: 1.5rem;
+            padding-left: 1rem;
+        }
+
+        .scoring-item h5 {
+            font-size: clamp(1.2rem, 2vw, 1.4rem);
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .scoring-item .role-tag {
+            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+            color: var(--highlight-color);
+            font-style: italic;
+            margin-bottom: 0.5rem;
+        }
+
+        .scoring-item .key-point {
+            font-size: clamp(1rem, 1.8vw, 1.2rem);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .scoring-item .key-point strong {
+            color: var(--accent-color);
+        }
+
+        /* 超連結樣式 */
+        a {
+            color: #6b7c8a;
+            text-decoration: underline;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #5a6b7a;
+            text-decoration: underline;
+        }
+
+        a:visited {
+            color: #6b7c8a;
+            text-decoration: underline;
+        }
+
+        /* 提醒框樣式 */
+        .reminder-box {
+            background: rgba(120, 120, 91, 0.1);
+            border-left: 4px solid var(--accent-color);
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+            text-align: left;
+        }
+
+        .reminder-box p {
+            margin-bottom: 0.5rem;
+            font-size: clamp(1rem, 1.8vw, 1.2rem);
+        }
+
+        /* 響應式設計 - 手機版 */
+        @media (max-width: 767px) {
+            .slide {
+                padding: 3vw;
+                overflow-y: auto;
+                justify-content: center;
+            }
+
+            .slide:first-child {
+                justify-content: center;
+                overflow-y: hidden;
+            }
+
+            .slide.scrollable {
+                justify-content: flex-start;
+            }
+
+            .nav {
+                width: 95%;
+                left: 2.5%;
+                z-index: 1002;
+            }
+
+            .nav-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 1.6rem;
+                opacity: 0.6;
+            }
+
+            h1 {
+                font-size: clamp(2.5rem, 6vw, 3.5rem);
+            }
+
+            h2 {
+                font-size: clamp(2rem, 4.5vw, 2.5rem);
+                margin-bottom: 0.8rem;
+            }
+
+            h3 {
+                width: 95%;
+                font-size: clamp(1.6rem, 3.8vw, 2rem);
+            }
+
+            h4 {
+                font-size: clamp(1.3rem, 2.8vw, 1.6rem);
+            }
+
+            h5 {
+                font-size: clamp(1.1rem, 2.2vw, 1.3rem);
+            }
+
+            p {
+                font-size: clamp(1rem, 2vw, 1.2rem);
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .content-section {
+                width: 100%;
+            }
+
+            .step-card {
+                padding: 1.5rem;
+            }
+
+            .agenda-list,
+            .qa-list,
+            .scoring-container {
+                width: 100%;
+                padding: 0 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="slides-container">
+        <!-- Slide 1: 標題頁 -->
+        <section class="slide active">
+            <h1>AI 簡報期中報告：成果發表</h1>
+            <h2 class="slide-subtitle">流程說明、QA 規則與評分標準</h2>
+        </section>
+
+        <!-- Slide 2: 今日議程 -->
+        <section class="slide scrollable">
+            <h3>今日流程</h3>
+            <div class="agenda-list">
+                <div class="agenda-item">
+                    <strong>報告流程與 QA 說明 (10 分鐘)</strong>
+                    <p style="font-size: clamp(1rem, 1.8vw, 1.2rem); margin-top: 0.5rem;">包含各組順序</p>
+                </div>
+
+                <div class="agenda-item">
+                    <strong>評分標準詳解 (5 分鐘)</strong>
+                    <p style="font-size: clamp(1rem, 1.8vw, 1.2rem); margin-top: 0.5rem;">包含「組內互評」機制</p>
+                </div>
+
+                <div class="agenda-item">
+                    <strong>成果發表 (每組 15 分鐘)</strong>
+                    <div class="group-list">
+                        <div class="group-item">G1 (飲食貧窮)</div>
+                        <div class="group-item">G2 (愛情腳本)</div>
+                        <div class="group-item">G3 (健康食品)</div>
+                        <div class="group-item">G4 (交友軟體)</div>
+                        <div class="group-item">G5 (睡眠品質)</div>
+                    </div>
+                </div>
+
+                <div class="agenda-item">
+                    <strong>總結與回饋</strong>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: 報告流程 -->
+        <section class="slide scrollable">
+            <h3>報告流程：每組 15 分鐘</h3>
+            <div class="step-card text-left">
+                <h4>(A) 10 分鐘：正式簡報</h4>
+                <p style="margin-bottom: 1.5rem; font-size: clamp(1.1rem, 2vw, 1.3rem);">請嚴格遵守時間。</p>
+
+                <div class="reminder-box">
+                    <p><strong>[提醒]</strong> 簡報必須包含五大結構：</p>
+                    <ul style="list-style-type: none; padding-left: 1.5rem; margin-top: 0.5rem;">
+                        <li style="margin-bottom: 0.5rem; position: relative; padding-left: 1.5rem;">
+                            <span style="position: absolute; left: 0; color: var(--accent-color);">•</span>
+                            主題簡介
+                        </li>
+                        <li style="margin-bottom: 0.5rem; position: relative; padding-left: 1.5rem;">
+                            <span style="position: absolute; left: 0; color: var(--accent-color);">•</span>
+                            主題的重要性
+                        </li>
+                        <li style="margin-bottom: 0.5rem; position: relative; padding-left: 1.5rem;">
+                            <span style="position: absolute; left: 0; color: var(--accent-color);">•</span>
+                            細節介紹 (AI 輔助)
+                        </li>
+                        <li style="margin-bottom: 0.5rem; position: relative; padding-left: 1.5rem;">
+                            <span style="position: absolute; left: 0; color: var(--accent-color);">•</span>
+                            學術案例/文獻支持
+                        </li>
+                        <li style="margin-bottom: 0.5rem; position: relative; padding-left: 1.5rem;">
+                            <span style="position: absolute; left: 0; color: var(--accent-color);">•</span>
+                            核心概念與關鍵問題
+                        </li>
+                    </ul>
+                </div>
+
+                <h4 style="margin-top: 2rem;">(B) 5 分鐘：Q&A 環節</h4>
+                <p style="margin-bottom: 1rem; font-size: clamp(1.1rem, 2vw, 1.3rem);">由「下一組」的靈感探險家 (Explorer) 與 團隊舵手 (Navigator) 主導提問。</p>
+                <p style="font-size: clamp(1.1rem, 2vw, 1.3rem);">提問方請針對簡報中的「核心問題」與「文獻支持」進行有深度的提問。</p>
+            </div>
+        </section>
+
+        <!-- Slide 4: QA 循環順序 -->
+        <section class="slide scrollable">
+            <h3>Q&A 循環提問順序</h3>
+            <div class="reminder-box">
+                <p>提問組：請準備好 2-3 個有深度的問題。</p>
+            </div>
+            <div class="qa-list" style="text-align: center;">
+                <div class="qa-item" style="text-align: center;">
+                    <strong>G1 (飲食貧窮)</strong> 報告 <span class="qa-arrow">➔</span> <strong>G2 (愛情腳本)</strong> 提問
+                </div>
+                <div class="qa-item" style="text-align: center;">
+                    <strong>G2 (愛情腳本)</strong> 報告 <span class="qa-arrow">➔</span> <strong>G3 (健康食品)</strong> 提問
+                </div>
+                <div class="qa-item" style="text-align: center;">
+                    <strong>G3 (健康食品)</strong> 報告 <span class="qa-arrow">➔</span> <strong>G4 (交友軟體)</strong> 提問
+                </div>
+                <div class="qa-item" style="text-align: center;">
+                    <strong>G4 (交友軟體)</strong> 報告 <span class="qa-arrow">➔</span> <strong>G5 (睡眠品質)</strong> 提問
+                </div>
+                <div class="qa-item" style="text-align: center;">
+                    <strong>G5 (睡眠品質)</strong> 報告 <span class="qa-arrow">➔</span> <strong>G1 (飲食貧窮)</strong> 提問
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5: 評分標準 -->
+        <section class="slide scrollable">
+            <h3>評分標準</h3>
+            <div class="scoring-container">
+                <div class="scoring-section">
+                    <h4>[ 講師評分 75% 下堂課公布]</h4>
+
+                    <div class="scoring-item">
+                        <h5>1. 內容深度與學術嚴謹性 (25%)</h5>
+                        <p class="role-tag">(Explorer / Navigator)</p>
+                        <p class="key-point">
+                            <strong>關鍵：</strong> 是否有高品質的「學術文獻」支持論點？事實查核是否嚴謹？
+                        </p>
+                    </div>
+
+                    <div class="scoring-item">
+                        <h5>2. AI 技能應用 (25%)</h5>
+                        <p class="role-tag">(Implementer / Explorer)</p>
+                        <p class="key-point">
+                            <strong>關鍵：</strong> AI 是「輔助」還是「依賴」？是否善用 AI 進行研究、總結、或生成高品質視覺 (Canva)？
+                        </p>
+                    </div>
+
+                    <div class="scoring-item">
+                        <h5>3. 簡報結構與口語表達 (25%)</h5>
+                        <p class="role-tag">(Spokesperson)</p>
+                        <p class="key-point">
+                            <strong>關鍵：</strong> 故事線是否吸引人？時間控制是否完美？
+                        </p>
+                    </div>
+                </div>
+
+                <div class="scoring-section">
+                    <h4>[ 團隊評分 25% ]</h4>
+
+                    <div class="scoring-item">
+                        <h5>4. 團隊協作與 Q&A 表現 (25%)</h5>
+                        <p class="key-point">
+                            <strong>關鍵：</strong> 本項分數將包含「Q&A 表現」，並主要由「組內互評」的結果決定。
+                        </p>
+                        <div style="text-align: left; margin-top: 2rem;">
+                            <p style="font-size: clamp(1.1rem, 2vw, 1.3rem); margin-bottom: 1rem;">組內互評表單：</p>
+                            <p><a href="https://forms.gle/3gdKzWpnTyKiM9b26" target="_blank" style="font-size: clamp(1.1rem, 2vw, 1.3rem);">https://forms.gle/3gdKzWpnTyKiM9b26</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="nav">
+        <button id="prev" class="nav-btn">&#8249;</button>
+        <button id="next" class="nav-btn">&#8250;</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = Array.from(document.querySelectorAll('.slide:not(.hidden)'));
+            const totalSlides = slides.length;
+            let currentSlide = 0;
+
+            function showSlide(index) {
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === index);
+                });
+            }
+
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            function prevSlide() {
+                currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            document.getElementById('next').addEventListener('click', nextSlide);
+            document.getElementById('prev').addEventListener('click', prevSlide);
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    nextSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    prevSlide();
+                }
+            });
+
+            // 觸控支援
+            let startX = 0;
+            let endX = 0;
+
+            document.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+            });
+
+            document.addEventListener('touchend', (e) => {
+                endX = e.changedTouches[0].clientX;
+                handleSwipe();
+            });
+
+            function handleSwipe() {
+                const threshold = 50;
+                const diff = startX - endX;
+
+                if (Math.abs(diff) > threshold) {
+                    if (diff > 0) {
+                        nextSlide();
+                    } else {
+                        prevSlide();
+                    }
+                }
+            }
+
+            showSlide(currentSlide);
+        });
+    </script>
+</body>
+</html>
+
