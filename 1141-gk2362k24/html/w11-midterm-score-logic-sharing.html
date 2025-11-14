@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>期中成績計算 - 計分邏輯與曲線校正</title>
+    <script src="../../sidebar_tools/sidebar.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            }
+        };
+    </script>
+    <style>
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg-color: #F4F2EF;
+            --text-color: #5a5a5a;
+            --accent-color: #78785b;
+            --line-color: #d1d1c2;
+            --highlight-color: #8c867b;
+            --font-family: 'Calibri', 'Noto Sans TC', sans-serif;
+            --color-primary: rgba(120, 120, 91, 0.7);
+            --color-secondary: rgba(163, 163, 128, 0.7);
+            --color-accent: rgba(180, 120, 120, 0.7);
+            --color-earth: rgba(139, 125, 107, 0.7);
+            --color-stone: rgba(152, 144, 136, 0.7);
+            --color-moss: rgba(108, 128, 108, 0.7);
+            --color-mist: rgba(168, 160, 152, 0.7);
+        }
+
+        h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+        }
+
+        h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 4vh;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 1rem;
+            width: 80%;
+            max-width: 800px;
+        }
+
+        h4 {
+            font-size: clamp(1.8rem, 3.3vw, 2.4rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 0.3rem;
+        }
+
+        h5 {
+            font-size: clamp(1rem, 1.8vw, 1.3rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.6rem;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            font-size: 1.5rem;
+            max-width: 80ch;
+        }
+
+        ul, ol {
+            color: #666;
+            font-size: 1.5rem;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+            text-align: left;
+            max-width: 80ch;
+        }
+
+        li {
+            margin-bottom: 0.8rem;
+        }
+
+        .slides-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: var(--bg-color);
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5vw;
+            box-sizing: border-box;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+            transform: scale(0.98);
+            text-align: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            font-size: 1.5rem;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            z-index: 1;
+        }
+
+        .slide.hidden {
+            display: none !important;
+        }
+
+        .slide.scrollable {
+            justify-content: flex-start;
+        }
+
+        .nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 98%;
+            left: 1%;
+            display: flex;
+            justify-content: space-between;
+            z-index: 1002;
+            pointer-events: none;
+        }
+
+        .nav-btn {
+            pointer-events: all;
+            background: none;
+            border: 1px solid var(--line-color);
+            color: var(--accent-color);
+            font-size: 2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.4;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            opacity: 1;
+        }
+
+        .step-card {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            width: 100%;
+            max-width: 800px;
+            margin: 1rem auto;
+        }
+
+        .step-card.text-left {
+            text-align: left;
+        }
+
+        .step-card h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .step-card p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .step-card ul, .step-card ol {
+            text-align: left;
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+        }
+
+        .content-section {
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            max-width: 900px;
+            margin: 1rem 0;
+        }
+
+        .content-section.text-left {
+            text-align: left;
+        }
+
+        .content-section h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        pre {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            line-height: 1.3;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow-x: auto;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            text-align: left;
+            max-width: 90%;
+        }
+
+        pre:hover {
+            background: var(--highlight-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        pre code {
+            background: transparent;
+            border: none;
+            padding: 0;
+            font-size: inherit;
+            color: inherit;
+            font-family: inherit;
+        }
+
+        pre::after {
+            content: "";
+            position: absolute;
+            top: 0.5rem;
+            right: 0.8rem;
+            width: 20px;
+            height: 20px;
+            background-image: url('../../pic/copy-white.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        pre:hover::after {
+            opacity: 1;
+        }
+
+        .contributor-list {
+            list-style: none;
+            padding: 0;
+            text-align: center;
+            font-size: 1.5rem;
+            line-height: 2;
+        }
+
+        .contributor-list li {
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight-score {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #7A9BA8;
+            margin-top: 1rem;
+        }
+
+        .group-score-table {
+            display: inline-block;
+            text-align: left;
+            font-size: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .group-score-table div {
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid var(--line-color);
+        }
+
+        .group-score-table div:first-child {
+            font-weight: 600;
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        /* MathJax 響應式樣式 */
+        .MathJax,
+        .mjx-chtml,
+        .MathJax_Display,
+        mjx-container {
+            max-width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            display: inline-block;
+        }
+
+        /* MathJax display math 容器 */
+        mjx-container[display="true"],
+        .MathJax_Display {
+            display: block !important;
+            margin: 1rem auto;
+            text-align: center;
+        }
+
+        /* 確保公式容器可以水平滾動 */
+        .math-container {
+            overflow-x: auto;
+            overflow-y: hidden;
+            max-width: 100%;
+            padding: 0.5rem 0;
+            -webkit-overflow-scrolling: touch;
+            box-sizing: border-box;
+        }
+
+        /* 包含公式的段落容器（使用 :has() 作為額外保護） */
+        @supports selector(:has(*)) {
+            p:has(.MathJax),
+            p:has(.mjx-chtml),
+            p:has(mjx-container) {
+                overflow-x: auto;
+                overflow-y: hidden;
+                padding: 0.5rem 0;
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .slide {
+                padding: 3vw;
+                overflow-y: auto;
+                justify-content: center;
+            }
+
+            .slide:first-child {
+                justify-content: center;
+                overflow-y: hidden;
+            }
+
+            .slide.scrollable {
+                justify-content: flex-start;
+            }
+
+            .nav {
+                width: 95%;
+                left: 2.5%;
+                z-index: 1002;
+            }
+
+            .nav-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 1.6rem;
+                opacity: 0.6;
+            }
+
+            h1 { font-size: clamp(2.5rem, 6vw, 3.5rem); }
+            h2 { font-size: clamp(2rem, 4.5vw, 2.5rem); margin-bottom: 0.8rem; }
+            h3 { width: 95%; font-size: clamp(1.6rem, 3.8vw, 2rem); }
+            h4 { font-size: clamp(1.3rem, 2.8vw, 1.6rem); }
+            h5 { font-size: clamp(1.1rem, 2.2vw, 1.3rem); }
+            p { font-size: clamp(1rem, 2vw, 1.2rem); }
+            ul, ol { font-size: clamp(1rem, 2vw, 1.2rem); }
+
+            .step-card, .content-section {
+                padding: 1.5rem;
+                margin: 0.5rem 0;
+            }
+
+            pre {
+                padding: 0.8rem;
+                font-size: 0.75rem;
+                margin: 0.6rem 0;
+                letter-spacing: 0.2px;
+                word-break: break-word;
+                white-space: pre-wrap;
+                overflow-wrap: break-word;
+                max-width: 100%;
+                box-sizing: border-box;
+            }
+
+            pre::after {
+                width: 12px;
+                height: 12px;
+                top: 0.2rem;
+                right: 0.4rem;
+            }
+
+            .highlight-score {
+                font-size: clamp(1.8rem, 4vw, 2.2rem);
+            }
+
+            .group-score-table {
+                font-size: clamp(1rem, 2vw, 1.2rem);
+            }
+
+            /* 小螢幕上的 MathJax 樣式 */
+            .MathJax,
+            .mjx-chtml,
+            mjx-container {
+                font-size: 85% !important;
+                max-width: 100%;
+            }
+
+            /* 確保公式在小螢幕上可以滾動 */
+            .math-container {
+                max-width: calc(100vw - 6vw);
+                margin: 0.5rem 0;
+                padding: 0.5rem 1rem;
+            }
+
+            /* 小螢幕上包含公式的段落 */
+            @supports selector(:has(*)) {
+                p:has(.MathJax),
+                p:has(.mjx-chtml),
+                p:has(mjx-container) {
+                    font-size: clamp(0.9rem, 2.5vw, 1.4rem);
+                }
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="slides-container">
+        <!-- Slide 1: 標題頁 -->
+        <section id="slide-1" class="slide active">
+            <h1>期中成績計算</h1>
+            <h2>計分邏輯與曲線校正</h2>
+        </section>
+
+        <!-- Slide 2: 目標 -->
+        <section id="slide-2" class="slide">
+            <h3>目標：公平、有區別力、符合教學期望</h3>
+            <div class="content-section">
+                <div style="margin-bottom: 2rem;">
+                    <h4>1. 整合 (Integrate)</h4>
+                    <p>合併 5 次作業 (50%) 與 1 次期中報告 (25%)。</p>
+                </div>
+                <div>
+                    <h4>2. 計算 (Calculate)</h4>
+                    <p>計算出 0-100 範圍的「原始分數」。（降低不及格率）</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: 平時作業 -->
+        <section id="slide-3" class="slide">
+            <h3>平時作業</h3>
+            <div class="content-section text-left">
+                <p><strong>資料：</strong> 5 次作業</p>
+                <p><strong>尺度：</strong> 每次作業皆已評定為 1-5 分，依照作業完整度、作業指示要求、產出品質進行評分</p>
+            </div>
+        </section>
+
+        <!-- Slide 4: 期中報告 -->
+        <section id="slide-4" class="slide scrollable">
+            <h3>期中報告</h3>
+                <p>此分數已綜合考量 (Rubric) 以下指標：</p>
+                <ul>
+                    <li>內容完整性 (30%)</li>
+                    <li>執行與分析 (30%)</li>
+                    <li>簡報製作 (10%)</li>
+                    <li>口頭報告 (10%)</li>
+                    <li>問答 (20%)</li>
+                </ul>
+                <p>此分數已納入「最佳貢獻者」或「組內互評」的個人加分。</p>
+            </div>
+        </section>
+
+        <!-- Slide 5: 步驟一：計算「原始分數」與加權 -->
+        <section id="slide-5" class="slide scrollable">
+            <h3>步驟二：計算「原始分數」 - 標準化</h3>
+            <div class="step-card text-left">
+                <h4>A. 標準化 (Standardization)</h4>
+                <p>將 1-5 分的尺度，轉換為 0-1 (0% ~ 100%) 的表現百分比。</p>
+                <ul>
+                    <li><strong>作業平均 ($A_{avg}$):</strong> $$S_{hw} = \frac{A_{avg} - 1}{4}$$</li>
+                    <li><strong>期中報告 ($M_{pers}$):</strong> $$S_{rep} = \frac{M_{pers} - 1}{4}$$</li>
+                </ul>
+            </div>
+            <div class="step-card text-left">
+                <h4>B. 加權平均 (Weighted Average)</h4>
+                <p>作業和簡報的權重 <strong>2:1</strong> 權重進行加權。</p>
+                <p style="text-align: center; margin: 1rem 0;">$$W_{avg} = \frac{(S_{hw} \times 2) + (S_{rep} \times 1)}{3}$$</p>
+            </div>
+            <div class="step-card text-left">
+                <h4>C. 原始分數 (Original Score)</h4>
+                <p>將加權後的百分比 (0-1) 轉為 0-100 分。</p>
+                <p style="text-align: center; margin: 1rem 0;">$$Score_{Orig} = W_{avg} \times 100$$</p>
+            </div>
+        </section>
+
+        <!-- Slide 6: 步驟二：找出全班基準與校正 -->
+        <section id="slide-6" class="slide scrollable">
+            <h3>步驟三：找出全班基準與校正</h3>
+            <div class="content-section text-left">
+                <p>腳本 (Script) 會先計算出<strong>全班</strong>的「原始分數」($Score_{Orig}$)。</p>
+                <p><strong>範例數據:</strong></p>
+                <pre><code>[66.3, 51.7, 36.7, 33.3, ... , 22.0, 69.0]</code></pre>
+                <p>然後，找出這群分數中的實際最大值與最小值：</p>
+                <ul>
+                    <li><strong>實際最低分 ($ActualMin$):</strong> <code>22.0</code></li>
+                    <li><strong>實際最高分 ($ActualMax$):</strong> <code>69.0</code></li>
+                </ul>
+                <p>重新校正「原始分數」，使其符合教學目標區間 (Target Range)。</p>
+                <ul>
+                    <li><strong>新最低分 ($NewMin$):</strong> <code>60.0</code></li>
+                    <li><strong>新最高分 ($NewMax$):</strong> <code>92.0</code></li>
+                </ul>
+                <div class="math-container" style="text-align: center; margin: 2rem 0;">
+                    <p style="margin: 0;">$$Score_{Final} = \text{NewMin} + \left( \frac{Score_{Orig} - \text{ActualMin}}{\text{ActualMax} - \text{ActualMin}} \right) \times (\text{NewMax} - \text{NewMin})$$</p>
+                </div>
+                <p><strong>套入參數：</strong></p>
+                <div class="math-container" style="text-align: center; margin: 1rem 0;">
+                    <p style="margin: 0;">$$Score_{Final} = 60 + \left( \frac{Score_{Orig} - 22.0}{69.0 - 22.0} \right) \times (92 - 60)$$</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 7: 最終公式 -->
+        <section id="slide-7" class="slide scrollable">
+            <h3>最終公式</h3>
+            <div class="content-section">
+                <div class="math-container" style="text-align: center; margin: 2rem 0;">
+                    <p style="margin: 0; font-size: clamp(1rem, 2.5vw, 1.8rem);">$$Score_{Final} = \text{NewMin} + \left( \frac{Score_{Orig} - \text{ActualMin}}{\text{ActualMax} - \text{ActualMin}} \right) \times (\text{NewMax} - \text{NewMin})$$</p>
+                </div>
+                <p><strong>套入參數：</strong></p>
+                <div class="math-container" style="text-align: center; margin: 1.5rem 0;">
+                    <p style="margin: 0; font-size: clamp(0.9rem, 2.2vw, 1.6rem);">$$Score_{Final} = 60 + \left( \frac{Score_{Orig} - 22.0}{69.0 - 22.0} \right) \times (92 - 60)$$</p>
+                </div>
+                <div class="math-container" style="text-align: center; margin: 1.5rem 0;">
+                    <p style="margin: 0; font-size: clamp(0.9rem, 2.2vw, 1.6rem);">$$Score_{Final} = 60 + \left( \frac{Score_{Orig} - 22.0}{47} \right) \times 32$$</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 8: 期中報告簡報分數 -->
+        <section id="slide-8" class="slide">
+            <h3>期中報告簡報原始分數</h3>
+            <p>分數級距 (1-5 分)</p>
+            <div class="group-score-table">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div><strong>組別</strong></div>
+                    <div><strong>分數</strong></div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div>1</div>
+                    <div>2.6</div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div>2</div>
+                    <div>3.8</div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div>3</div>
+                    <div>4.2</div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div>4</div>
+                    <div>3</div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div>5</div>
+                    <div>3</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 9: 最佳貢獻者 -->
+        <section id="slide-9" class="slide scrollable">
+            <h1>期中報告，你的努力有被看見</h1>
+            <p class="highlight-score">原始總分增加 6.67 分</p>
+            <div class="content-section">
+                <ul class="contributor-list">
+                    <li>1170730515 汪O駿</li>
+                    <li>1180730508 温O奇</li>
+                    <li>1180730509 何O秞</li>
+                    <li>1180730514 張O彗</li>
+                    <li>1180730516 陳O瑩</li>
+                    <li>1180730518 楊O儒</li>
+                    <li>1180730521 黃O昕</li>
+                    <li>1180730523 周O瑄</li>
+                    <li>1180730505 曹O諺</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <div class="nav">
+        <button id="prev" class="nav-btn">&#8249;</button>
+        <button id="next" class="nav-btn">&#8250;</button>
+    </div>
+
+    <script>
+        // 投影片導航系統
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = Array.from(document.querySelectorAll('.slide:not(.hidden)'));
+            const totalSlides = slides.length;
+            let currentSlide = 0;
+
+            function showSlide(index) {
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === index);
+                });
+            }
+
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            function prevSlide() {
+                currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            document.getElementById('next').addEventListener('click', nextSlide);
+            document.getElementById('prev').addEventListener('click', prevSlide);
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    nextSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    prevSlide();
+                }
+            });
+
+            // 觸控支援
+            let startX = 0;
+            let endX = 0;
+
+            document.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+            });
+
+            document.addEventListener('touchend', (e) => {
+                endX = e.changedTouches[0].clientX;
+                handleSwipe();
+            });
+
+            function handleSwipe() {
+                const threshold = 50;
+                const diff = startX - endX;
+
+                if (Math.abs(diff) > threshold) {
+                    if (diff > 0) {
+                        nextSlide();
+                    } else {
+                        prevSlide();
+                    }
+                }
+            }
+
+            showSlide(currentSlide);
+        });
+
+        // 程式碼區塊點擊複製功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const codeBlocks = document.querySelectorAll('pre');
+
+            codeBlocks.forEach(block => {
+                const codeElement = block.querySelector('code');
+                if (!codeElement) return;
+
+                const originalText = codeElement.textContent;
+
+                block.addEventListener('click', async function() {
+                    if (codeElement.textContent === '已複製！') {
+                        return;
+                    }
+
+                    const text = originalText.trim();
+
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        codeElement.textContent = '已複製！';
+
+                        setTimeout(() => {
+                            codeElement.textContent = originalText;
+                        }, 1500);
+
+                    } catch (err) {
+                        console.error('複製失敗:', err);
+
+                        const textArea = document.createElement('textarea');
+                        textArea.value = text;
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textArea);
+
+                        codeElement.textContent = '已複製！';
+
+                        setTimeout(() => {
+                            codeElement.textContent = originalText;
+                        }, 1500);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+

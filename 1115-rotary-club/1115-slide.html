@@ -652,7 +652,7 @@
            ============================================ */
         .timeline-container {
             width: 100%;
-            max-width: 1000px;
+            max-width: 1400px;
             padding: 2rem 0;
             overflow-x: auto;
             display: flex;
@@ -666,7 +666,7 @@
             display: flex;
             position: relative;
             align-items: flex-start;
-            justify-content: center;
+            justify-content: flex-start;
             padding-top: 50px;
             gap: 3rem;
         }
@@ -752,6 +752,14 @@
 
         .timeline-item-large .timeline-content .text {
             font-size: clamp(1.125rem, 1.5vw, 1.2rem) !important;
+        }
+
+        /* Narrow timeline item - for better spacing */
+        .timeline-item-narrow {
+            flex: 0 0 auto;
+            min-width: 150px;
+            max-width: 250px;
+            padding: 0 1.5rem;
         }
 
         /* Current state - low saturation blue */
@@ -1224,22 +1232,24 @@
                 <h2 style="font-size: clamp(2rem, 2.5vw, 1.75rem);">Appier 產品人 / 國防大學 兼任講師</h2>
                 <div class="timeline-container">
                     <div class="timeline-track">
-                        <div class="timeline-item timeline-item-large">
+                        <div class="timeline-item timeline-item-large timeline-item-narrow">
                             <div class="timeline-year">2009-2016</div>
                             <div class="timeline-content">
                                 <div class="title">台灣大學</div>
                                 <div class="subtitle">心理學士</div>
                                 <!-- <div class="text">大專生科技部計劃</div> -->
                                 <div class="subtitle">心理碩士認知計量</div>
-                                <!-- <div class="text">情緒對賭局決策的影響</div> -->
+                                <div class="text">情緒對決策的影響</div>
+
+                                <div class="text"><a href="https://pubmed.ncbi.nlm.nih.gov/28421669/#:~:text=modulate%20decision%20making-,Misfortune%20may%20be%20a%20blessing%20in%20disguise:%20Fairness%20perception%20and,Epub%202017%20Apr%2019.">(Psychophysiology, 2017)</a></div>
                             </div>
                         </div>
                         <div class="timeline-item timeline-item-large">
                             <div class="timeline-year">2016</div>
                             <div class="timeline-content">
                                 <div class="title">雲圖科學</div>
-                                <div class="subtitle">資料分析師</div>
-                                <div class="text">數據建模</div>
+                                <div class="subtitle">打雜</div>
+                                <div class="text">報關行推薦系統</div>
                             </div>
                         </div>
                         <div class="timeline-item timeline-item-large">
@@ -1390,7 +1400,6 @@
                 <ul>
                     <li>錯把家事當成舒壓的先生</li>
                     <li style="cursor: pointer;">熱愛模組化思考的探索者 <span class="reveal-text" style="font-size: 3rem; font-weight: 600;">INTJ-A</span></li>
-                    <li>AI 實踐的狂熱者</li>
                 </ul>
             </div>
         </section>
@@ -1405,34 +1414,6 @@
                 </blockquote>
                 <p>我們是「碳基生命」。當我們引以為傲的技能，一個一個被矽基電體用更低的成本、更高的效率複製時，我們剩下什麼？</p>
                 <p>這不是一個未來的天問，這是一個「存在主義」的探問。</p>
-            </div>
-        </section>
-
-        <section class="layout-two-column">
-            <div class="slide-content">
-                <div class="image-column">
-                    <img src="../pic/1115/biological-artificial-brain.jpg"
-                         alt="碳基生命 vs. 矽基電體"
-                         loading="lazy">
-                    <div class="image-source">
-                        圖片來源: <a href="https://scitechdaily.com/building-a-new-type-of-efficient-artificial-intelligence-inspired-by-the-brain/" target="_blank" rel="noopener noreferrer">Scitech Daily</a>
-                    </div>
-                </div>
-                <div class="text-column">
-                    <h1>碳基生命 vs. 矽基電體</h1>
-                    <p style="font-size: 1.5rem;">Biological vs. Artificial Intelligence</p>
-                    <blockquote>
-                        <p>當 AI 外包了計算、記憶、閱讀、理解、甚至創造...</p>
-                        <p>那 人類 ... 還剩下什麼？</p>
-                    </blockquote>
-                </div>
-            </div>
-        </section>
-
-        <section class="layout-bigtext">
-            <div class="slide-content">
-                <h1>Anxiety</h1>
-                <h2 style="text-align: center; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 300; margin-top: 1rem;">焦慮?</h2>
             </div>
         </section>
 
@@ -1472,6 +1453,13 @@
                 class=""
                 style="width: 100%; height: auto; display: block; margin: 2rem 0;"
                 loading="lazy">
+            </div>
+        </section>
+
+        <section class="layout-bigtext">
+            <div class="slide-content">
+                <h1>Anxiety</h1>
+                <h2 style="text-align: center; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 300; margin-top: 1rem;">焦慮?</h2>
             </div>
         </section>
 
@@ -1589,6 +1577,27 @@
             </div>
         </section>
 
+        <section class="layout-two-column">
+            <div class="slide-content">
+                <div class="image-column">
+                    <img src="../pic/1115/biological-artificial-brain.jpg"
+                         alt="碳基生命 vs. 矽基電體"
+                         loading="lazy">
+                    <div class="image-source">
+                        圖片來源: <a href="https://scitechdaily.com/building-a-new-type-of-efficient-artificial-intelligence-inspired-by-the-brain/" target="_blank" rel="noopener noreferrer">Scitech Daily</a>
+                    </div>
+                </div>
+                <div class="text-column">
+                    <h1>碳基生命 vs. 矽基電體</h1>
+                    <p style="font-size: 1.5rem;">Biological vs. Artificial Intelligence</p>
+                    <blockquote>
+                        <p>當 AI 外包了計算、記憶、閱讀、理解、甚至創造...</p>
+                        <p>那 人類 ... 還剩下什麼？</p>
+                    </blockquote>
+                </div>
+            </div>
+        </section>
+
         <section class="layout-title">
             <div class="slide-content">
                 <h1>釐清本質</h1>
@@ -1655,8 +1664,7 @@
                 <p style="font-size: 120% !important;"><b>傳統 AI：</b>工作是「分析」或「分類」或「預測」。</p>
                 <blockquote style="font-size: 120% !important;">(e.g., 判斷是不是垃圾郵件、預測股價)</blockquote>
                 <p style="font-size: 120% !important;"><b>生成式 AI：</b>工作是「創造」(Create)。</p>
-                <blockquote style="font-size: 120% !important;">(e.g., 生成一個飛天豬、寫一篇「出軌都是對方的錯」新聞稿)</blockquote>
-                <p style="font-weight: 600; font-size: 120% !important;">它創造文字、圖片、音樂、程式碼。這就是為什麼我們感覺它「像人」。</p>
+                <blockquote style="font-size: 120% !important;">(e.g., 寫一篇「逃兵與詐騙的刑責輕重」新聞稿)</blockquote>
             </div>
         </section>
 
@@ -1681,6 +1689,29 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <section class="layout-title">
+            <div class="slide-content">
+                <h1><b>AI 的失憶事件</b></h1>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>ChatGPT Atlas 瀏覽器試用</h1>
+                <img src="../pic/1115/atlas-delete.png"
+                     alt="ChatGPT Atlas 瀏覽器"
+                     style="width: 60%; max-width: 60%; height: auto; display: block; margin: 2rem auto 0; border-radius: 4px; background: transparent; filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.15));"
+                     loading="lazy">
+            </div>
+        </section>
+
+        <section class="layout-title">
+            <div class="slide-content">
+                <blockquote style="font-size: 2em;">"我是一個大型語言模型，<br>
+                    我沒有記憶功能。<br>
+                    我不知道你的 MBTI 是什麼。"</blockquote>
             </div>
         </section>
 
@@ -1759,7 +1790,7 @@
         </section>
 
 
-        <section class="layout-default">
+        <section class="layout-default hidden">
             <div class="slide-content">
                 <h1>QKV (Query, Key, Value)</h1>
                 <p>Transformer「注意力機制」的運作核心。</p>
@@ -1857,7 +1888,7 @@
 
         <section class="layout-title">
             <div class="slide-content">
-                <h2 style="font-size: clamp(2rem, 3vw, 1.75rem); font-weight: 400; color: var(--accent-color); margin-top: 2rem; margin-bottom: 1rem;">想一下，假如要製作一個大腦代理人，它需要具備哪些核心功能？</h2>
+                <h2 style="font-size: clamp(2rem, 3vw, 1.75rem); font-weight: 400; color: var(--accent-color); margin-top: 2rem; margin-bottom: 1rem;">想像一下，假如要製作一個大腦代理人，它需要具備哪些核心功能？</h2>
             </div>
         </section>
 
@@ -1868,6 +1899,21 @@
                         allowfullscreen
                         sandbox="allow-scripts allow-same-origin allow-forms">
             </iframe>
+        </section>
+
+        <section class="layout-title">
+            <div class="slide-content">
+                <h1 style="font-size: 3rem;"><b>內部核心 (Brain Itself)</b></h1>
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>MoE <span style="font-size: 50%;">(Mixture of Experts)</span></h1>
+                <p>一種讓大型語言模型<b>內部分工協作</b>的架構。</p>
+                <p><b>運作：</b>一個「路由器」(Router) 先判斷問題類型，再交給對應的「專家」處理。</p>
+                <blockquote><p style="font-weight: 400;">像是人類不同腦區負責不同功能，既能保持功能運作，又能大幅降低運算成本、加快速度。</p></blockquote>
+            </div>
         </section>
 
         <section class="layout-default scrollable">
@@ -2032,24 +2078,19 @@
             </div>
         </section>
 
-        <section class="layout-default">
+        <section class="layout-title">
             <div class="slide-content">
-                <h1>MoE <span style="font-size: 50%;">(Mixture of Experts)</span></h1>
-                <p>一種讓大型語言模型<b>內部分工協作</b>的架構。</p>
-                <p>在語言模型內選擇最適的「子專家網路」參與運算，以最小的資源達成最大的效果。</p>
-                <blockquote>(e.g., 數學專家、歷史專家、程式碼專家...)</blockquote>
-                <p><b>運作：</b>一個「路由器」(Router) 先判斷問題類型，再交給對應的「專家」處理。</p>
-                <p style="font-weight: 600;">像是人類不同腦區負責不同功能，既能保持功能運作，又能大幅降低運算成本、加快速度。</p>
+                <h1 style="font-size: 3rem;"><b></b>外部協作 (Seeking Help)</b></h1>
             </div>
         </section>
 
         <section class="layout-default">
             <div class="slide-content">
                 <h1>RAG <span style="font-size: 50%;">(Retrieval-Augmented Generation，檢索增強生成)</span></h1>
-                <p>一種讓大型語言模型在生成答案前，先從外部資料庫搜尋（Retrieval）再生成回應（Generation） 的技術，<b>部分解決「幻覺」和「知識過時」的問題</b></p>
-                <p><b>RAG 概念：</b>讓 AI 進行「開書考試」(Open-book Test)。</p>
-                <blockquote><b>Step 1 (檢索): </b>先去內部資料庫「找出」原文。
-                <br><b>Step 2 (生成): </b>看著原文「總結」答案給你。
+                <p>一種讓大型語言模型在生成答案前，先從外部資料庫搜尋（Retrieval），<br><b>部分解決「幻覺」和「知識過時」的問題</b></p>
+                <blockquote>讓 AI 進行開書考試：<br>
+                    <b>Step 1 檢索: </b>先去內部資料庫「找出」原文。
+                <br><b>Step 2 生成: </b>看著原文「總結」答案給你。
                 </blockquote>
             </div>
         </section>
@@ -2120,19 +2161,10 @@
             </div>
         </section>
 
-        <section class="layout-two-column">
+        <section class="layout-two-column reverse">
             <div class="slide-content">
-                <div class="image-column">
-                    <iframe src="a2a-mcp-interaction.html"
-                            title="範例分享：輸入座標搜尋方圓 2 公里內好評價餐廳"
-                            frameborder="0"
-                            allowfullscreen
-                            sandbox="allow-scripts allow-same-origin allow-forms"
-                            style="width: 100%; height: 600px; border-radius: 4px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
-                    </iframe>
-                </div>
                 <div class="text-column">
-                    <div class="mermaid">
+                    <div class="mermaid" style="width: 100%;">
                         flowchart TD
                         User["使用者<br/>User"] -->|"輸入座標與需求"| RootAgent["root_agent<br/>(A2A 協調者)"]
                         RootAgent -->|"A2A 委派"| MapAgent["map_agent<br/>(地圖搜尋)"]
@@ -2152,6 +2184,15 @@
                         style MapTool fill:#e8e8e8,stroke:#3D3A37,stroke-width:1px,color:#3D3A37
                         style ReviewTool fill:#e8e8e8,stroke:#3D3A37,stroke-width:1px,color:#3D3A37
                     </div>
+                </div>
+                <div class="image-column">
+                    <iframe src="a2a-mcp-interaction.html"
+                            title="範例分享：輸入座標搜尋方圓 2 公里內好評價餐廳"
+                            frameborder="0"
+                            allowfullscreen
+                            sandbox="allow-scripts allow-same-origin allow-forms"
+                            style="width: 100%; height: 600px; border-radius: 4px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+                    </iframe>
                 </div>
             </div>
         </section>
@@ -2349,7 +2390,7 @@
                                 </td>
                                 <td style="border: 1px solid var(--line-color); padding: 0.6rem; text-align: center;">7</td>
                                 <td style="border: 1px solid var(--line-color); padding: 0.6rem; font-size: clamp(1.125rem, 1.5vw, 1.275rem); color: #5c5855;">
-                                    GPT-5, Sora
+                                    GPT-5.1, Sora
                                 </td>
                             </tr>
                             <tr>
@@ -2807,7 +2848,7 @@
             <div class="slide-content">
                 <h1>第一性原則 (First Principles)</h1>
                 <p>跳脫現有慣例，從物理性意義的「基本真理」出發。</p>
-                <blockquote>「把一個問題拆解回它最基礎、最不可否認的真相，然後從那裡開始重新建構解決方案。」</blockquote>
+                <blockquote>「把一個問題拆解回它最基礎、最客觀的真相，然後從那裡開始重新建構解決方案。」</blockquote>
             </div>
         </section>
 
@@ -2972,7 +3013,6 @@
 
         <section class="layout-quote">
             <div class="slide-content">
-                <h1 style="font-size: clamp(2rem, 5vw, 4rem);">原則三：</h1>
                 <h1 style="font-size: clamp(2.5rem, 6vw, 5rem);">職場打團體戰</h1>
             </div>
         </section>
