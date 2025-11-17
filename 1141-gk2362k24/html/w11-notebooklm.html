@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>主動學習 2.0：用 NotebookLM 探索並客製化你的學習流</title>
+    <script src="../../sidebar_tools/sidebar.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* ============================================
+           CSS 變數定義（來自 style_1116.md）
+           ============================================ */
+        :root {
+            --bg-color: #F5F4F0;        /* Warm, off-white, like aged paper */
+            --text-color: #3D3A37;      /* Dark, soft brown/gray */
+            --accent-color: #9A948C;    /* Muted stone gray */
+            --header-bg: #EAEBE6;       /* Very light, muted moss */
+            --line-color: #d1d1c2;      /* For borders and lines */
+            --highlight-color: #8c867b; /* For highlights */
+            --font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+            /* 圖表顏色系統 - 藍色系 */
+            --chart-hex-9: #A0B0C0;     /* Light blue-gray */
+            --chart-hex-10: #8898A8;    /* Medium blue-gray */
+            --chart-hex-11: #98A0B8;    /* Blue-gray */
+            --chart-hex-12: #788098;    /* Dark blue-gray */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+        }
+
+        /* 投影片容器 */
+        .slides-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: var(--bg-color);
+        }
+
+        /* 投影片基礎樣式 */
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5vw;
+            box-sizing: border-box;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+            transform: scale(0.98);
+            text-align: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+            font-family: var(--font-family);
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            z-index: 1;
+        }
+
+        .slide.hidden {
+            display: none !important;
+        }
+
+        .slide.scrollable {
+            justify-content: flex-start;
+        }
+
+        /* 標題層級 */
+        h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 400;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: clamp(1.2rem, 3vw, 1.75rem);
+            font-weight: 300;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+        }
+
+        h3 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 400;
+            color: var(--text-color);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--header-bg);
+        }
+
+        h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+        }
+
+        h5 {
+            font-size: clamp(1.2rem, 2vw, 1.4rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.6rem;
+        }
+
+        p {
+            font-size: clamp(1.2rem, 2.5vw, 1.75rem);
+            color: var(--text-color);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .slide-subtitle {
+            color: var(--accent-color);
+            font-size: clamp(1.2rem, 3vw, 1.75rem);
+            font-weight: 400;
+            margin-top: -1rem;
+        }
+
+        /* 導航系統 */
+        .nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 98%;
+            left: 1%;
+            display: flex;
+            justify-content: space-between;
+            z-index: 1002;
+            pointer-events: none;
+        }
+
+        .nav-btn {
+            pointer-events: all;
+            background: none;
+            border: 1px solid var(--line-color);
+            color: var(--accent-color);
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.4;
+            font-family: var(--font-family);
+        }
+
+        .nav-btn:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            opacity: 1;
+        }
+
+        /* 內容佈局系統 */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            align-items: start;
+        }
+
+        .content-section {
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            font-family: var(--font-family);
+        }
+
+        .content-section h3 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        .content-section h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .content-section p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .content-section.text-left {
+            text-align: left;
+        }
+
+        /* 兩欄佈局 */
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            align-items: start;
+        }
+
+        .two-columns > div {
+            width: 100%;
+        }
+
+        .two-columns h4 {
+            font-size: clamp(1.344rem, 2.52vw, 1.68rem);
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .two-columns p {
+            font-size: clamp(1.2096rem, 2.268vw, 1.512rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        /* 字多版本容器 */
+        .bunch-word-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            padding: 1.5vh 2vw;
+            overflow-y: auto;
+            overflow-x: hidden;
+            text-align: left;
+            height: 100%;
+            box-sizing: border-box;
+            font-family: var(--font-family);
+            direction: ltr; /* 確保捲軸在右側 */
+        }
+
+        /* 隱藏捲軸但保留捲動功能 */
+        .bunch-word-container.hide-scrollbar {
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        .bunch-word-container.hide-scrollbar::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        /* 整頁滑動模式：移除容器的高度限制，讓內容自然展開，由 .slide 處理滑動 */
+        .bunch-word-container.full-page-scroll {
+            height: auto;
+            min-height: 100%;
+            overflow: visible;
+            padding-bottom: 5vh;
+        }
+
+        .bunch-word-container > div {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .bunch-word-container h2 {
+            font-size: clamp(1.8rem, 3.5vw, 2.2rem);
+            margin-bottom: 1.5vh;
+            text-align: center;
+            width: 100%;
+            color: var(--highlight-color);
+            font-weight: 400;
+        }
+
+        /* 列表系統 */
+        ul {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            max-width: 800px;
+            margin: 1rem 0;
+            font-family: var(--font-family);
+        }
+
+        ul li {
+            margin-bottom: 15px;
+            position: relative;
+            padding-left: 1.5em;
+            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+
+        ul li::before {
+            content: '- ';
+            color: var(--accent-color);
+            font-weight: bold;
+            display: inline-block;
+            position: absolute;
+            left: 0;
+        }
+
+        ol {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            max-width: 800px;
+            margin: 1rem 0;
+            font-family: var(--font-family);
+            counter-reset: list-item 0;
+        }
+
+        ol li {
+            margin-bottom: 15px;
+            position: relative;
+            padding-left: 2em;
+            font-size: clamp(1rem, 1.8vw, 1.3rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            counter-increment: list-item;
+        }
+
+        ol li::before {
+            content: counter(list-item) '. ';
+            color: var(--accent-color);
+            font-weight: bold;
+            display: inline-block;
+            position: absolute;
+            left: 0;
+        }
+
+        /* SVG 圖形系統 */
+        .svg-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+        }
+
+        .svg-responsive {
+            max-width: 90%;
+            max-height: 90vh;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+        }
+
+        /* 作業內容區塊 */
+        .homework-content {
+            width: 100%;
+            max-width: 1000px;
+            text-align: left;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .homework-content h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .homework-content h5 {
+            font-size: clamp(1.2rem, 2vw, 1.4rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .homework-content p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        .homework-content ol {
+            max-width: 100%;
+        }
+
+        .homework-content ol li {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            margin-bottom: 1rem;
+        }
+
+        .homework-content a,
+        .bunch-word-container a {
+            color: var(--chart-hex-10) !important;
+            text-decoration: underline;
+            transition: color 0.3s ease;
+        }
+
+        .homework-content a:hover,
+        .bunch-word-container a:hover {
+            color: var(--chart-hex-12) !important;
+        }
+
+        /* Blockquote 樣式 */
+        blockquote {
+            border-left: 4px solid var(--accent-color);
+            padding-left: 2rem;
+            margin: 2rem 0;
+            font-style: italic;
+            color: var(--text-color);
+            font-size: 70%; /* 縮小 30% */
+            position: relative;
+        }
+
+        blockquote p {
+            margin-bottom: 0.5rem;
+        }
+
+        /* 複製按鈕樣式 (參考 1115-slide.html) */
+        .copy-blockquote-btn {
+            padding: 0.4rem 0.8rem;
+            background: rgba(154, 148, 140, 0.1);
+            color: var(--accent-color);
+            border: 1px solid rgba(154, 148, 140, 0.3);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-family: var(--font-family);
+            transition: all 0.2s ease;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        .copy-blockquote-btn:hover {
+            background: rgba(154, 148, 140, 0.2);
+            border-color: rgba(154, 148, 140, 0.5);
+        }
+
+        .copy-blockquote-btn:active {
+            transform: scale(0.95);
+        }
+
+        .copy-feedback {
+            font-size: 0.7rem;
+            color: var(--accent-color);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            margin-left: 0.5rem;
+        }
+
+        /* Code 樣式 */
+        code {
+            background: rgba(154, 148, 140, 0.2);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        /* 投影片圖片樣式 */
+        .slide-image {
+            max-width: 100%;
+            max-height: 60vh;
+            height: auto;
+            border: 1px solid var(--line-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            object-fit: contain;
+            margin: 1rem 0;
+            display: block;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 767px) {
+            .nav {
+                width: 95%;
+                left: 2.5%;
+            }
+
+            .nav-btn {
+                width: 44px;
+                height: 44px;
+                font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+                opacity: 0.6;
+            }
+
+            .two-columns, .bunch-word-container, .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .two-columns > div, .content-section {
+                width: 100%;
+            }
+
+            .bunch-word-container {
+                padding: 2vh 3vw;
+            }
+
+            .bunch-word-container h2 {
+                font-size: clamp(1.3rem, 3vw, 1.6rem);
+                margin-bottom: 2vh;
+                margin-top: 1vh;
+            }
+
+            .slide {
+                padding: 3vw;
+            }
+
+            /* 手機版 SVG 樣式 */
+            .svg-container {
+                overflow-x: auto;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .svg-responsive {
+                max-width: 95%;
+                max-height: 80vh;
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .two-columns, .content-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 3vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="slides-container">
+        <!-- Slide 1: 標題投影片 -->
+        <section class="slide active">
+            <h1>主動學習 2.0</h1>
+            <p class="slide-subtitle">用 NotebookLM 探索並客製化你的 AI 學習流</p>
+        </section>
+
+        <!-- Slide 2: [引導] 你的學習焦慮 -->
+        <section class="slide scrollable">
+            <h3>複習課堂內容不求人？</h3>
+            <div class="content-grid">
+                <div class="content-section text-left">
+                    <img src="../../pic/w11/soc-cover.jpg" alt="SOC" style="width: 80%; height: auto; display: block; margin: 0 auto;">
+                </div>
+                <div class="content-section text-left">
+                    <h3>大學生的資訊焦慮</h3>
+                    <ul>
+                        <li>看不完的 Paper 和原文書？</li>
+                        <li>抓不到重點的共筆？</li>
+                        <li>(心理學：資訊過載 Information Overload)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: [引導] 核心提問 -->
+        <section class="slide">
+            <blockquote>
+                <p style="font-size: 1.5em; text-align: center;">如果你的 PDF 講義、所有筆記...</p>
+                <p style="font-size: 2em; text-align: center; font-weight: bold;">...能「自動」變成隨身聽、閃卡和測驗題？</p>
+            </blockquote>
+        </section>
+
+        <!-- Slide 4: 介紹 NotebookLM -->
+        <section class="slide">
+            <h3>NotebookLM：你的個人化 AI 知識庫</h3>
+            <div class="content-grid">
+                <div class="content-section text-left">
+                    <h4><i class="fas fa-times-circle"></i> 這「不是」...</h4>
+                    <ul>
+                        <li>又一個通用聊天機器人</li>
+                        <li>另一個搜尋引擎</li>
+                    </ul>
+                </div>
+                <div class="content-section text-left">
+                    <h4><i class="fas fa-check-circle"></i> 這「是」...</h4>
+                    <ul>
+                        <li>你的「專屬」資料庫</li>
+                        <li>一個有本有據的學習夥伴</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5: [基石] 一切的基礎 -->
+        <section class="slide">
+            <h3>一切的基礎：有本有據</h3>
+            <div class="content-grid">
+                <div class="content-section text-left">
+                    <h4>1. 有本有據 (Source-Grounded)</h4>
+                    <p>AI 的全世界 = 你上傳的資料。</p>
+                    <p>它「不准」去 Google 亂搜，零幻覺。</p>
+                </div>
+                <div class="content-section text-left">
+                    <h4>2. 可信引用 (Citations)</h4>
+                    <p>所有閃卡、測驗、答案，100% 來自你的講義。</p>
+                    <p>點擊 <strong>[1]</strong>, <strong>[2]</strong> 即可跳轉回原文驗證。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 6: 核心功能 (1)：Audio -->
+        <section class="slide scrollable">
+            <h3>核心功能 (1)：學習用「讀得不如用聽的」</h3>
+            <div class="content-grid">
+                <div class="content-section text-left">
+                    <h4>功能：生成語音摘要</h4>
+                    <p>AI 自動生成 2-5 分鐘的「語音摘要」。</p>
+                    <h5>使用情境：</h5>
+                    <ul>
+                        <li>(預習) 上課前 10 分鐘，快速抓重點。</li>
+                        <li>(通勤) 搭捷運、走路時，用「聽」的複習。</li>
+                    </ul>
+                </div>
+                <div class="content-section">
+                    <img src="../../pic/w11/audio-overview.jpg" alt="Audio Overview" style="width: 50%; height: auto; display: block; margin: 0 auto;">
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 7: 核心功能 (2)：Flashcards -->
+        <section class="slide scrollable">
+            <h3>核心功能 (2)：AI 閃卡</h3>
+            <div class="content-grid">
+                <div class="content-section text-left">
+                    <h4>功能：AI 自動抓重點的閃卡</h4>
+                    <p>自動生成「關鍵詞彙」和「定義」的閃卡。</p>
+                    <h5>目標：</h5>
+                    <p><strong>主動回憶 (Active Recall)</strong>。最強大的記憶策略之一，強迫大腦回想答案，而非被動重讀。</p>
+                </div>
+                <div class="content-section">
+                    <img src="../../pic/w11/flash-card.gif" alt="Flashcards" style="width: 50%; height: auto; display: block; margin: 0 auto;">
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 8: 核心功能 (3)：Quiz -->
+        <section class="slide scrollable">
+            <h3>核心功能 (3)：自我測驗</h3>
+            <div class="content-grid">
+                <div class="content-section text-left">
+                    <h4>功能：專屬你的隨堂小考</h4>
+                    <p>AI 根據你的資料，自動生成選擇題、申論題。</p>
+                    <h5>目標：</h5>
+                    <p><strong>檢索練習 (Retrieval Practice)</strong>。找出「你以為懂了，其實沒懂」的知識盲點。</p>
+                </div>
+                <div class="content-section">
+                    <img src="../../pic/w11/quiz.jpg" alt="Quiz" style="width: 50%; height: auto; display: block; margin: 0 auto;">
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 9: [v2.2] 安裝手機版 -->
+        <section class="slide scrollable">
+            <h3>安裝 NotebookLM (手機版)</h3>
+            <div class="content-grid">
+                <div class="content-section text-left">
+                    <h4><i class="fab fa-apple"></i> iOS (iPhone/iPad)</h4>
+                    <p>1. 打開 <strong>App Store</strong></p>
+                    <p>2. 搜尋 "<strong>NotebookLM</strong>"</p>
+                    <p>3. 點擊「取得」</p>
+                    <h4 style="margin-top: 2rem;"><i class="fab fa-android"></i> Android</h4>
+                    <p>1. 打開 <strong>Google Play 商店</strong></p>
+                    <p>2. 搜尋 "<strong>NotebookLM</strong>"</p>
+                    <p>3. 點擊「安裝」</p>
+                </div>
+                <div class="content-section">
+                    <img src="../../pic/w11/app-store.jpg" alt="App Store" style="width: 50%; height: auto; display: block; margin: 0 auto;">
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 9: 使用範例截圖 -->
+        <section class="slide scrollable">
+            <div class="bunch-word-container full-page-scroll">
+                <div>
+                    <h2>使用範例截圖</h2>
+                    <img src="../../pic/w11/1-portal.jpg" alt="Portal" class="slide-image">
+                    <img src="../../pic/w11/2-input.jpg" alt="Audio" class="slide-image">
+                    <img src="../../pic/w11/3-output-selection.jpg" alt="Output Selection" class="slide-image">
+                    <img src="../../pic/w11/4-importing.jpg" alt="Importing" class="slide-image">
+                    <img src="../../pic/w11/5-import-success.jpg" alt="Import Success" class="slide-image">
+                    <img src="../../pic/w11/6-input-request.jpg" alt="Input Request" class="slide-image">
+                    <img src="../../pic/w11/7-summary-loading.jpg" alt="Summary Loading" class="slide-image">
+                    <img src="../../pic/w11/8-summary-output.jpg" alt="" class="slide-image">
+                    <img src="../../pic/w11/9-studio-portal.jpg" alt="" class="slide-image">
+                    <img src="../../pic/w11/10-customization.jpg" alt="" class="slide-image">
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 10: [v2.2] 正面實例 (探索) -->
+        <section class="slide scrollable">
+            <div class="bunch-word-container">
+                <div>
+                    <h2>實例：用「探索」功能研究新主題</h2>
+                    <h4>示範流程 (不需上傳檔案)：</h4>
+                    <ol>
+                        <li><strong>探索來源 (Find Sources)：</strong>
+                            <ul><li>在「來源」面板，點擊「探索來源」</li></ul>
+                        </li>
+                        <li><strong>輸入關鍵字：</strong>
+                            <ul><li>"[關鍵字1, 關鍵字2, 關鍵字3]"</li></ul>
+                        </li>
+                        <li><strong>策展 (Curate)：</strong>
+                            <ul><li>NotebookLM 推薦 10 個相關來源。</li><li>你「檢閱」AI 提供的摘要，只勾選 3-4 篇最相關的匯入。</li></ul>
+                        </li>
+                        <li><strong>生成 (Generate)：</strong>
+                            <ul><li>點擊「Audio Overview」，立刻生成一份關於這 4 篇文章的語音摘要。</li></ul>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 12: [v2.2] 實戰演練 (完整版) -->
+        <section class="slide scrollable">
+            <div class="bunch-word-container full-page-scroll">
+                <div>
+                    <h3>用 Audio Overview 快速掌握新知</h3>
+                    <!-- 第一部分：探索與聆聽 -->
+                    <div class="homework-content">
+                        <h4>[實戰] 小組工作坊 (25 分鐘)</h4>
+                        <h5>步驟 1：(10 分鐘) 四選一並探索來源</h5>
+                        <p>隨機分成 4 組，使用 "Find Sources" 功能，輸入中英文關鍵字，並匯入 2-3 篇相關來源。</p>
+                        <ul>
+                            <li><strong>第一組主題 (心理)：</strong> "拖延症 心理機制" / "Procrastination psychological mechanism"</li>
+                            <li><strong>第二組主題 (工作)：</strong> "心流" / "Flow state at work"</li>
+                            <li><strong>第三組主題 (AI)：</strong> "AI 幻覺" / "AI Hallucination"</li>
+                            <li><strong>第四組主題 (生活)：</strong> "數位排毒" / "Digital Detox"</li>
+                        </ul>
+                    </div>
+
+                    <!-- 第二部分：客製化 Audio -->
+                    <div class="homework-content" style="margin-top: 3rem;">
+                        <h5>步驟 2：(10 分鐘) 生成並客製化 Audio</h5>
+                        <p>1. 點擊「Audio Overview」</p>
+                        <p>2. 點擊「客製化 (Customize)」</p>
+                        <p>3. 進行以下設定：</p>
+                        <ul>
+                            <li><strong>語言 (Language):</strong>
+                                <ul><li>選擇 <strong>"繁體中文"</strong></li></ul>
+                            </li>
+                            <li><strong>音訊長度 (Length):</strong>
+                                <ul><li>(若可選) 選擇 "Short" (短)</li></ul>
+                                <ul><li>(若不可選) 我們將用 Prompt 控制</li></ul>
+                            </li>
+                            <li><strong>Audio Prompt 最佳寫法：</strong> 在「客製化」中使用 Prompt，讓 Audio 更精準
+                                <ul>
+                                    <li><strong>公式：</strong> [角色] + [任務] + [格式/限制]</li>
+                                    <li><strong>範例 1：要求簡短 (控制長度)</strong>
+                                        <div style="position: relative;">
+                                            <button class="copy-blockquote-btn" data-copy-target="blockquote-1">
+                                                <i class="fas fa-copy"></i> 複製
+                                            </button>
+                                            <span class="copy-feedback" id="feedback-1">已複製！</span>
+                                            <blockquote id="blockquote-1"><p>"你是一位導師，請用**最多 3 分鐘**，為一個大一新生總結這些資料的核心論點。"</p></blockquote>
+                                        </div>
+                                    </li>
+                                    <li><strong>範例 2：要求比較</strong>
+                                        <div style="position: relative;">
+                                            <button class="copy-blockquote-btn" data-copy-target="blockquote-2">
+                                                <i class="fas fa-copy"></i> 複製
+                                            </button>
+                                            <span class="copy-feedback" id="feedback-2">已複製！</span>
+                                            <blockquote id="blockquote-2"><p>"你是一位辯論教練，請生成一段語音，**專注於比較** [觀點A] 和 [觀點B] 的不同之處。"</p></blockquote>
+                                        </div>
+                                    </li>
+                                    <li><strong>範例 3：要求應用</strong>
+                                        <div style="position: relative;">
+                                            <button class="copy-blockquote-btn" data-copy-target="blockquote-3">
+                                                <i class="fas fa-copy"></i> 複製
+                                            </button>
+                                            <span class="copy-feedback" id="feedback-3">已複製！</span>
+                                            <blockquote id="blockquote-3"><p>"你是一位生活教練，請用這些資料，生成一段 3 分鐘的語音，提供 3 個**具體的行動建議**。"</p></blockquote>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="homework-content" style="margin-top: 3rem;">
+                        <h5>步驟 3：(5 分鐘) 聆聽與分享</h5>
+                        <p>請小組成員一起聆聽這份 3 分鐘的 AI 語音摘要，並準備分享：</p>
+                        <p><strong>"分享三個你們聽到全新的知識亮點"</strong></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 15: [v2.2] 總結 (心法) -->
+        <section class="slide">
+            <div class="svg-container">
+                <img src="../../svg/w11-notobooklm-takeaway.svg" alt="Takeaway" class="svg-responsive">
+            </div>
+        </section>
+
+        <!-- Slide 16: 課後作業 (1/2) -->
+        <section class="slide scrollable">
+            <div class="bunch-word-container">
+                <div>
+                    <h1>第 11 週作業</h1>
+                    <!-- Google Form 超連結 -->
+                    <p>最晚週五 11/21 23:59 前繳交 <strong><a href="https://forms.gle/LtGET9Y9Z5HrxhbA6" target="_blank">Google 表單連結</a></strong></p>
+                    <div class="homework-content">
+                        <h4>社會學深度研究專題分析</h4>
+                        <h5>【步驟 1】匯入資料源</h5>
+                            <p>請下載老師提供的 <a href="https://drive.google.com/file/d/1J4XvvUgkCjr-hn6k46I9CpQOvDxG1_CG/view?usp=drive_link" target="_blank"><code>SOC社會學.pdf</code></a> 檔案。</p>
+                        <p>在 NotebookLM 中建立新 Notebook，並上傳此檔案。</p>
+                        <h5>【步驟 2】文獻研究與回答</h5>
+                        <div>
+                            <p>使用 NotebookLM 所有功能精讀文件，並在 Google Form 回答 5 個問題。</p>
+                            <h5>(所有答案必須源自 <code>SOC社會學.pdf</code>)</h5>
+                            <ol>
+                                <li>根據本文，『微觀社會學』的具體定義是什麼？它與『宏觀社會學』有何本質區別？</li>
+                                <li>根據本文，美國不同的社會群體在「貧窮率」這個社會指標上的經歷有何主要差異？請特別指出本文描述的「最貧窮群體」為何？</li>
+                                <li>根據本文，在社會研究中，『效度 (Validity)』的具體定義是什麼？它與『信度 (Reliability)』有何本質區邊？</li>
+                                <li>『功能主義 (Functionalism)』如何解釋「潛在功能 (Latent function)」的社會學意義？請根據本文總結其核心論證。</li>
+                                <li>作者（韋伯）如何闡釋『魅力型權威 (Charismatic authority)』的成因（或：力量來源）？請根據本文列出其核心要素。</li>
+                            </ol>
+                        </div>
+                        <h5>【步驟 3】反思截圖</h5>
+                        <p>上傳 1 張你認為「最有幫助」的介面截圖（如：聊天、閃卡）。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+
+    <div class="nav">
+        <button id="prev" class="nav-btn">&#8249;</button>
+        <button id="next" class="nav-btn">&#8250;</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = Array.from(document.querySelectorAll('.slide:not(.hidden)'));
+            const totalSlides = slides.length;
+            let currentSlide = 0;
+
+            function showSlide(index) {
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === index);
+                });
+            }
+
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            function prevSlide() {
+                currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            document.getElementById('next').addEventListener('click', nextSlide);
+            document.getElementById('prev').addEventListener('click', prevSlide);
+
+            // 鍵盤支援
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    e.preventDefault();
+                    nextSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    prevSlide();
+                }
+            });
+
+            // 觸控支援（左右滑動）
+            let startX = 0;
+            let endX = 0;
+
+            document.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+            });
+
+            document.addEventListener('touchend', (e) => {
+                endX = e.changedTouches[0].clientX;
+                handleSwipe();
+            });
+
+            function handleSwipe() {
+                const threshold = 50;
+                const diff = startX - endX;
+
+                if (Math.abs(diff) > threshold) {
+                    if (diff > 0) {
+                        // 向左滑動，下一張
+                        nextSlide();
+                    } else {
+                        // 向右滑動，上一張
+                        prevSlide();
+                    }
+                }
+            }
+
+            showSlide(currentSlide);
+        });
+
+        // 複製 blockquote 文字功能
+        function setupCopyButtons() {
+            const copyButtons = document.querySelectorAll('.copy-blockquote-btn');
+
+            copyButtons.forEach(button => {
+                button.addEventListener('click', async function() {
+                    const targetId = this.getAttribute('data-copy-target');
+                    const blockquote = document.getElementById(targetId);
+                    const feedbackId = 'feedback-' + targetId.split('-')[1];
+                    const feedback = document.getElementById(feedbackId);
+
+                    if (!blockquote) return;
+
+                    // 提取文字內容（移除 HTML 標籤）
+                    const text = blockquote.innerText || blockquote.textContent;
+
+                    try {
+                        // 使用現代 Clipboard API
+                        await navigator.clipboard.writeText(text);
+
+                        // 顯示反饋
+                        if (feedback) {
+                            feedback.style.opacity = '1';
+                            setTimeout(() => {
+                                feedback.style.opacity = '0';
+                            }, 2000);
+                        }
+                    } catch (err) {
+                        console.error('複製失敗:', err);
+                        // 降級方案：使用傳統方法
+                        const textArea = document.createElement('textarea');
+                        textArea.value = text;
+                        textArea.style.position = 'fixed';
+                        textArea.style.opacity = '0';
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        try {
+                            document.execCommand('copy');
+                            if (feedback) {
+                                feedback.textContent = '已複製！';
+                                feedback.style.opacity = '1';
+                                setTimeout(() => {
+                                    feedback.style.opacity = '0';
+                                }, 2000);
+                            }
+                        } catch (e) {
+                            alert('無法複製，請手動選取文字');
+                        }
+                        document.body.removeChild(textArea);
+                    }
+                });
+            });
+        }
+
+        // 頁面載入時初始化複製按鈕
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', setupCopyButtons);
+        } else {
+            setupCopyButtons();
+        }
+    </script>
+</body>
+</html>
+

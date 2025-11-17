@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>顏色色卡 - Style 1116</title>
+    <style>
+        /* ============================================
+           CSS 變數定義（來自 1115-slide.html）
+           ============================================ */
+        :root {
+            --bg-color: #F5F4F0;        /* Warm, off-white, like aged paper */
+            --text-color: #3D3A37;      /* Dark, soft brown/gray */
+            --accent-color: #9A948C;    /* Muted stone gray */
+            --header-bg: #EAEBE6;       /* Very light, muted moss */
+            --line-color: #d1d1c2;      /* For borders and lines */
+            --highlight-color: #8c867b; /* For highlights */
+            --font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-family);
+            line-height: 1.6;
+            padding: 2rem;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 排版系統 */
+        h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 400;
+            color: var(--text-color);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: clamp(1.2rem, 3vw, 1.75rem);
+            font-weight: 300;
+            color: var(--accent-color);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--line-color);
+        }
+
+        h3 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 400;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        /* 顏色展示區塊 */
+        .color-section {
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid var(--line-color);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .color-card {
+            background: #fff;
+            border: 1px solid var(--line-color);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .color-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .color-swatch {
+            width: 100%;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .color-swatch.solid {
+            /* 實色背景 */
+        }
+
+        .color-swatch.transparent {
+            background-image:
+                linear-gradient(45deg, #ccc 25%, transparent 25%),
+                linear-gradient(-45deg, #ccc 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #ccc 75%),
+                linear-gradient(-45deg, transparent 75%, #ccc 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+
+        .color-swatch.transparent > div {
+            width: 100%;
+            height: 100%;
+        }
+
+        .color-info {
+            padding: 1rem;
+        }
+
+        .color-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .color-code {
+            font-size: 0.85rem;
+            color: var(--accent-color);
+            font-family: 'Courier New', monospace;
+            margin-bottom: 0.3rem;
+        }
+
+        .color-description {
+            font-size: 0.75rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        /* 分類標題 */
+        .category-title {
+            font-size: clamp(1.4rem, 3vw, 1.8rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin: 2rem 0 1rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 767px) {
+            .color-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 1rem;
+            }
+
+            .color-swatch {
+                height: 100px;
+            }
+
+            body {
+                padding: 1rem;
+            }
+        }
+
+        /* 特殊樣式：對比文字 */
+        .color-swatch.light-text {
+            color: #fff;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .color-swatch.dark-text {
+            color: var(--text-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>顏色色卡系統</h1>
+        <p style="text-align: center; color: var(--accent-color); margin-bottom: 3rem;">
+            基於 style_1116.md、1115-slide.html、w1-2095-ai-forecast.html、w3-unsupervised-learning.html 的所有顏色
+        </p>
+
+        <!-- 一、基礎色彩系統 -->
+        <div class="color-section">
+            <h2>一、基礎色彩系統（來自 style_1116.md）</h2>
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-swatch solid dark-text" style="background-color: #F5F4F0;">
+                        <div>背景色</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">--bg-color</div>
+                        <div class="color-code">#F5F4F0</div>
+                        <div class="color-description">Warm, off-white, like aged paper</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid light-text" style="background-color: #3D3A37;">
+                        <div>主要文字</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">--text-color</div>
+                        <div class="color-code">#3D3A37</div>
+                        <div class="color-description">Dark, soft brown/gray</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid light-text" style="background-color: #9A948C;">
+                        <div>強調色</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">--accent-color</div>
+                        <div class="color-code">#9A948C</div>
+                        <div class="color-description">Muted stone gray</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid dark-text" style="background-color: #EAEBE6;">
+                        <div>標題背景</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">--header-bg</div>
+                        <div class="color-code">#EAEBE6</div>
+                        <div class="color-description">Very light, muted moss</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid dark-text" style="background-color: #d1d1c2;">
+                        <div>線條/邊框</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">--line-color</div>
+                        <div class="color-code">#d1d1c2</div>
+                        <div class="color-description">For borders and lines</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid light-text" style="background-color: #8c867b;">
+                        <div>高亮</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">--highlight-color</div>
+                        <div class="color-code">#8c867b</div>
+                        <div class="color-description">For highlights</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 二、1115-slide.html 中的額外顏色 -->
+        <div class="color-section">
+            <h2>二、1115-slide.html 中的額外顏色</h2>
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-swatch solid light-text" style="background-color: #6B8BA4;">
+                        <div>Current Blue</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">--current-blue</div>
+                        <div class="color-code">#6B8BA4</div>
+                        <div class="color-description">Low saturation blue</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid dark-text" style="background-color: #ffffff;">
+                        <div>白色</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">White</div>
+                        <div class="color-code">#ffffff</div>
+                        <div class="color-description">Pure white</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid light-text" style="background-color: #5c5855;">
+                        <div>深灰文字</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Dark Gray Text</div>
+                        <div class="color-code">#5c5855</div>
+                        <div class="color-description">深灰色文字</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid light-text" style="background-color: #92a247;">
+                        <div>綠色</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Green</div>
+                        <div class="color-code">#92a247</div>
+                        <div class="color-description">成功/正面色</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid light-text" style="background-color: #70a8d4;">
+                        <div>MCP 藍</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">MCP Blue</div>
+                        <div class="color-code">#70a8d4</div>
+                        <div class="color-description">MCP 相關</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid light-text" style="background-color: #d9a548;">
+                        <div>A2A 黃</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">A2A Yellow</div>
+                        <div class="color-code">#d9a548</div>
+                        <div class="color-description">A2A 相關</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid dark-text" style="background-color: #f9f9f9;">
+                        <div>淺灰</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Light Gray</div>
+                        <div class="color-code">#f9f9f9</div>
+                        <div class="color-description">淺灰色</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid light-text" style="background-color: #a67c7c;">
+                        <div>紅棕色</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Red Brown</div>
+                        <div class="color-code">#a67c7c</div>
+                        <div class="color-description">紅棕色</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid light-text" style="background-color: #7a8570;">
+                        <div>橄欖綠</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Olive Green</div>
+                        <div class="color-code">#7a8570</div>
+                        <div class="color-description">橄欖綠色</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid light-text" style="background-color: #b89a6f;">
+                        <div>棕色</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Brown</div>
+                        <div class="color-code">#b89a6f</div>
+                        <div class="color-description">棕色</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid dark-text" style="background-color: #e8e8e8;">
+                        <div>淺灰</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Light Gray 2</div>
+                        <div class="color-code">#e8e8e8</div>
+                        <div class="color-description">淺灰色</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid light-text" style="background-color: #5E6C6A;">
+                        <div>深灰綠</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Dark Gray Green</div>
+                        <div class="color-code">#5E6C6A</div>
+                        <div class="color-description">深灰綠色</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid dark-text" style="background-color: #C2B8A3;">
+                        <div>米色</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Beige</div>
+                        <div class="color-code">#C2B8A3</div>
+                        <div class="color-description">米色</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid dark-text" style="background-color: #A9B2AE;">
+                        <div>灰綠</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Gray Green</div>
+                        <div class="color-code">#A9B2AE</div>
+                        <div class="color-description">灰綠色</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 三、w1-2095-ai-forecast.html 中的圖表顏色 -->
+        <div class="color-section">
+            <h2>三、w1-2095-ai-forecast.html 中的圖表顏色</h2>
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-swatch solid dark-text" style="background-color: #F4F2EF;">
+                        <div>背景色</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">--bg-color</div>
+                        <div class="color-code">#F4F2EF</div>
+                        <div class="color-description">背景色（略有不同）</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid light-text" style="background-color: #5a5a5a;">
+                        <div>文字色</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">--text-color</div>
+                        <div class="color-code">#5a5a5a</div>
+                        <div class="color-description">文字顏色</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid light-text" style="background-color: #78785b;">
+                        <div>強調色</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">--accent-color</div>
+                        <div class="color-code">#78785b</div>
+                        <div class="color-description">強調色</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid light-text" style="background-color: #666;">
+                        <div>段落文字</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Paragraph Text</div>
+                        <div class="color-code">#666</div>
+                        <div class="color-description">段落文字</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid light-text" style="background-color: #888;">
+                        <div>副標題</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Subtitle</div>
+                        <div class="color-code">#888</div>
+                        <div class="color-description">副標題顏色</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 2rem;">圖表專用顏色（半透明）</h3>
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(120, 120, 91, 0.7); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">Primary</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">--color-primary</div>
+                        <div class="color-code">rgba(120, 120, 91, 0.7)</div>
+                        <div class="color-description">主色（半透明）</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(163, 163, 128, 0.7); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">Secondary</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">--color-secondary</div>
+                        <div class="color-code">rgba(163, 163, 128, 0.7)</div>
+                        <div class="color-description">次色（半透明）</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(180, 120, 120, 0.7); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">Accent</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">--color-accent</div>
+                        <div class="color-code">rgba(180, 120, 120, 0.7)</div>
+                        <div class="color-description">粉紅色（半透明）</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(120, 150, 120, 0.7); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">Success</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">--color-success</div>
+                        <div class="color-code">rgba(120, 150, 120, 0.7)</div>
+                        <div class="color-description">綠色（半透明）</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(120, 140, 160, 0.7); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">Info</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">--color-info</div>
+                        <div class="color-code">rgba(120, 140, 160, 0.7)</div>
+                        <div class="color-description">藍色（半透明）</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(160, 140, 180, 0.7); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">Warning 1</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">--color-warning</div>
+                        <div class="color-code">rgba(160, 140, 180, 0.7)</div>
+                        <div class="color-description">警告色 1（半透明）</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(210, 160, 90, 0.7); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">Warning 2</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">colorPalette.warning</div>
+                        <div class="color-code">rgba(210, 160, 90, 0.7)</div>
+                        <div class="color-description">警告色 2（半透明）</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 四、w3-unsupervised-learning.html 中的顏色 -->
+        <div class="color-section">
+            <h2>四、w3-unsupervised-learning.html 中的顏色</h2>
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-swatch solid dark-text" style="background-color: #F4F2EF;">
+                        <div>背景色</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">--bg-color</div>
+                        <div class="color-code">#F4F2EF</div>
+                        <div class="color-description">背景色</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid dark-text" style="background-color: #ffffff;">
+                        <div>面板色</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">--panel-color</div>
+                        <div class="color-code">#ffffff</div>
+                        <div class="color-description">面板顏色</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid light-text" style="background-color: #5a5a5a;">
+                        <div>主要文字</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">--primary-text</div>
+                        <div class="color-code">#5a5a5a</div>
+                        <div class="color-description">主要文字</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid light-text" style="background-color: #8c867b;">
+                        <div>次要文字</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">--secondary-text</div>
+                        <div class="color-code">#8c867b</div>
+                        <div class="color-description">次要文字</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid light-text" style="background-color: #78785b;">
+                        <div>強調色</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">--accent-color</div>
+                        <div class="color-code">#78785b</div>
+                        <div class="color-description">強調色</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid dark-text" style="background-color: #d1d1c2;">
+                        <div>邊框色</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">--border-color</div>
+                        <div class="color-code">#d1d1c2</div>
+                        <div class="color-description">邊框顏色</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid dark-text" style="background-color: #faf6f1;">
+                        <div>面板背景</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Panel Background</div>
+                        <div class="color-code">#faf6f1</div>
+                        <div class="color-description">面板背景色</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 五、透明度變化（rgba） -->
+        <div class="color-section">
+            <h2>五、透明度變化（rgba）</h2>
+
+            <h3>黑色透明度系列</h3>
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(0, 0, 0, 0.05); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #000;">5%</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Black 5%</div>
+                        <div class="color-code">rgba(0, 0, 0, 0.05)</div>
+                        <div class="color-description">極淡陰影</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(0, 0, 0, 0.08); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #000;">8%</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Black 8%</div>
+                        <div class="color-code">rgba(0, 0, 0, 0.08)</div>
+                        <div class="color-description">淡陰影</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(0, 0, 0, 0.1); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #000;">10%</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Black 10%</div>
+                        <div class="color-code">rgba(0, 0, 0, 0.1)</div>
+                        <div class="color-description">標準陰影</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(0, 0, 0, 0.12); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #000;">12%</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Black 12%</div>
+                        <div class="color-code">rgba(0, 0, 0, 0.12)</div>
+                        <div class="color-description">較深陰影</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(0, 0, 0, 0.15); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">15%</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Black 15%</div>
+                        <div class="color-code">rgba(0, 0, 0, 0.15)</div>
+                        <div class="color-description">深陰影</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(0, 0, 0, 0.3); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">30%</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Black 30%</div>
+                        <div class="color-code">rgba(0, 0, 0, 0.3)</div>
+                        <div class="color-description">遮罩層</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 2rem;">白色透明度系列</h3>
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(255, 255, 255, 0.6); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #000;">60%</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">White 60%</div>
+                        <div class="color-code">rgba(255, 255, 255, 0.6)</div>
+                        <div class="color-description">半透明白</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(255, 255, 255, 0.8); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #000;">80%</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">White 80%</div>
+                        <div class="color-code">rgba(255, 255, 255, 0.8)</div>
+                        <div class="color-description">較不透明白</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 2rem;">藍色透明度系列（Current Blue）</h3>
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(107, 139, 164, 0.1); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #000;">10%</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Blue 10%</div>
+                        <div class="color-code">rgba(107, 139, 164, 0.1)</div>
+                        <div class="color-description">極淡藍</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(107, 139, 164, 0.2); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #000;">20%</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Blue 20%</div>
+                        <div class="color-code">rgba(107, 139, 164, 0.2)</div>
+                        <div class="color-description">淡藍</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(107, 139, 164, 0.3); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">30%</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Blue 30%</div>
+                        <div class="color-code">rgba(107, 139, 164, 0.3)</div>
+                        <div class="color-description">中淡藍</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(107, 139, 164, 0.5); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">50%</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Blue 50%</div>
+                        <div class="color-code">rgba(107, 139, 164, 0.5)</div>
+                        <div class="color-description">半透明藍</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(107, 139, 164, 0.6); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">60%</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Blue 60%</div>
+                        <div class="color-code">rgba(107, 139, 164, 0.6)</div>
+                        <div class="color-description">較不透明藍</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(107, 139, 164, 0.7); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">70%</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Blue 70%</div>
+                        <div class="color-code">rgba(107, 139, 164, 0.7)</div>
+                        <div class="color-description">圖表用藍</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(107, 139, 164, 0.8); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">80%</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Blue 80%</div>
+                        <div class="color-code">rgba(107, 139, 164, 0.8)</div>
+                        <div class="color-description">深藍</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 2rem;">強調色透明度系列</h3>
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(154, 148, 140, 0.6); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">Accent 60%</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Accent 60%</div>
+                        <div class="color-code">rgba(154, 148, 140, 0.6)</div>
+                        <div class="color-description">強調色 60%</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(154, 148, 140, 0.8); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">Accent 80%</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Accent 80%</div>
+                        <div class="color-code">rgba(154, 148, 140, 0.8)</div>
+                        <div class="color-description">強調色 80%</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(140, 134, 123, 0.6); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">Highlight 60%</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Highlight 60%</div>
+                        <div class="color-code">rgba(140, 134, 123, 0.6)</div>
+                        <div class="color-description">高亮色 60%</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(140, 134, 123, 0.8); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">Highlight 80%</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Highlight 80%</div>
+                        <div class="color-code">rgba(140, 134, 123, 0.8)</div>
+                        <div class="color-description">高亮色 80%</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 2rem;">其他透明度顏色</h3>
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(234, 235, 230, 0.5); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #000;">Header BG 50%</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Header BG 50%</div>
+                        <div class="color-code">rgba(234, 235, 230, 0.5)</div>
+                        <div class="color-description">標題背景 50%</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(163, 163, 129, 0.1); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #000;">Card BG 10%</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Card BG 10%</div>
+                        <div class="color-code">rgba(163, 163, 129, 0.1)</div>
+                        <div class="color-description">卡片背景 10%</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(120, 150, 120, 0.2); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #000;">Success 20%</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Success 20%</div>
+                        <div class="color-code">rgba(120, 150, 120, 0.2)</div>
+                        <div class="color-description">成功色 20%</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(180, 120, 120, 1); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">Pink Solid</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Pink Solid</div>
+                        <div class="color-code">rgba(180, 120, 120, 1)</div>
+                        <div class="color-description">粉紅色（實色）</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 六、圖表專用顏色建議 -->
+        <div class="color-section">
+            <h2>六、圖表專用顏色建議</h2>
+            <p style="margin-bottom: 1.5rem; color: var(--accent-color);">
+                以下顏色建議用於圖表的線條和欄位，提供更好的視覺區分
+            </p>
+
+            <h3>圖表線條顏色（深色系）</h3>
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-swatch solid light-text" style="background-color: #6B8BA4;">
+                        <div>線條 1</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Chart Line 1</div>
+                        <div class="color-code">#6B8BA4</div>
+                        <div class="color-description">藍色線條</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid light-text" style="background-color: #78785b;">
+                        <div>線條 2</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Chart Line 2</div>
+                        <div class="color-code">#78785b</div>
+                        <div class="color-description">橄欖色線條</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid light-text" style="background-color: #9A948C;">
+                        <div>線條 3</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Chart Line 3</div>
+                        <div class="color-code">#9A948C</div>
+                        <div class="color-description">灰色線條</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid light-text" style="background-color: #8c867b;">
+                        <div>線條 4</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Chart Line 4</div>
+                        <div class="color-code">#8c867b</div>
+                        <div class="color-description">深灰色線條</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch solid light-text" style="background-color: #5c5855;">
+                        <div>線條 5</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Chart Line 5</div>
+                        <div class="color-code">#5c5855</div>
+                        <div class="color-description">深灰線條</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 2rem;">圖表欄位/區域顏色（半透明）</h3>
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(120, 120, 91, 0.7); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">Primary</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Chart Bar Primary</div>
+                        <div class="color-code">rgba(120, 120, 91, 0.7)</div>
+                        <div class="color-description">主色欄位</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(163, 163, 128, 0.7); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">Secondary</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Chart Bar Secondary</div>
+                        <div class="color-code">rgba(163, 163, 128, 0.7)</div>
+                        <div class="color-description">次色欄位</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(180, 120, 120, 0.7); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">Accent</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Chart Bar Accent</div>
+                        <div class="color-code">rgba(180, 120, 120, 0.7)</div>
+                        <div class="color-description">粉紅欄位</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(120, 150, 120, 0.7); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">Success</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Chart Bar Success</div>
+                        <div class="color-code">rgba(120, 150, 120, 0.7)</div>
+                        <div class="color-description">綠色欄位</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(120, 140, 160, 0.7); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">Info</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Chart Bar Info</div>
+                        <div class="color-code">rgba(120, 140, 160, 0.7)</div>
+                        <div class="color-description">藍色欄位</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(210, 160, 90, 0.7); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">Warning</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Chart Bar Warning</div>
+                        <div class="color-code">rgba(210, 160, 90, 0.7)</div>
+                        <div class="color-description">黃色欄位</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch transparent">
+                        <div style="background-color: rgba(107, 139, 164, 0.7); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">Current Blue</div>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Chart Bar Blue</div>
+                        <div class="color-code">rgba(107, 139, 164, 0.7)</div>
+                        <div class="color-description">Current Blue 欄位</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 頁尾 -->
+        <div style="text-align: center; margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--line-color); color: var(--accent-color);">
+            <p>顏色色卡系統 - 最後更新：2025</p>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+

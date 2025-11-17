@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Active Learning 2.0: Explore and Customize Your Learning Flow with NotebookLM</title>
+    <script src="../../sidebar_tools/sidebar.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* ============================================
+           CSS Variables (from style_1116.md)
+           ============================================ */
+        :root {
+            --bg-color: #F5F4F0;        /* Warm, off-white, like aged paper */
+            --text-color: #3D3A37;      /* Dark, soft brown/gray */
+            --accent-color: #9A948C;    /* Muted stone gray */
+            --header-bg: #EAEBE6;       /* Very light, muted moss */
+            --line-color: #d1d1c2;      /* For borders and lines */
+            --highlight-color: #8c867b; /* For highlights */
+            --font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+            /* Chart color system - Blue tones */
+            --chart-hex-9: #A0B0C0;     /* Light blue-gray */
+            --chart-hex-10: #8898A8;    /* Medium blue-gray */
+            --chart-hex-11: #98A0B8;    /* Blue-gray */
+            --chart-hex-12: #788098;    /* Dark blue-gray */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+        }
+
+        /* Slide container */
+        .slides-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: var(--bg-color);
+        }
+
+        /* Base slide styles */
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5vw;
+            box-sizing: border-box;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+            transform: scale(0.98);
+            text-align: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+            font-family: var(--font-family);
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            z-index: 1;
+        }
+
+        .slide.hidden {
+            display: none !important;
+        }
+
+        .slide.scrollable {
+            justify-content: flex-start;
+        }
+
+        /* Heading levels */
+        h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 400;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: clamp(1.2rem, 3vw, 1.75rem);
+            font-weight: 300;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+        }
+
+        h3 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 400;
+            color: var(--text-color);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--header-bg);
+        }
+
+        h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+        }
+
+        h5 {
+            font-size: clamp(1.2rem, 2vw, 1.4rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.6rem;
+        }
+
+        p {
+            font-size: clamp(1.2rem, 2.5vw, 1.75rem);
+            color: var(--text-color);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .slide-subtitle {
+            color: var(--accent-color);
+            font-size: clamp(1.2rem, 3vw, 1.75rem);
+            font-weight: 400;
+            margin-top: -1rem;
+        }
+
+        /* Navigation system */
+        .nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 98%;
+            left: 1%;
+            display: flex;
+            justify-content: space-between;
+            z-index: 1002;
+            pointer-events: none;
+        }
+
+        .nav-btn {
+            pointer-events: all;
+            background: none;
+            border: 1px solid var(--line-color);
+            color: var(--accent-color);
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.4;
+            font-family: var(--font-family);
+        }
+
+        .nav-btn:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            opacity: 1;
+        }
+
+        /* Content layout system */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            align-items: start;
+        }
+
+        .content-section {
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            font-family: var(--font-family);
+        }
+
+        .content-section h3 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        .content-section h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .content-section p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .content-section.text-left {
+            text-align: left;
+        }
+
+        /* Two-column layout */
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            align-items: start;
+        }
+
+        .two-columns > div {
+            width: 100%;
+        }
+
+        .two-columns h4 {
+            font-size: clamp(1.344rem, 2.52vw, 1.68rem);
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .two-columns p {
+            font-size: clamp(1.2096rem, 2.268vw, 1.512rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        /* Text-heavy container */
+        .bunch-word-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            padding: 1.5vh 2vw;
+            overflow-y: auto;
+            overflow-x: hidden;
+            text-align: left;
+            height: 100%;
+            box-sizing: border-box;
+            font-family: var(--font-family);
+            direction: ltr; /* Ensure scrollbar on the right */
+        }
+
+        /* Hide scrollbar but keep scrolling functionality */
+        .bunch-word-container.hide-scrollbar {
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        .bunch-word-container.hide-scrollbar::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        /* Full-page scroll mode: Remove container height limit, let content expand naturally, handled by .slide */
+        .bunch-word-container.full-page-scroll {
+            height: auto;
+            min-height: 100%;
+            overflow: visible;
+            padding-bottom: 5vh;
+        }
+
+        .bunch-word-container > div {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .bunch-word-container h2 {
+            font-size: clamp(1.8rem, 3.5vw, 2.2rem);
+            margin-bottom: 1.5vh;
+            text-align: center;
+            width: 100%;
+            color: var(--highlight-color);
+            font-weight: 400;
+        }
+
+        /* List system */
+        ul {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            max-width: 800px;
+            margin: 1rem 0;
+            font-family: var(--font-family);
+        }
+
+        ul li {
+            margin-bottom: 15px;
+            position: relative;
+            padding-left: 1.5em;
+            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+
+        ul li::before {
+            content: '- ';
+            color: var(--accent-color);
+            font-weight: bold;
+            display: inline-block;
+            position: absolute;
+            left: 0;
+        }
+
+        ol {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            max-width: 800px;
+            margin: 1rem 0;
+            font-family: var(--font-family);
+            counter-reset: list-item 0;
+        }
+
+        ol li {
+            margin-bottom: 15px;
+            position: relative;
+            padding-left: 2em;
+            font-size: clamp(1rem, 1.8vw, 1.3rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            counter-increment: list-item;
+        }
+
+        ol li::before {
+            content: counter(list-item) '. ';
+            color: var(--accent-color);
+            font-weight: bold;
+            display: inline-block;
+            position: absolute;
+            left: 0;
+        }
+
+        /* SVG graphics system */
+        .svg-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+        }
+
+        .svg-responsive {
+            max-width: 90%;
+            max-height: 90vh;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+        }
+
+        /* Homework content block */
+        .homework-content {
+            width: 100%;
+            max-width: 1000px;
+            text-align: left;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .homework-content h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .homework-content h5 {
+            font-size: clamp(1.2rem, 2vw, 1.4rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .homework-content p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        .homework-content ol {
+            max-width: 100%;
+        }
+
+        .homework-content ol li {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            margin-bottom: 1rem;
+        }
+
+        .homework-content a,
+        .bunch-word-container a {
+            color: var(--chart-hex-10) !important;
+            text-decoration: underline;
+            transition: color 0.3s ease;
+        }
+
+        .homework-content a:hover,
+        .bunch-word-container a:hover {
+            color: var(--chart-hex-12) !important;
+        }
+
+        /* Blockquote styles */
+        blockquote {
+            border-left: 4px solid var(--accent-color);
+            padding-left: 2rem;
+            margin: 2rem 0;
+            font-style: italic;
+            color: var(--text-color);
+            font-size: 70%; /* Reduce by 30% */
+            position: relative;
+        }
+
+        blockquote p {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Copy button styles (reference: 1115-slide.html) */
+        .copy-blockquote-btn {
+            padding: 0.4rem 0.8rem;
+            background: rgba(154, 148, 140, 0.1);
+            color: var(--accent-color);
+            border: 1px solid rgba(154, 148, 140, 0.3);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-family: var(--font-family);
+            transition: all 0.2s ease;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        .copy-blockquote-btn:hover {
+            background: rgba(154, 148, 140, 0.2);
+            border-color: rgba(154, 148, 140, 0.5);
+        }
+
+        .copy-blockquote-btn:active {
+            transform: scale(0.95);
+        }
+
+        .copy-feedback {
+            font-size: 0.7rem;
+            color: var(--accent-color);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            margin-left: 0.5rem;
+        }
+
+        /* Code styles */
+        code {
+            background: rgba(154, 148, 140, 0.2);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        /* Slide image styles */
+        .slide-image {
+            max-width: 100%;
+            max-height: 60vh;
+            height: auto;
+            border: 1px solid var(--line-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            object-fit: contain;
+            margin: 1rem 0;
+            display: block;
+        }
+
+        /* Responsive design */
+        @media (max-width: 767px) {
+            .nav {
+                width: 95%;
+                left: 2.5%;
+            }
+
+            .nav-btn {
+                width: 44px;
+                height: 44px;
+                font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+                opacity: 0.6;
+            }
+
+            .two-columns, .bunch-word-container, .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .two-columns > div, .content-section {
+                width: 100%;
+            }
+
+            .bunch-word-container {
+                padding: 2vh 3vw;
+            }
+
+            .bunch-word-container h2 {
+                font-size: clamp(1.3rem, 3vw, 1.6rem);
+                margin-bottom: 2vh;
+                margin-top: 1vh;
+            }
+
+            .slide {
+                padding: 3vw;
+            }
+
+            /* Mobile SVG styles */
+            .svg-container {
+                overflow-x: auto;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .svg-responsive {
+                max-width: 95%;
+                max-height: 80vh;
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .two-columns, .content-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 3vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="slides-container">
+        <!-- Slide 1: Title slide -->
+        <section class="slide active">
+            <h1>Active Learning 2.0</h1>
+            <p class="slide-subtitle">Explore and Customize Your AI Learning Flow with NotebookLM</p>
+        </section>
+
+        <!-- Slide 2: [Introduction] Your Learning Anxiety -->
+        <section class="slide scrollable">
+            <h3>Review Class Content Without Help?</h3>
+            <div class="content-grid">
+                <div class="content-section text-left">
+                    <img src="../../pic/w11/soc-cover.jpg" alt="SOC" style="width: 80%; height: auto; display: block; margin: 0 auto;">
+                </div>
+                <div class="content-section text-left">
+                    <h3>College Students' Information Anxiety</h3>
+                    <ul>
+                        <li>Endless papers and textbooks?</li>
+                        <li>Shared notes without clear focus?</li>
+                        <li>(Psychology: Information Overload)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: [Introduction] Core Question -->
+        <section class="slide">
+            <blockquote>
+                <p style="font-size: 1.5em; text-align: center;">What if your PDF handouts and all notes...</p>
+                <p style="font-size: 2em; text-align: center; font-weight: bold;">...could "automatically" become podcasts, flashcards, and quizzes?</p>
+            </blockquote>
+        </section>
+
+        <!-- Slide 4: Introducing NotebookLM -->
+        <section class="slide">
+            <h3>NotebookLM: Your Personalized AI Knowledge Base</h3>
+            <div class="content-grid">
+                <div class="content-section text-left">
+                    <h4><i class="fas fa-times-circle"></i> This is "NOT"...</h4>
+                    <ul>
+                        <li>Another generic chatbot</li>
+                        <li>Another search engine</li>
+                    </ul>
+                </div>
+                <div class="content-section text-left">
+                    <h4><i class="fas fa-check-circle"></i> This "IS"...</h4>
+                    <ul>
+                        <li>Your "exclusive" database</li>
+                        <li>A source-grounded learning partner</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5: [Foundation] The Foundation of Everything -->
+        <section class="slide">
+            <h3>The Foundation: Source-Grounded</h3>
+            <div class="content-grid">
+                <div class="content-section text-left">
+                    <h4>1. Source-Grounded</h4>
+                    <p>AI's entire world = your uploaded data.</p>
+                    <p>It is "not allowed" to search Google randomly, zero hallucinations.</p>
+                </div>
+                <div class="content-section text-left">
+                    <h4>2. Trustworthy Citations</h4>
+                    <p>All flashcards, quizzes, and answers are 100% from your handouts.</p>
+                    <p>Click <strong>[1]</strong>, <strong>[2]</strong> to jump back to the original text for verification.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 6: Core Feature (1): Audio -->
+        <section class="slide scrollable">
+            <h3>Core Feature (1): "Listening is Better Than Reading" for Learning</h3>
+            <div class="content-grid">
+                <div class="content-section text-left">
+                    <h4>Feature: Generate Audio Summary</h4>
+                    <p>AI automatically generates a 2-5 minute "audio summary".</p>
+                    <h5>Use Cases:</h5>
+                    <ul>
+                        <li>(Preview) 10 minutes before class, quickly grasp key points.</li>
+                        <li>(Commute) While taking the subway or walking, review by "listening".</li>
+                    </ul>
+                </div>
+                <div class="content-section">
+                    <img src="../../pic/w11/audio-overview.jpg" alt="Audio Overview" style="width: 50%; height: auto; display: block; margin: 0 auto;">
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 7: Core Feature (2): Flashcards -->
+        <section class="slide scrollable">
+            <h3>Core Feature (2): AI Flashcards</h3>
+            <div class="content-grid">
+                <div class="content-section text-left">
+                    <h4>Feature: AI Auto-Generated Key Point Flashcards</h4>
+                    <p>Automatically generates flashcards with "key terms" and "definitions".</p>
+                    <h5>Goal:</h5>
+                    <p><strong>Active Recall</strong>. One of the most powerful memory strategies, forcing the brain to recall answers rather than passively re-reading.</p>
+                </div>
+                <div class="content-section">
+                    <img src="../../pic/w11/flash-card.gif" alt="Flashcards" style="width: 50%; height: auto; display: block; margin: 0 auto;">
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 8: Core Feature (3): Quiz -->
+        <section class="slide scrollable">
+            <h3>Core Feature (3): Self-Quiz</h3>
+            <div class="content-grid">
+                <div class="content-section text-left">
+                    <h4>Feature: Your Personalized Pop Quiz</h4>
+                    <p>AI automatically generates multiple-choice and essay questions based on your data.</p>
+                    <h5>Goal:</h5>
+                    <p><strong>Retrieval Practice</strong>. Identify knowledge blind spots where "you thought you understood, but actually didn't".</p>
+                </div>
+                <div class="content-section">
+                    <img src="../../pic/w11/quiz.jpg" alt="Quiz" style="width: 50%; height: auto; display: block; margin: 0 auto;">
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 9: [v2.2] Mobile Installation -->
+        <section class="slide scrollable">
+            <h3>Install NotebookLM (Mobile)</h3>
+            <div class="content-grid">
+                <div class="content-section text-left">
+                    <h4><i class="fab fa-apple"></i> iOS (iPhone/iPad)</h4>
+                    <p>1. Open <strong>App Store</strong></p>
+                    <p>2. Search for "<strong>NotebookLM</strong>"</p>
+                    <p>3. Tap "Get"</p>
+                    <h4 style="margin-top: 2rem;"><i class="fab fa-android"></i> Android</h4>
+                    <p>1. Open <strong>Google Play Store</strong></p>
+                    <p>2. Search for "<strong>NotebookLM</strong>"</p>
+                    <p>3. Tap "Install"</p>
+                </div>
+                <div class="content-section">
+                    <img src="../../pic/w11/app-store.jpg" alt="App Store" style="width: 50%; height: auto; display: block; margin: 0 auto;">
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 10: Usage Example Screenshots -->
+        <section class="slide scrollable">
+            <div class="bunch-word-container full-page-scroll">
+                <div>
+                    <h2>Usage Example Screenshots</h2>
+                    <img src="../../pic/w11/1-portal.jpg" alt="Portal" class="slide-image">
+                    <img src="../../pic/w11/2-input.jpg" alt="Audio" class="slide-image">
+                    <img src="../../pic/w11/3-output-selection.jpg" alt="Output Selection" class="slide-image">
+                    <img src="../../pic/w11/4-importing.jpg" alt="Importing" class="slide-image">
+                    <img src="../../pic/w11/5-import-success.jpg" alt="Import Success" class="slide-image">
+                    <img src="../../pic/w11/6-input-request.jpg" alt="Input Request" class="slide-image">
+                    <img src="../../pic/w11/7-summary-loading.jpg" alt="Summary Loading" class="slide-image">
+                    <img src="../../pic/w11/8-summary-output.jpg" alt="" class="slide-image">
+                    <img src="../../pic/w11/9-studio-portal.jpg" alt="" class="slide-image">
+                    <img src="../../pic/w11/10-customization.jpg" alt="" class="slide-image">
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 11: [v2.2] Positive Example (Explore) -->
+        <section class="slide scrollable">
+            <div class="bunch-word-container">
+                <div>
+                    <h2>Example: Research New Topics with "Explore" Feature</h2>
+                    <h4>Demo Workflow (No file upload needed):</h4>
+                    <ol>
+                        <li><strong>Find Sources:</strong>
+                            <ul><li>In the "Sources" panel, click "Find Sources"</li></ul>
+                        </li>
+                        <li><strong>Enter Keywords:</strong>
+                            <ul><li>"[keyword1, keyword2, keyword3]"</li></ul>
+                        </li>
+                        <li><strong>Curate:</strong>
+                            <ul><li>NotebookLM recommends 10 related sources.</li><li>You "review" the summaries provided by AI and only check 3-4 most relevant ones to import.</li></ul>
+                        </li>
+                        <li><strong>Generate:</strong>
+                            <ul><li>Click "Audio Overview" to instantly generate an audio summary about these 4 articles.</li></ul>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 12: [v2.2] Hands-on Practice (Full Version) -->
+        <section class="slide scrollable">
+            <div class="bunch-word-container full-page-scroll">
+                <div>
+                    <h3>Quickly Master New Knowledge with Audio Overview</h3>
+                    <!-- Part 1: Explore and Listen -->
+                    <div class="homework-content">
+                        <h4>[Hands-on] Group Workshop (25 minutes)</h4>
+                        <h5>Step 1: (10 minutes) Choose One of Four and Explore Sources</h5>
+                        <p>Randomly divide into 4 groups, use the "Find Sources" feature, enter Chinese/English keywords, and import 2-3 related sources.</p>
+                        <ul>
+                            <li><strong>Group 1 Topic (Psychology):</strong> "Procrastination psychological mechanism" / "Procrastination psychological mechanism"</li>
+                            <li><strong>Group 2 Topic (Work):</strong> "Flow state" / "Flow state at work"</li>
+                            <li><strong>Group 3 Topic (AI):</strong> "AI Hallucination" / "AI Hallucination"</li>
+                            <li><strong>Group 4 Topic (Life):</strong> "Digital Detox" / "Digital Detox"</li>
+                        </ul>
+                    </div>
+
+                    <!-- Part 2: Customize Audio -->
+                    <div class="homework-content" style="margin-top: 3rem;">
+                        <h5>Step 2: (10 minutes) Generate and Customize Audio</h5>
+                        <p>1. Click "Audio Overview"</p>
+                        <p>2. Click "Customize"</p>
+                        <p>3. Make the following settings:</p>
+                        <ul>
+                            <li><strong>Language:</strong>
+                                <ul><li>Select <strong>"Traditional Chinese"</strong></li></ul>
+                            </li>
+                            <li><strong>Audio Length:</strong>
+                                <ul><li>(If available) Select "Short"</li></ul>
+                                <ul><li>(If not available) We will use Prompt to control</li></ul>
+                            </li>
+                            <li><strong>Best Audio Prompt Writing:</strong> Use Prompt in "Customize" to make Audio more precise
+                                <ul>
+                                    <li><strong>Formula:</strong> [Role] + [Task] + [Format/Limitations]</li>
+                                    <li><strong>Example 1: Request Brief (Control Length)</strong>
+                                        <div style="position: relative;">
+                                            <button class="copy-blockquote-btn" data-copy-target="blockquote-1">
+                                                <i class="fas fa-copy"></i> Copy
+                                            </button>
+                                            <span class="copy-feedback" id="feedback-1">Copied!</span>
+                                            <blockquote id="blockquote-1"><p>"You are a tutor. Please use **at most 3 minutes** to summarize the core arguments of these materials for a first-year college student."</p></blockquote>
+                                        </div>
+                                    </li>
+                                    <li><strong>Example 2: Request Comparison</strong>
+                                        <div style="position: relative;">
+                                            <button class="copy-blockquote-btn" data-copy-target="blockquote-2">
+                                                <i class="fas fa-copy"></i> Copy
+                                            </button>
+                                            <span class="copy-feedback" id="feedback-2">Copied!</span>
+                                            <blockquote id="blockquote-2"><p>"You are a debate coach. Please generate an audio segment that **focuses on comparing** the differences between [Viewpoint A] and [Viewpoint B]."</p></blockquote>
+                                        </div>
+                                    </li>
+                                    <li><strong>Example 3: Request Application</strong>
+                                        <div style="position: relative;">
+                                            <button class="copy-blockquote-btn" data-copy-target="blockquote-3">
+                                                <i class="fas fa-copy"></i> Copy
+                                            </button>
+                                            <span class="copy-feedback" id="feedback-3">Copied!</span>
+                                            <blockquote id="blockquote-3"><p>"You are a life coach. Please use these materials to generate a 3-minute audio segment that provides 3 **specific action recommendations**."</p></blockquote>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="homework-content" style="margin-top: 3rem;">
+                        <h5>Step 3: (5 minutes) Listen and Share</h5>
+                        <p>Please have group members listen to this 3-minute AI audio summary together and prepare to share:</p>
+                        <p><strong>"Share three new knowledge highlights you heard"</strong></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 13: [v2.2] Summary (Key Takeaways) -->
+        <section class="slide">
+            <div class="svg-container">
+                <img src="../../svg/w11-notobooklm-takeaway.svg" alt="Takeaway" class="svg-responsive">
+            </div>
+        </section>
+
+        <!-- Slide 14: Homework (1/2) -->
+        <section class="slide scrollable">
+            <div class="bunch-word-container">
+                <div>
+                    <h1>Week 11 Assignment</h1>
+                    <!-- Google Form link -->
+                    <p>Submit by Friday 11/21 23:59 at the latest <strong><a href="https://forms.gle/LtGET9Y9Z5HrxhbA6" target="_blank">Google Form Link</a></strong></p>
+                    <div class="homework-content">
+                        <h4>Sociology In-Depth Research Topic Analysis</h4>
+                        <h5>【Step 1】Import Data Source</h5>
+                            <p>Please download the <a href="https://drive.google.com/file/d/1J4XvvUgkCjr-hn6k46I9CpQOvDxG1_CG/view?usp=drive_link" target="_blank"><code>SOC社會學.pdf</code></a> file provided by the instructor.</p>
+                        <p>Create a new Notebook in NotebookLM and upload this file.</p>
+                        <h5>【Step 2】Literature Research and Answer</h5>
+                        <div>
+                            <p>Use all NotebookLM features to thoroughly read the document and answer 5 questions in the Google Form.</p>
+                            <h5>(All answers must be sourced from <code>SOC社會學.pdf</code>)</h5>
+                            <ol>
+                                <li>According to this text, what is the specific definition of 'Microsociology'? What is the essential difference between it and 'Macrosociology'?</li>
+                                <li>According to this text, what are the main differences in the experiences of different social groups in the United States regarding the social indicator of "poverty rate"? Please specifically identify which "poorest group" is described in this text.</li>
+                                <li>According to this text, what is the specific definition of 'Validity' in social research? What is the essential difference between it and 'Reliability'?</li>
+                                <li>How does 'Functionalism' explain the sociological significance of "Latent function"? Please summarize its core arguments based on this text.</li>
+                                <li>How does the author (Weber) explain the causes (or: sources of power) of 'Charismatic authority'? Please list its core elements based on this text.</li>
+                            </ol>
+                        </div>
+                        <h5>【Step 3】Reflection Screenshot</h5>
+                        <p>Upload 1 screenshot of the interface you found "most helpful" (e.g., chat, flashcards).</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+
+    <div class="nav">
+        <button id="prev" class="nav-btn">&#8249;</button>
+        <button id="next" class="nav-btn">&#8250;</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = Array.from(document.querySelectorAll('.slide:not(.hidden)'));
+            const totalSlides = slides.length;
+            let currentSlide = 0;
+
+            function showSlide(index) {
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === index);
+                });
+            }
+
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            function prevSlide() {
+                currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            document.getElementById('next').addEventListener('click', nextSlide);
+            document.getElementById('prev').addEventListener('click', prevSlide);
+
+            // Keyboard support
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    e.preventDefault();
+                    nextSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    prevSlide();
+                }
+            });
+
+            // Touch support (swipe left/right)
+            let startX = 0;
+            let endX = 0;
+
+            document.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+            });
+
+            document.addEventListener('touchend', (e) => {
+                endX = e.changedTouches[0].clientX;
+                handleSwipe();
+            });
+
+            function handleSwipe() {
+                const threshold = 50;
+                const diff = startX - endX;
+
+                if (Math.abs(diff) > threshold) {
+                    if (diff > 0) {
+                        // Swipe left, next slide
+                        nextSlide();
+                    } else {
+                        // Swipe right, previous slide
+                        prevSlide();
+                    }
+                }
+            }
+
+            showSlide(currentSlide);
+        });
+
+        // Copy blockquote text functionality
+        function setupCopyButtons() {
+            const copyButtons = document.querySelectorAll('.copy-blockquote-btn');
+
+            copyButtons.forEach(button => {
+                button.addEventListener('click', async function() {
+                    const targetId = this.getAttribute('data-copy-target');
+                    const blockquote = document.getElementById(targetId);
+                    const feedbackId = 'feedback-' + targetId.split('-')[1];
+                    const feedback = document.getElementById(feedbackId);
+
+                    if (!blockquote) return;
+
+                    // Extract text content (remove HTML tags)
+                    const text = blockquote.innerText || blockquote.textContent;
+
+                    try {
+                        // Use modern Clipboard API
+                        await navigator.clipboard.writeText(text);
+
+                        // Show feedback
+                        if (feedback) {
+                            feedback.style.opacity = '1';
+                            setTimeout(() => {
+                                feedback.style.opacity = '0';
+                            }, 2000);
+                        }
+                    } catch (err) {
+                        console.error('Copy failed:', err);
+                        // Fallback: use traditional method
+                        const textArea = document.createElement('textarea');
+                        textArea.value = text;
+                        textArea.style.position = 'fixed';
+                        textArea.style.opacity = '0';
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        try {
+                            document.execCommand('copy');
+                            if (feedback) {
+                                feedback.textContent = 'Copied!';
+                                feedback.style.opacity = '1';
+                                setTimeout(() => {
+                                    feedback.style.opacity = '0';
+                                }, 2000);
+                            }
+                        } catch (e) {
+                            alert('Unable to copy, please manually select text');
+                        }
+                        document.body.removeChild(textArea);
+                    }
+                });
+            });
+        }
+
+        // Initialize copy buttons on page load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', setupCopyButtons);
+        } else {
+            setupCopyButtons();
+        }
+    </script>
+</body>
+</html>
+

@@ -68,8 +68,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // 在 html/ 目錄下的中文頁面，回到父層的 index.html（課程首頁）
                 homeLink = '../index.html';
             } else if (pathname.includes('/html_en/')) {
-                // 在 html_en/ 目錄下的英文頁面，回到父層的 index.html 或 index_en.html
-                homeLink = '../index.html';  // 可以改為 index_en.html 如果英文首頁在父層
+                // 在 html_en/ 目錄下的英文頁面，回到同層的 index_en.html
+                homeLink = 'index_en.html';
             } else {
                 // 其他情況，根據語言回到對應的首頁
                 // 嘗試找到同層或上層的 index 檔案

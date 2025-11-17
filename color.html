@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>顏色選擇器 - 侘寂風與莫蘭迪風格</title>
+    <style>
+        :root {
+            --bg-color: #F5F4F0;
+            --text-color: #3D3A37;
+            --accent-color: #9A948C;
+            --header-bg: #EAEBE6;
+            --line-color: #d1d1c2;
+            --font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-family);
+            line-height: 1.6;
+            padding: 2rem;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 400;
+            color: var(--text-color);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+        }
+
+        .color-section {
+            margin-bottom: 4rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .color-name {
+            font-size: 2rem;
+            font-weight: 400;
+            color: var(--text-color);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--line-color);
+        }
+
+        .color-variants {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .color-variant {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1.5rem;
+            background: var(--bg-color);
+            border-radius: 8px;
+            border: 2px solid var(--line-color);
+            transition: all 0.3s ease;
+        }
+
+        .color-variant:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .color-variant.selected {
+            border-color: var(--text-color);
+            border-width: 3px;
+            background: var(--header-bg);
+        }
+
+        .color-swatch {
+            width: 100%;
+            height: 120px;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .color-info {
+            width: 100%;
+            text-align: center;
+        }
+
+        .color-code {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .color-label {
+            font-size: 0.85rem;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--accent-color);
+        }
+
+        .checkbox-wrapper label {
+            font-size: 0.9rem;
+            color: var(--text-color);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .summary {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            max-width: 300px;
+            border: 2px solid var(--line-color);
+        }
+
+        .summary h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        .selected-colors {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .selected-color-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            background: var(--bg-color);
+            border-radius: 4px;
+        }
+
+        .selected-color-swatch {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            border: 1px solid var(--line-color);
+        }
+
+        .selected-color-code {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: var(--text-color);
+        }
+
+        @media (max-width: 768px) {
+            .color-variants {
+                grid-template-columns: 1fr;
+            }
+
+            .summary {
+                position: relative;
+                bottom: auto;
+                right: auto;
+                margin-top: 2rem;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>顏色選擇器</h1>
+        <p class="subtitle">侘寂風與莫蘭迪低飽和風格變體</p>
+
+        <!-- 紅色 -->
+        <div class="color-section">
+            <h2 class="color-name">紅色 (Red)</h2>
+            <div class="color-variants">
+                <div class="color-variant" data-color="#C8A8A0" data-name="Red 1">
+                    <div class="color-swatch" style="background-color: #C8A8A0;"></div>
+                    <div class="color-info">
+                        <div class="color-code">#C8A8A0</div>
+                        <div class="color-label">侘寂風 - 灰調玫瑰</div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="red-1" class="color-checkbox">
+                            <label for="red-1">採用</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="color-variant" data-color="#B89A9A" data-name="Red 2">
+                    <div class="color-swatch" style="background-color: #B89A9A;"></div>
+                    <div class="color-info">
+                        <div class="color-code">#B89A9A</div>
+                        <div class="color-label">莫蘭迪 - 粉灰紅</div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="red-2" class="color-checkbox">
+                            <label for="red-2">採用</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="color-variant" data-color="#A68B85" data-name="Red 3">
+                    <div class="color-swatch" style="background-color: #A68B85;"></div>
+                    <div class="color-info">
+                        <div class="color-code">#A68B85</div>
+                        <div class="color-label">侘寂風 - 陶土紅</div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="red-3" class="color-checkbox">
+                            <label for="red-3">採用</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 橙色 -->
+        <div class="color-section">
+            <h2 class="color-name">橙色 (Orange)</h2>
+            <div class="color-variants">
+                <div class="color-variant" data-color="#D4B8A0" data-name="Orange 1">
+                    <div class="color-swatch" style="background-color: #D4B8A0;"></div>
+                    <div class="color-info">
+                        <div class="color-code">#D4B8A0</div>
+                        <div class="color-label">莫蘭迪 - 淡陶橙</div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="orange-1" class="color-checkbox">
+                            <label for="orange-1">採用</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="color-variant" data-color="#C4A890" data-name="Orange 2">
+                    <div class="color-swatch" style="background-color: #C4A890;"></div>
+                    <div class="color-info">
+                        <div class="color-code">#C4A890</div>
+                        <div class="color-label">侘寂風 - 大地橙</div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="orange-2" class="color-checkbox">
+                            <label for="orange-2">採用</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="color-variant" data-color="#B8A088" data-name="Orange 3">
+                    <div class="color-swatch" style="background-color: #B8A088;"></div>
+                    <div class="color-info">
+                        <div class="color-code">#B8A088</div>
+                        <div class="color-label">莫蘭迪 - 灰調橙</div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="orange-3" class="color-checkbox">
+                            <label for="orange-3">採用</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 黃色 -->
+        <div class="color-section">
+            <h2 class="color-name">黃色 (Yellow)</h2>
+            <div class="color-variants">
+                <div class="color-variant" data-color="#D4C8A0" data-name="Yellow 1">
+                    <div class="color-swatch" style="background-color: #D4C8A0;"></div>
+                    <div class="color-info">
+                        <div class="color-code">#D4C8A0</div>
+                        <div class="color-label">侘寂風 - 米黃</div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="yellow-1" class="color-checkbox">
+                            <label for="yellow-1">採用</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="color-variant" data-color="#C8BC98" data-name="Yellow 2">
+                    <div class="color-swatch" style="background-color: #C8BC98;"></div>
+                    <div class="color-info">
+                        <div class="color-code">#C8BC98</div>
+                        <div class="color-label">莫蘭迪 - 淡灰黃</div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="yellow-2" class="color-checkbox">
+                            <label for="yellow-2">採用</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="color-variant" data-color="#B8AC88" data-name="Yellow 3">
+                    <div class="color-swatch" style="background-color: #B8AC88;"></div>
+                    <div class="color-info">
+                        <div class="color-code">#B8AC88</div>
+                        <div class="color-label">侘寂風 - 稻草黃</div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="yellow-3" class="color-checkbox">
+                            <label for="yellow-3">採用</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 綠色 -->
+        <div class="color-section">
+            <h2 class="color-name">綠色 (Green)</h2>
+            <div class="color-variants">
+                <div class="color-variant" data-color="#A8B8A0" data-name="Green 1">
+                    <div class="color-swatch" style="background-color: #A8B8A0;"></div>
+                    <div class="color-info">
+                        <div class="color-code">#A8B8A0</div>
+                        <div class="color-label">莫蘭迪 - 灰綠</div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="green-1" class="color-checkbox">
+                            <label for="green-1">採用</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="color-variant" data-color="#98A890" data-name="Green 2">
+                    <div class="color-swatch" style="background-color: #98A890;"></div>
+                    <div class="color-info">
+                        <div class="color-code">#98A890</div>
+                        <div class="color-label">侘寂風 - 苔蘚綠</div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="green-2" class="color-checkbox">
+                            <label for="green-2">採用</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="color-variant" data-color="#8C9C88" data-name="Green 3">
+                    <div class="color-swatch" style="background-color: #8C9C88;"></div>
+                    <div class="color-info">
+                        <div class="color-code">#8C9C88</div>
+                        <div class="color-label">莫蘭迪 - 橄欖灰</div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="green-3" class="color-checkbox">
+                            <label for="green-3">採用</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 藍色 -->
+        <div class="color-section">
+            <h2 class="color-name">藍色 (Blue)</h2>
+            <div class="color-variants">
+                <div class="color-variant" data-color="#A0B0C0" data-name="Blue 1">
+                    <div class="color-swatch" style="background-color: #A0B0C0;"></div>
+                    <div class="color-info">
+                        <div class="color-code">#A0B0C0</div>
+                        <div class="color-label">莫蘭迪 - 粉藍灰</div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="blue-1" class="color-checkbox">
+                            <label for="blue-1">採用</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="color-variant" data-color="#90A0B0" data-name="Blue 2">
+                    <div class="color-swatch" style="background-color: #90A0B0;"></div>
+                    <div class="color-info">
+                        <div class="color-code">#90A0B0</div>
+                        <div class="color-label">侘寂風 - 霧藍</div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="blue-2" class="color-checkbox">
+                            <label for="blue-2">採用</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="color-variant" data-color="#8898A8" data-name="Blue 3">
+                    <div class="color-swatch" style="background-color: #8898A8;"></div>
+                    <div class="color-info">
+                        <div class="color-code">#8898A8</div>
+                        <div class="color-label">莫蘭迪 - 灰藍</div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="blue-3" class="color-checkbox">
+                            <label for="blue-3">採用</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 靛色 -->
+        <div class="color-section">
+            <h2 class="color-name">靛色 (Indigo)</h2>
+            <div class="color-variants">
+                <div class="color-variant" data-color="#98A0B8" data-name="Indigo 1">
+                    <div class="color-swatch" style="background-color: #98A0B8;"></div>
+                    <div class="color-info">
+                        <div class="color-code">#98A0B8</div>
+                        <div class="color-label">侘寂風 - 淡靛灰</div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="indigo-1" class="color-checkbox">
+                            <label for="indigo-1">採用</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="color-variant" data-color="#8890A8" data-name="Indigo 2">
+                    <div class="color-swatch" style="background-color: #8890A8;"></div>
+                    <div class="color-info">
+                        <div class="color-code">#8890A8</div>
+                        <div class="color-label">莫蘭迪 - 灰靛</div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="indigo-2" class="color-checkbox">
+                            <label for="indigo-2">採用</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="color-variant" data-color="#788098" data-name="Indigo 3">
+                    <div class="color-swatch" style="background-color: #788098;"></div>
+                    <div class="color-info">
+                        <div class="color-code">#788098</div>
+                        <div class="color-label">侘寂風 - 深靛灰</div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="indigo-3" class="color-checkbox">
+                            <label for="indigo-3">採用</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 紫色 -->
+        <div class="color-section">
+            <h2 class="color-name">紫色 (Purple)</h2>
+            <div class="color-variants">
+                <div class="color-variant" data-color="#B0A8C0" data-name="Purple 1">
+                    <div class="color-swatch" style="background-color: #B0A8C0;"></div>
+                    <div class="color-info">
+                        <div class="color-code">#B0A8C0</div>
+                        <div class="color-label">莫蘭迪 - 粉紫灰</div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="purple-1" class="color-checkbox">
+                            <label for="purple-1">採用</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="color-variant" data-color="#A098B0" data-name="Purple 2">
+                    <div class="color-swatch" style="background-color: #A098B0;"></div>
+                    <div class="color-info">
+                        <div class="color-code">#A098B0</div>
+                        <div class="color-label">侘寂風 - 淡紫灰</div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="purple-2" class="color-checkbox">
+                            <label for="purple-2">採用</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="color-variant" data-color="#9088A0" data-name="Purple 3">
+                    <div class="color-swatch" style="background-color: #9088A0;"></div>
+                    <div class="color-info">
+                        <div class="color-code">#9088A0</div>
+                        <div class="color-label">莫蘭迪 - 灰紫</div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="purple-3" class="color-checkbox">
+                            <label for="purple-3">採用</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 選取摘要 -->
+    <div class="summary">
+        <h3>已選取的顏色</h3>
+        <div class="selected-colors" id="selectedColors">
+            <p style="color: var(--accent-color); font-style: italic;">尚未選取任何顏色</p>
+        </div>
+    </div>
+
+    <script>
+        // 選取摘要容器
+        const selectedColorsContainer = document.getElementById('selectedColors');
+        const selectedColors = new Map();
+
+        // 為所有 checkbox 添加事件監聽器
+        document.querySelectorAll('.color-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const variant = this.closest('.color-variant');
+                const colorCode = variant.dataset.color;
+                const colorName = variant.dataset.name;
+                const checkboxId = this.id;
+
+                if (this.checked) {
+                    // 選取顏色
+                    variant.classList.add('selected');
+                    selectedColors.set(checkboxId, {
+                        code: colorCode,
+                        name: colorName
+                    });
+                } else {
+                    // 取消選取
+                    variant.classList.remove('selected');
+                    selectedColors.delete(checkboxId);
+                }
+
+                updateSummary();
+            });
+        });
+
+        // 更新選取摘要
+        function updateSummary() {
+            if (selectedColors.size === 0) {
+                selectedColorsContainer.innerHTML = '<p style="color: var(--accent-color); font-style: italic;">尚未選取任何顏色</p>';
+                return;
+            }
+
+            selectedColorsContainer.innerHTML = '';
+            selectedColors.forEach((color, id) => {
+                const item = document.createElement('div');
+                item.className = 'selected-color-item';
+                item.innerHTML = `
+                    <div class="selected-color-swatch" style="background-color: ${color.code};"></div>
+                    <div class="selected-color-code">${color.code}</div>
+                `;
+                selectedColorsContainer.appendChild(item);
+            });
+        }
+
+        // 點擊色塊也可以選取/取消選取
+        document.querySelectorAll('.color-variant').forEach(variant => {
+            variant.addEventListener('click', function(e) {
+                // 如果點擊的是 checkbox 或 label，不處理（避免雙重觸發）
+                if (e.target.type === 'checkbox' || e.target.tagName === 'LABEL') {
+                    return;
+                }
+
+                const checkbox = this.querySelector('.color-checkbox');
+                if (checkbox) {
+                    checkbox.checked = !checkbox.checked;
+                    checkbox.dispatchEvent(new Event('change'));
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
