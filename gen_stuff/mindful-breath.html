@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4-7-8 正念呼吸 (Mindfulness Breathing)</title>
+    <style>
+        /* * =========================================
+         * 1. 視覺風格設定 (Visual Style)
+         * =========================================
+         */
+
+        :root {
+            /* * 顏色定義：對應三個階段的情緒色彩
+             * HSL 模式方便調整色相，保持統一的飽和度與亮度
+             */
+            --hue-inhale: 210; /* 藍色：清新的空氣 */
+            --hue-hold: 270;   /* 紫色：深沉的靜止 */
+            --hue-exhale: 35;  /* 橙色：溫暖的釋放 */
+
+            --bg-dark: #0b1016;
+            --bg-light: #1b2330;
+
+            --bubble-size: 280px;
+            --font-main: "Helvetica Neue", Arial, sans-serif;
+
+            /* 當前動態顏色 (由 JS 控制) */
+            --current-hue: var(--hue-inhale);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+
+        body {
+            background: radial-gradient(circle at center, var(--bg-light) 0%, var(--bg-dark) 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            font-family: var(--font-main);
+            color: rgba(255, 255, 255, 0.9);
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* * 氣泡本體 (The Bubble) */
+        .bubble {
+            width: var(--bubble-size);
+            height: var(--bubble-size);
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+
+            /* 光暈效果：顏色會隨著變數 --current-hue 改變 */
+            box-shadow:
+                inset 0 0 40px rgba(255, 255, 255, 0.05),
+                0 0 20px rgba(0, 0, 0, 0.2),
+                0 0 60px hsla(var(--current-hue), 50%, 60%, 0.6);
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+
+            /* * 關鍵過渡：
+             * Transform (大小): 由 JS 設定時間，確保吸氣4s/吐氣8s精準同步
+             * Box-shadow (顏色): 設定 1.5s 的漸變，讓顏色切換時不會太突兀
+             */
+            transition: transform 1s ease-in-out, box-shadow 1.5s ease;
+        }
+
+        /* 倒數數字 */
+        .timer-text {
+            font-size: 5rem;
+            font-weight: 200;
+            color: #ffffff;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* 狀態文字 (吸氣/閉氣/吐氣) */
+        .status-text {
+            /* 修改這裡：原本是 50px，改成 100px (或更大) 讓文字往下移 */
+            margin-top: 100px;
+
+            font-size: 1.6rem;
+            letter-spacing: 6px;
+            font-weight: 300;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 1s ease, transform 1s ease, color 1.5s ease;
+            color: hsla(var(--current-hue), 60%, 70%, 1);
+        }
+
+        .status-text.visible {
+            opacity: 0.9;
+            transform: translateY(0);
+        }
+
+        /* * 開始按鈕層 (Overlay) */
+        #overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(11, 16, 22, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.8s ease;
+        }
+
+        #overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .btn-start {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: var(--font-main);
+        }
+
+        .btn-start:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.6);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+
+        /* 背景星空 */
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.2;
+            animation: twinkle 4s infinite ease-in-out;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.2); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="stars-container"></div>
+
+    <!-- 啟動遮罩 -->
+    <div id="overlay">
+        <button class="btn-start" id="start-btn">開始練習</button>
+    </div>
+
+    <div class="container">
+        <div class="bubble" id="bubble">
+            <span class="timer-text" id="timer"></span>
+        </div>
+        <div class="status-text" id="status">4-7-8 呼吸法</div>
+    </div>
+
+    <script>
+        /**
+         * =========================================
+         * 2. 參數設定 (Configuration)
+         * =========================================
+         * 依照需求調整為 4-7-8 呼吸法
+         */
+        const CONFIG = {
+            inhale: { time: 4, label: "吸氣 (Inhale)", hue: 210, scale: 1.5 },
+            hold:   { time: 7, label: "閉氣 (Hold)",   hue: 270, scale: 1.5 }, // 閉氣時保持擴張狀態
+            exhale: { time: 8, label: "吐氣 (Exhale)", hue: 35,  scale: 1.0 },
+
+            countdownTime: 3 // 開始前的倒數秒數
+        };
+
+        // DOM 元素
+        const bubble = document.getElementById('bubble');
+        const timerDisplay = document.getElementById('timer');
+        const statusDisplay = document.getElementById('status');
+        const overlay = document.getElementById('overlay');
+        const startBtn = document.getElementById('start-btn');
+
+        /**
+         * =========================================
+         * 3. 核心邏輯 (Core Logic)
+         * =========================================
+         */
+
+        // 設定氣泡的顏色與狀態
+        function setPhaseStyle(hue, scale, duration) {
+            // 設定 CSS 變數，控制氣泡光暈顏色
+            document.documentElement.style.setProperty('--current-hue', hue);
+
+            // 設定過渡時間，確保與呼吸長度同步
+            // 注意：box-shadow 的顏色變換我們保持固定節奏 (1.5s) 讓它看起來比較柔和
+            bubble.style.transition = `transform ${duration}s ease-in-out, box-shadow 1.5s ease`;
+            bubble.style.transform = `scale(${scale})`;
+        }
+
+        // 執行單一階段的 Promise
+        function runPhase(phaseData) {
+            return new Promise(resolve => {
+                const { time, label, hue, scale } = phaseData;
+
+                // 1. 更新視覺狀態 (顏色、大小)
+                setPhaseStyle(hue, scale, time);
+
+                // 2. 更新文字
+                statusDisplay.textContent = label;
+                statusDisplay.classList.add('visible');
+
+                // 3. 倒數計時邏輯
+                let remaining = time;
+                timerDisplay.textContent = remaining;
+
+                const startTime = Date.now();
+                const endTime = startTime + (time * 1000);
+
+                const timerInterval = setInterval(() => {
+                    const now = Date.now();
+                    const timeLeft = Math.max(0, Math.ceil((endTime - now) / 1000));
+
+                    if (timerDisplay.textContent != timeLeft) {
+                        timerDisplay.textContent = timeLeft;
+                    }
+
+                    if (now >= endTime) {
+                        clearInterval(timerInterval);
+                        resolve(); // 階段結束
+                    }
+                }, 50); // 每 50ms 檢查一次即可
+            });
+        }
+
+        // 呼吸循環主程式
+        async function startBreathingCycle() {
+            while (true) {
+                // 吸氣 (4s) - 藍色
+                await runPhase(CONFIG.inhale);
+
+                // 閉氣 (7s) - 紫色
+                await runPhase(CONFIG.hold);
+
+                // 吐氣 (8s) - 橙色
+                await runPhase(CONFIG.exhale);
+            }
+        }
+
+        // 啟動前的倒數計時 (3..2..1)
+        function startCountdown() {
+            return new Promise(resolve => {
+                let count = CONFIG.countdownTime;
+
+                // 隱藏開始按鈕與遮罩
+                overlay.classList.add('hidden');
+
+                // 初始化文字
+                statusDisplay.textContent = "準備...";
+                statusDisplay.classList.add('visible');
+                timerDisplay.textContent = count;
+
+                // 讓氣泡回到初始狀態
+                bubble.style.transform = 'scale(1)';
+                document.documentElement.style.setProperty('--current-hue', CONFIG.inhale.hue); // 預備色
+
+                const interval = setInterval(() => {
+                    count--;
+                    if (count > 0) {
+                        timerDisplay.textContent = count;
+                    } else {
+                        clearInterval(interval);
+                        timerDisplay.textContent = ""; // 清空數字準備開始
+                        resolve();
+                    }
+                }, 1000);
+            });
+        }
+
+        // 初始化背景星空
+        function initStars() {
+            const container = document.getElementById('stars-container');
+            for(let i=0; i<50; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const size = Math.random() * 2 + 1;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                container.appendChild(star);
+            }
+        }
+
+        // 程式進入點
+        window.onload = () => {
+            initStars();
+
+            // 綁定開始按鈕事件
+            startBtn.addEventListener('click', async () => {
+                await startCountdown();
+                startBreathingCycle();
+            });
+        };
+
+    </script>
+</body>
+</html>

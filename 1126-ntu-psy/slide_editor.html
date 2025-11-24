@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Standalone HTML Slide Editor</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        header {
+            background-color: #ffffff;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        header h1 {
+            font-size: 1.5rem;
+            margin: 0;
+            margin-right: auto;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        select, input[type="text"], input[type="file"], button {
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.25rem;
+            border: 1px solid #ced4da;
+            font-size: 0.9rem;
+            background-color: #fff;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+            cursor: pointer;
+            transition: background-color 0.15s ease-in-out;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        #slide-list-container, #preview-container {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            border-left: 1px solid #dee2e6;
+        }
+        #slide-list-container {
+            flex-basis: 30%;
+        }
+        #preview-container {
+           flex-basis: 70%;
+        }
+        h2 {
+            margin-top: 0;
+            font-size: 1.25rem;
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 0.5rem;
+        }
+        #slide-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .slide-item {
+            padding: 0.75rem;
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            margin-bottom: 0.5rem;
+            border-radius: 0.25rem;
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .slide-item:active {
+            cursor: grabbing;
+            background-color: #e9ecef;
+        }
+        .slide-item.dragging {
+            opacity: 0.5;
+        }
+        .slide-item-handle {
+            font-size: 1.2rem;
+            color: #adb5bd;
+            cursor: grab;
+        }
+        .slide-item-text {
+            flex: 1;
+            cursor: pointer;
+        }
+        .slide-item-text:hover {
+            color: #007bff;
+            text-decoration: underline;
+        }
+        .slide-item-delete {
+            color: #dc3545;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            transition: background-color 0.15s ease-in-out;
+        }
+        .slide-item-delete:hover {
+            background-color: #f8d7da;
+        }
+        .slide-item.active {
+            border-color: #007bff;
+            background-color: #e7f3ff;
+        }
+        #preview-iframe {
+            width: 100%;
+            height: 95%;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Slide Editor</h1>
+            <div class="control-group">
+                <label for="file-input">Load File:</label>
+                <input type="file" id="file-input" accept=".html">
+            </div>
+            <div class="control-group">
+                <label for="split-class-input">Slide Class:</label>
+                <input type="text" id="split-class-input" value="layout">
+            </div>
+            <button id="process-btn">Process</button>
+            <button id="save-btn" disabled>Save New Version</button>
+        </header>
+
+        <main class="main-content">
+            <div id="slide-list-container">
+                <h2>Reorder Slides</h2>
+                <ul id="slide-list">
+                    <!-- Slide items will be dynamically inserted here -->
+                </ul>
+            </div>
+            <div id="preview-container">
+                <h2>Live Preview</h2>
+                <iframe id="preview-iframe" sandbox="allow-scripts allow-same-origin"></iframe>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // --- DOM Elements ---
+        const fileInput = document.getElementById('file-input');
+        const splitClassInput = document.getElementById('split-class-input');
+        const processBtn = document.getElementById('process-btn');
+        const saveBtn = document.getElementById('save-btn');
+        const slideList = document.getElementById('slide-list');
+        const previewIframe = document.getElementById('preview-iframe');
+
+        // --- App State ---
+        let originalHtml = '';
+        let originalFilename = 'presentation.html';
+        let slides = [];
+        let sourceDoc = null;
+        let dragAndDropSetup = false; // Track if drag-and-drop is already set up
+
+
+        // --- Event Listeners ---
+        fileInput.addEventListener('change', handleFileLoad);
+        processBtn.addEventListener('click', processHtml);
+        saveBtn.addEventListener('click', handleSave);
+
+        // --- Functions ---
+
+        /**
+         * Helper function to find slide elements with precise class matching
+         * Filters out elements that contain the class name as a substring (e.g., "slides-container" when searching for "slide")
+         * @param {Document|Element} root - The root element or document to search in
+         * @param {string} splitClass - The class name to search for
+         * @returns {Array} - Filtered list of slide elements
+         */
+        function findSlideElements(root, splitClass) {
+            const allMatches = root.querySelectorAll(`[class*="${splitClass}"]`);
+            return Array.from(allMatches).filter(node => {
+                const classList = node.className.split(/\s+/);
+                // Match if any class exactly equals splitClass, or starts/ends with it (for compound classes like "slide-active")
+                // This prevents matching "slides-container" when searching for "slide"
+                return classList.some(cls => {
+                    return cls === splitClass ||
+                           cls.startsWith(splitClass + '-') ||
+                           cls.endsWith('-' + splitClass);
+                });
+            });
+        }
+
+        /**
+         * Handles the file loading from the <input type="file">
+         */
+        function handleFileLoad(event) {
+            const file = event.target.files[0];
+            if (!file) {
+                return;
+            }
+
+            originalFilename = file.name;
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                originalHtml = e.target.result;
+                processBtn.disabled = false;
+                alert(`File "${originalFilename}" loaded successfully. Ready to process.`);
+            };
+
+            reader.onerror = (e) => {
+                alert('Error reading file.');
+                console.error("FileReader error:", e);
+                processBtn.disabled = true;
+            };
+
+            reader.readAsText(file);
+        }
+
+        /**
+         * Parses the loaded HTML, splits it into slides, and populates the list
+         */
+        function processHtml() {
+            const splitClass = splitClassInput.value.trim();
+            if (!splitClass || !originalHtml) {
+                alert("Please load a file and provide a slide class.");
+                return;
+            }
+
+            try {
+                const parser = new DOMParser();
+                sourceDoc = parser.parseFromString(originalHtml, 'text/html');
+
+                // Check for parsing errors
+                const parserError = sourceDoc.querySelector('parsererror');
+                if (parserError) {
+                    alert(`HTML parsing error: ${parserError.textContent}`);
+                    console.error('Parser error:', parserError.textContent);
+                    return;
+                }
+
+                // Use precise selector to match class names exactly (not substring match)
+                // This prevents matching "slides-container" when searching for "slide"
+                const slideNodes = findSlideElements(sourceDoc, splitClass);
+
+                if (slideNodes.length === 0) {
+                    alert(`No elements found with class containing "${splitClass}". Please check the class name.\n\nTip: The selector looks for elements where the class attribute contains "${splitClass}".`);
+                    return;
+                }
+
+                slides = Array.from(slideNodes);
+
+                // Log information about found slides
+                console.log(`Found ${slides.length} slides with class containing "${splitClass}"`);
+                if (slides.length > 0) {
+                    const firstSlide = slides[0];
+                    console.log('First slide:', {
+                        tagName: firstSlide.tagName,
+                        className: firstSlide.className,
+                        parentTag: firstSlide.parentNode?.tagName,
+                        parentId: firstSlide.parentNode?.id,
+                        parentClass: firstSlide.parentNode?.className
+                    });
+                }
+
+                // Reset drag and drop setup when processing a new file
+                dragAndDropSetup = false;
+
+                populateSlideList();
+                updatePreview();
+                saveBtn.disabled = false;
+
+                console.log(`Successfully processed ${slides.length} slides`);
+            } catch (error) {
+                alert(`Error processing HTML: ${error.message}`);
+                console.error('Processing error:', error);
+            }
+        }
+
+        /**
+         * Populates the slide list UI with draggable items
+         */
+        function populateSlideList() {
+            slideList.innerHTML = ''; // Clear existing list
+            slides.forEach((slide, index) => {
+                const listItem = document.createElement('li');
+                listItem.className = 'slide-item';
+                listItem.setAttribute('draggable', 'true');
+                listItem.dataset.index = index;
+                listItem.dataset.slideIndex = index; // Store slide index for navigation
+
+                const handle = document.createElement('span');
+                handle.className = 'slide-item-handle';
+                handle.textContent = '☰';
+
+                const text = document.createElement('span');
+                text.className = 'slide-item-text';
+                // Get preview text safely
+                const previewText = slide.textContent ? slide.textContent.substring(0, 40).trim() : 'Empty slide';
+                text.textContent = `Slide ${index + 1}: ${previewText}...`;
+                text.title = 'Click to jump to this slide';
+
+                // Add click handler for navigation
+                text.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    jumpToSlide(index);
+                });
+
+                const deleteBtn = document.createElement('span');
+                deleteBtn.className = 'slide-item-delete';
+                deleteBtn.textContent = '🗑️';
+                deleteBtn.title = 'Delete this slide';
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteSlide(index);
+                });
+
+                listItem.appendChild(handle);
+                listItem.appendChild(text);
+                listItem.appendChild(deleteBtn);
+                slideList.appendChild(listItem);
+            });
+
+            // Only set up drag and drop once using event delegation
+            if (!dragAndDropSetup) {
+                setupDragAndDrop();
+                dragAndDropSetup = true;
+            }
+        }
+
+        /**
+         * Jumps to a specific slide in the preview
+         */
+        function jumpToSlide(index) {
+            console.log('jumpToSlide called with index:', index, 'Total slides:', slides.length);
+
+            if (index < 0 || index >= slides.length) {
+                console.error('Invalid slide index:', index, 'Valid range: 0 to', slides.length - 1);
+                return;
+            }
+
+            // Update active state in list
+            const listItems = slideList.querySelectorAll('.slide-item');
+            listItems.forEach((item, i) => {
+                if (i === index) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+
+            // Try to navigate to slide in preview iframe with retry mechanism
+            function attemptNavigation(retryCount = 0) {
+                const maxRetries = 10;
+                const retryDelay = 150;
+
+                try {
+                    const iframeWindow = previewIframe.contentWindow;
+                    const iframeDoc = previewIframe.contentDocument || (iframeWindow ? iframeWindow.document : null);
+
+                    if (!iframeWindow || !iframeDoc) {
+                        if (retryCount < maxRetries) {
+                            setTimeout(() => attemptNavigation(retryCount + 1), retryDelay);
+                        }
+                        return;
+                    }
+
+                    console.log('Attempting to navigate to slide', index + 1, 'in iframe (attempt', retryCount + 1, ')');
+
+                    // Method 1: Try to call goToSlide function if it exists in iframe
+                    if (iframeWindow && typeof iframeWindow.goToSlide === 'function') {
+                        console.log('Found goToSlide function in iframe, calling with index:', index);
+                        try {
+                            iframeWindow.goToSlide(index);
+                            console.log('Successfully called goToSlide in iframe');
+                            return;
+                        } catch (e) {
+                            console.error('Error calling goToSlide in iframe:', e);
+                        }
+                    } else {
+                        // goToSlide might not be ready yet, retry
+                        if (retryCount < maxRetries) {
+                            setTimeout(() => attemptNavigation(retryCount + 1), retryDelay);
+                            return;
+                        }
+                        console.log('goToSlide function not found in iframe after retries');
+                    }
+
+                    // Method 2: Try to use postMessage to communicate with iframe
+                    console.log('Trying postMessage to communicate with iframe');
+                    try {
+                        iframeWindow.postMessage({
+                            type: 'goToSlide',
+                            index: index
+                        }, '*');
+                        console.log('PostMessage sent successfully');
+                        // Give postMessage a moment, then fallback to direct DOM manipulation
+                        setTimeout(() => {
+                            const splitClass = splitClassInput.value.trim();
+                            const slideElements = findSlideElements(iframeDoc, splitClass);
+                            if (slideElements[index] && !slideElements[index].classList.contains('active')) {
+                                console.log('PostMessage may not have worked, using direct DOM manipulation');
+                                slideElements.forEach((slide, i) => {
+                                    slide.classList.toggle('active', i === index);
+                                });
+                            }
+                        }, 100);
+                    } catch (e) {
+                        console.error('Error sending postMessage:', e);
+                    }
+
+                    // Method 3: Direct DOM manipulation - remove active from all, add to target
+                    const splitClass = splitClassInput.value.trim();
+                    const slideElements = findSlideElements(iframeDoc, splitClass);
+                    console.log('Found', slideElements.length, 'slide elements with class containing', splitClass);
+                    console.log('Target index:', index, 'Sidebar slides count:', slides.length);
+                    if (slideElements.length > 0) {
+                        console.log('First slide text:', slideElements[0].textContent.substring(0, 30));
+                        if (slideElements[index]) {
+                            console.log('Target slide text:', slideElements[index].textContent.substring(0, 30));
+                        }
+                    }
+
+                    if (slideElements[index]) {
+                        console.log('Using direct DOM manipulation for slide', index);
+                        // Remove active class from all slides
+                        slideElements.forEach(slide => {
+                            slide.classList.remove('active');
+                        });
+                        // Add active class to target slide
+                        slideElements[index].classList.add('active');
+                        // Also try scrollIntoView for visibility (if needed)
+                        slideElements[index].scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        // Highlight the slide briefly
+                        slideElements[index].style.transition = 'box-shadow 0.3s ease';
+                        slideElements[index].style.boxShadow = '0 0 20px rgba(0, 123, 255, 0.5)';
+                        setTimeout(() => {
+                            slideElements[index].style.boxShadow = '';
+                        }, 2000);
+                    } else {
+                        console.warn('Slide element not found at index', index, 'out of', slideElements.length, 'total slides');
+                    }
+                } catch (e) {
+                    console.error('Error in navigation attempt:', e);
+                    if (retryCount < maxRetries) {
+                        setTimeout(() => attemptNavigation(retryCount + 1), retryDelay);
+                    }
+                }
+            }
+
+            // Start navigation attempt
+            attemptNavigation();
+        }
+
+        /**
+         * Deletes a slide from the list
+         */
+        function deleteSlide(index) {
+            if (index < 0 || index >= slides.length) {
+                console.error('Invalid slide index:', index);
+                return;
+            }
+
+            const confirmDelete = confirm(`確定要刪除 Slide ${index + 1} 嗎？\n\n此操作不會影響原始檔案，只會影響預覽和儲存的版本。`);
+            if (!confirmDelete) {
+                return;
+            }
+
+            // Remove slide from array
+            slides.splice(index, 1);
+
+            // Re-populate list and update preview
+            populateSlideList();
+            updatePreview();
+
+            console.log(`Deleted slide at index ${index}, ${slides.length} slides remaining`);
+        }
+
+        /**
+         * Creates the final HTML string based on the new slide order.
+         * This is a more robust implementation for preview and save.
+         * @param {boolean} forPreview - If true, removes hidden classes for preview. If false, keeps original state for saving.
+         */
+        function buildFinalHtmlString(forPreview = true) {
+            if (!sourceDoc || slides.length === 0) {
+                console.error('Cannot build HTML: missing sourceDoc or slides');
+                return '';
+            }
+
+            try {
+                // Create a deep clone of the original document to avoid modifying it
+                const finalDoc = sourceDoc.cloneNode(true);
+                const splitClass = splitClassInput.value.trim();
+
+                // Find the slide elements within the cloned document
+                const slidesInClone = findSlideElements(finalDoc, splitClass);
+
+                if (slidesInClone.length === 0) {
+                    console.error("Could not find slides in the cloned document.");
+                    return "<html><body>Error: No slides found with class containing '" + splitClass + "'.</body></html>";
+                }
+
+                // Get the parent of the first slide from the original document
+                const firstOriginalSlide = slides[0];
+                if (!firstOriginalSlide || !firstOriginalSlide.parentNode) {
+                    console.error("Cannot determine parent container for slides");
+                    return "<html><body>Error: Cannot determine slide container.</body></html>";
+                }
+
+                const originalParent = firstOriginalSlide.parentNode;
+
+                // Find the corresponding parent in the cloned document
+                // We need to find it before removing slides, as the reference might be lost
+                let parentInClone = null;
+
+                // Strategy 1: Try to find parent by matching structure (e.g., id="deck")
+                if (originalParent.id) {
+                    parentInClone = finalDoc.getElementById(originalParent.id);
+                }
+
+                // Strategy 2: Try to find by tag name and position
+                if (!parentInClone && originalParent.tagName) {
+                    const candidates = finalDoc.querySelectorAll(originalParent.tagName);
+                    // Try to find a parent that contains slides
+                    for (let candidate of candidates) {
+                        const hasSlides = candidate.querySelector(`[class*="${splitClass}"]`);
+                        if (hasSlides) {
+                            parentInClone = candidate;
+                            break;
+                        }
+                    }
+                }
+
+                // Strategy 3: Use the parent of the first slide in clone (before removal)
+                if (!parentInClone && slidesInClone.length > 0) {
+                    parentInClone = slidesInClone[0].parentNode;
+                }
+
+                if (!parentInClone) {
+                    console.error("Cannot find parent in cloned document");
+                    return "<html><body>Error: Cannot find parent container in document.</body></html>";
+                }
+
+                // Remove all original slides from the cloned document
+                slidesInClone.forEach(slide => {
+                    if (slide.parentNode) {
+                        slide.parentNode.removeChild(slide);
+                    }
+                });
+
+                // Insert reordered slides back in the new order
+                slides.forEach(originalSlide => {
+                    // Clone the slide and insert it
+                    const clonedSlide = originalSlide.cloneNode(true);
+
+                    // Only remove 'hidden' class for preview, not for saving
+                    // This ensures hidden slides are visible in preview but preserved in saved file
+                    if (forPreview) {
+                        // Remove 'hidden' class from cloned slide for preview
+                        if (clonedSlide.classList && clonedSlide.classList.contains('hidden')) {
+                            clonedSlide.classList.remove('hidden');
+                        }
+                        // Also check for style.display = 'none'
+                        if (clonedSlide.style && clonedSlide.style.display === 'none') {
+                            clonedSlide.style.display = '';
+                        }
+                        // Check for any element with hidden class inside the slide
+                        const hiddenElements = clonedSlide.querySelectorAll('.hidden');
+                        hiddenElements.forEach(el => {
+                            el.classList.remove('hidden');
+                            if (el.style && el.style.display === 'none') {
+                                el.style.display = '';
+                            }
+                        });
+                    }
+
+                    parentInClone.appendChild(clonedSlide);
+                });
+
+                // Inject navigation control script for preview mode only (before serialization)
+                if (forPreview) {
+                    const splitClass = splitClassInput.value.trim();
+                    // Escape the class name for use in CSS selector (escape special CSS characters)
+                    const escapedClass = splitClass.replace(/[!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, '\\$&');
+                    // Use DOM manipulation to inject script safely
+                    const scriptElement = finalDoc.createElement('script');
+                    const selectorStr = '.' + escapedClass + ':not(.hidden)';
+                    const selectorJson = JSON.stringify(selectorStr);
+                    // After reordering, DOM order matches slides array order
+                    // Use the same filtering logic as findSlideElements to ensure consistency
+                    const splitClassJson = JSON.stringify(splitClass);
+                    scriptElement.textContent = [
+                        '(function(){',
+                        'const allMatches=document.querySelectorAll(' + selectorJson + ');',
+                        'const s=Array.from(allMatches).filter(function(node){',
+                        'const classList=node.className.split(/\\s+/);',
+                        'return classList.some(function(cls){',
+                        'return cls===' + splitClassJson + '||cls.startsWith(' + splitClassJson + '+"-")||cls.endsWith("-"+' + splitClassJson + ');',
+                        '});',
+                        '});',
+                        'console.log("Slides found in preview:",s.length);',
+                        's.forEach(function(slide,idx){',
+                        'console.log("Preview slide",idx+1,":",slide.textContent.substring(0,30));',
+                        '});',
+                        'window.goToSlide=function(i){',
+                        'console.log("goToSlide called with index:",i,"total slides:",s.length);',
+                        'if(i>=0&&i<s.length){',
+                        'console.log("Activating slide:",i+1,"text:",s[i].textContent.substring(0,30));',
+                        's.forEach(function(e,j){e.classList.toggle("active",j===i)});',
+                        '}',
+                        '};',
+                        'window.addEventListener("message",function(e){',
+                        'if(e.data&&e.data.type==="goToSlide"&&typeof e.data.index==="number"){',
+                        'window.goToSlide(e.data.index);',
+                        '}',
+                        '});',
+                        '})();'
+                    ].join('');
+                    // Append script to body
+                    if (finalDoc.body) {
+                        finalDoc.body.appendChild(scriptElement);
+                    } else {
+                        // If no body, create one
+                        const body = finalDoc.createElement('body');
+                        body.appendChild(scriptElement);
+                        if (finalDoc.documentElement) {
+                            finalDoc.documentElement.appendChild(body);
+                        }
+                    }
+                }
+
+                // Use outerHTML to get the complete HTML string
+                // This preserves script tags and other content without encoding issues
+                let htmlString = '';
+
+                try {
+                    // Get DOCTYPE declaration
+                    const doctype = finalDoc.doctype;
+                    if (doctype) {
+                        htmlString = '<!DOCTYPE ' + doctype.name;
+                        if (doctype.publicId) {
+                            htmlString += ' PUBLIC "' + doctype.publicId + '"';
+                        }
+                        if (doctype.systemId) {
+                            htmlString += ' "' + doctype.systemId + '"';
+                        }
+                        htmlString += '>\n';
+                    }
+
+                    // Use outerHTML which preserves script tags correctly
+                    htmlString += finalDoc.documentElement.outerHTML;
+
+                } catch (e) {
+                    console.error('Error serializing HTML:', e);
+                    // Last resort: try to reconstruct from innerHTML
+                    const htmlElement = finalDoc.documentElement;
+                    if (htmlElement) {
+                        htmlString = '<!DOCTYPE html>\n<html';
+                        if (htmlElement.lang) {
+                            htmlString += ' lang="' + htmlElement.lang + '"';
+                        }
+                        htmlString += '>\n';
+                        if (finalDoc.head) {
+                            htmlString += '<head>' + finalDoc.head.innerHTML + '</head>\n';
+                        }
+                        if (finalDoc.body) {
+                            htmlString += '<body>' + finalDoc.body.innerHTML + '</body>\n';
+                        }
+                        htmlString += '</html>';
+                    } else {
+                        throw new Error('Cannot serialize document');
+                    }
+                }
+
+                console.log(`Generated HTML with ${slides.length} slides, length: ${htmlString.length}`);
+                return htmlString;
+            } catch (error) {
+                console.error('Error building final HTML:', error);
+                return `<html><body>Error generating preview: ${error.message}</body></html>`;
+            }
+        }
+
+        /**
+         * Updates the iframe preview based on the current slide order
+         */
+        function updatePreview() {
+            try {
+                const finalHtml = buildFinalHtmlString();
+                if (!finalHtml) {
+                    console.error('buildFinalHtmlString returned empty string');
+                    previewIframe.srcdoc = '<html><body style="padding: 20px; color: red;">Error: Could not generate preview HTML.</body></html>';
+                    return;
+                }
+
+                console.log('Updating preview, HTML length:', finalHtml.length);
+                previewIframe.srcdoc = finalHtml;
+
+                // Wait for iframe to load and check for errors
+                previewIframe.onload = () => {
+                    try {
+                        const iframeWindow = previewIframe.contentWindow;
+                        const iframeDoc = previewIframe.contentDocument || iframeWindow.document;
+                        const slidesInPreview = findSlideElements(iframeDoc, splitClassInput.value.trim());
+                        console.log(`Preview loaded: ${slidesInPreview.length} slides found in preview`);
+
+                        // Check if goToSlide function is available
+                        if (iframeWindow && typeof iframeWindow.goToSlide === 'function') {
+                            console.log('✓ goToSlide function is available in iframe');
+                        } else {
+                            console.log('⚠ goToSlide function not found in iframe, will use postMessage or scrollIntoView');
+                        }
+
+                        if (slidesInPreview.length === 0) {
+                            console.warn('No slides found in preview!');
+                        }
+                    } catch (e) {
+                        console.error('Error checking preview content:', e);
+                    }
+                };
+            } catch (error) {
+                console.error('Error updating preview:', error);
+                previewIframe.srcdoc = `<html><body style="padding: 20px; color: red;">Error updating preview: ${error.message}</body></html>`;
+            }
+        }
+
+        /**
+         * Handles the drag-and-drop functionality for reordering slides
+         * Uses event delegation to avoid re-binding events
+         */
+        function setupDragAndDrop() {
+            let draggedItem = null;
+
+            // Use event delegation for dragstart and dragend
+            slideList.addEventListener('dragstart', (e) => {
+                if (e.target.classList.contains('slide-item')) {
+                    draggedItem = e.target;
+                    setTimeout(() => {
+                        if (e.target) e.target.classList.add('dragging');
+                    }, 0);
+                }
+            });
+
+            slideList.addEventListener('dragend', (e) => {
+                if (e.target && e.target.classList.contains('slide-item')) {
+                    e.target.classList.remove('dragging');
+                }
+                draggedItem = null;
+            });
+
+            slideList.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                if (!draggedItem) return;
+
+                const afterElement = getDragAfterElement(slideList, e.clientY);
+                if (afterElement == null) {
+                    slideList.appendChild(draggedItem);
+                } else {
+                    slideList.insertBefore(draggedItem, afterElement);
+                }
+            });
+
+            slideList.addEventListener('drop', (e) => {
+                e.preventDefault();
+                if (!draggedItem) return;
+
+                const oldIndex = parseInt(draggedItem.dataset.index, 10);
+                const newIndex = Array.from(slideList.children).indexOf(draggedItem);
+
+                // Validate indices
+                if (oldIndex < 0 || oldIndex >= slides.length || newIndex < 0 || newIndex > slides.length) {
+                    console.error('Invalid drag indices:', { oldIndex, newIndex, slidesLength: slides.length });
+                    populateSlideList(); // Reset the list
+                    return;
+                }
+
+                // Move item in the slides array
+                const [movedSlide] = slides.splice(oldIndex, 1);
+                slides.splice(newIndex, 0, movedSlide);
+
+                // Re-populate list to fix indices and then update the preview
+                populateSlideList();
+                updatePreview();
+            });
+
+            function getDragAfterElement(container, y) {
+                const draggableElements = [...container.querySelectorAll('.slide-item:not(.dragging)')];
+
+                return draggableElements.reduce((closest, child) => {
+                    const box = child.getBoundingClientRect();
+                    const offset = y - box.top - box.height / 2;
+                    if (offset < 0 && offset > closest.offset) {
+                        return { offset: offset, element: child };
+                    } else {
+                        return closest;
+                    }
+                }, { offset: Number.NEGATIVE_INFINITY }).element;
+            }
+        }
+
+        /**
+         * Generates the new HTML and triggers a download
+         * Note: This preserves the original state (including hidden classes) of slides
+         */
+        function handleSave() {
+            // Use forPreview=false to preserve hidden classes in saved file
+            const finalHtml = buildFinalHtmlString(false);
+            if (!finalHtml) {
+                alert("Nothing to save. Please process a file first.");
+                return;
+            }
+
+            // Create filename
+            const now = new Date();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const timestamp = `${minutes}-${seconds}`;
+            const newFilename = `${originalFilename.replace(/\.html$/, '')}_${timestamp}.html`;
+
+            // Create a blob and trigger download
+            const blob = new Blob([finalHtml], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = newFilename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+    </script>
+
+</body>
+</html>

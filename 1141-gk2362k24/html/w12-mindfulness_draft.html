@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>數位時代的深呼吸：科學、正念與 AI 協作</title>
+    <script src="../../sidebar_tools/sidebar.js"></script>
+    <style>
+        /* ============================================
+           CSS 變數定義（來自 style_1116.md）
+           ============================================ */
+        :root {
+            --bg-color: #F5F4F0;        /* Warm, off-white, like aged paper */
+            --text-color: #3D3A37;      /* Dark, soft brown/gray */
+            --accent-color: #9A948C;    /* Muted stone gray */
+            --header-bg: #EAEBE6;       /* Very light, muted moss */
+            --line-color: #d1d1c2;      /* For borders and lines */
+            --highlight-color: #8c867b; /* For highlights */
+            --font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+        }
+
+        /* 投影片容器 */
+        .slides-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: var(--bg-color);
+        }
+
+        /* 投影片基礎樣式 */
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5vw;
+            box-sizing: border-box;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+            transform: scale(0.98);
+            text-align: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+            font-family: var(--font-family);
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            z-index: 1;
+        }
+
+        .slide.hidden {
+            display: none !important;
+        }
+
+        .slide.scrollable {
+            justify-content: flex-start;
+        }
+
+        /* 標題層級 */
+        h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 400;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 400;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--header-bg);
+        }
+
+        h3 {
+            font-size: clamp(1.8rem, 4.5vw, 3rem);
+            font-weight: 300;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--header-bg);
+        }
+
+        h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+        }
+
+        h5 {
+            font-size: clamp(1.2rem, 2vw, 1.4rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.6rem;
+        }
+
+        p {
+            font-size: clamp(1.2rem, 2.5vw, 1.75rem);
+            color: var(--text-color);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .slide-subtitle {
+            color: var(--accent-color);
+            font-size: clamp(1.2rem, 3vw, 1.75rem);
+            font-weight: 400;
+            margin-top: -1rem;
+        }
+
+        /* 導航系統 */
+        .nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 98%;
+            left: 1%;
+            display: flex;
+            justify-content: space-between;
+            z-index: 1002;
+            pointer-events: none;
+        }
+
+        .nav-btn {
+            pointer-events: all;
+            background: none;
+            border: 1px solid var(--line-color);
+            color: var(--accent-color);
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.4;
+            font-family: var(--font-family);
+        }
+
+        .nav-btn:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            opacity: 1;
+        }
+
+        /* 內容佈局系統 */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            align-items: start;
+        }
+
+        .content-section {
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            font-family: var(--font-family);
+        }
+
+        .content-section h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .content-section p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .content-section.text-left {
+            text-align: left;
+        }
+
+        /* 兩欄佈局 */
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            align-items: start;
+        }
+
+        .two-columns > div {
+            width: 100%;
+        }
+
+        .two-columns h4 {
+            font-size: clamp(1.344rem, 2.52vw, 1.68rem);
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .two-columns p {
+            font-size: clamp(1.2096rem, 2.268vw, 1.512rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        /* 字多版本容器 */
+        .bunch-word-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            padding: 1.5vh 2vw;
+            overflow-y: auto;
+            overflow-x: hidden;
+            text-align: left;
+            height: 100%;
+            box-sizing: border-box;
+            font-family: var(--font-family);
+            direction: ltr;
+        }
+
+        .bunch-word-container.full-page-scroll {
+            height: auto;
+            min-height: 100%;
+            overflow: visible;
+            padding-bottom: 5vh;
+        }
+
+        .bunch-word-container > div {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .bunch-word-container h2 {
+            font-size: clamp(1.8rem, 3.5vw, 2.2rem);
+            margin-bottom: 1.5vh;
+            text-align: center;
+            width: 100%;
+            color: var(--highlight-color);
+            font-weight: 400;
+        }
+
+        /* 列表系統 */
+        ul {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            max-width: 800px;
+            margin: 1rem 0;
+            font-family: var(--font-family);
+        }
+
+        ul li {
+            margin-bottom: 15px;
+            position: relative;
+            padding-left: 1.5em;
+            font-size: clamp(1rem, 2.5vw, 1.75rem);
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+
+        ul li::before {
+            content: '- ';
+            color: var(--accent-color);
+            font-weight: bold;
+            display: inline-block;
+            position: absolute;
+            left: 0;
+        }
+
+        ol {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            max-width: 800px;
+            margin: 1rem 0;
+            font-family: var(--font-family);
+            counter-reset: list-item 0;
+        }
+
+        ol li {
+            margin-bottom: 15px;
+            position: relative;
+            padding-left: 2em;
+            font-size: clamp(1rem, 2.5vw, 1.75rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            counter-increment: list-item;
+        }
+
+        ol li::before {
+            content: counter(list-item) '. ';
+            color: var(--accent-color);
+            font-weight: bold;
+            display: inline-block;
+            position: absolute;
+            left: 0;
+        }
+
+        /* 步驟卡片系統 */
+        .step-card {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            font-family: var(--font-family);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .step-card h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .step-card p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .step-card.text-left {
+            text-align: left;
+        }
+
+        .step-card.text-center {
+            text-align: center;
+        }
+
+        /* 提示詞區塊 */
+        .prompt-block {
+            background: rgba(255, 255, 255, 0.5);
+            border-left: 4px solid var(--accent-color);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+            text-align: left;
+            max-width: 900px;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(0.9rem, 1.8vw, 1.2rem);
+            line-height: 1.8;
+            color: var(--text-color);
+        }
+
+        .prompt-block strong {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        /* 程式碼區塊 */
+        .code-block {
+            background: rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--line-color);
+            border-radius: 4px;
+            padding: 1rem;
+            margin: 1rem 0;
+            text-align: left;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+            color: var(--text-color);
+            max-width: 800px;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 767px) {
+            .nav {
+                width: 95%;
+                left: 2.5%;
+            }
+
+            .nav-btn {
+                width: 44px;
+                height: 44px;
+                font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+                opacity: 0.6;
+            }
+
+            .two-columns, .bunch-word-container, .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .two-columns > div, .content-section {
+                width: 100%;
+            }
+
+            .bunch-word-container {
+                padding: 2vh 3vw;
+            }
+
+            .bunch-word-container h2 {
+                font-size: clamp(1.3rem, 3vw, 1.6rem);
+                margin-bottom: 2vh;
+                margin-top: 1vh;
+            }
+
+            .step-card {
+                padding: 1.5rem;
+            }
+
+            .prompt-block {
+                padding: 1rem;
+                font-size: clamp(0.85rem, 1.5vw, 1rem);
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .two-columns, .content-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 3vw;
+            }
+        }
+
+        /* 特殊樣式 */
+        .highlight-box {
+            background: rgba(154, 148, 140, 0.1);
+            border: 2px solid var(--accent-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            max-width: 800px;
+        }
+
+        .emoji-large {
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin: 0 0.5rem;
+        }
+
+        .checklist {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            max-width: 700px;
+            margin: 1rem auto;
+        }
+
+        .checklist li {
+            margin-bottom: 1rem;
+            padding-left: 2.5em;
+            position: relative;
+            font-size: clamp(1rem, 2.5vw, 1.75rem);
+        }
+
+        .checklist li::before {
+            content: '☐';
+            position: absolute;
+            left: 0;
+            font-size: 1.5em;
+            color: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="slides-container">
+        <!-- Slide 1: 課程封面 -->
+        <section class="slide active">
+            <h1>數位時代的深呼吸</h1>
+            <p class="slide-subtitle">從腦科學原理到打造你的專屬放鬆 App</p>
+            <p style="margin-top: 3rem; font-size: clamp(0.9rem, 1.5vw, 1.1rem); color: var(--accent-color);">
+                #Mindfulness #AI #WebDev
+            </p>
+        </section>
+
+        <!-- 介紹 正念 -->
+        <section class="slide">
+            「正念」一詞在現代英語中對應的是「Mindfulness」，然而其概念根源可追溯至古印度巴利文（Pali）中的「Sati」以及梵文（Sanskrit）中的「Smṛti」
+            Sati的原意包含「記憶」、「回想」與「銘記」。在早期佛教經典中，這並非指對過去事件的追憶，而是指「記住當下」，即保持對當前身心現象的持續性覺知，不忘失觀察的對象 。這種記憶是動態的，強調在每一個剎那中保持覺知的連續性。
+        </section>
+
+        <section class="slide">
+            1881年，英國駐斯里蘭卡（當時稱為錫蘭，Galle）的裁判官Thomas William Rhys Davids在翻譯佛教經典時，首次將「Sati」對譯為英文的「Mindfulness」1。這一翻譯選擇極具歷史意義，它將一個原本具有特定宗教意涵的概念，轉化為一個描述心理狀態的世俗詞彙，為後來的心理學研究奠定了語言基礎。在此之前或其他的翻譯語境中，Sati有時也被譯為「專注」（Attention）或「自我沈著」（Self-possession），但Mindfulness一詞最終成為了標準。
+            ref: https://psychcentral.com/lib/a-brief-history-of-mindfulness-in-the-usa-and-its-impact-on-our-lives
+        </section>
+
+        <!-- 正念並非佛教獨有 -->
+         <section class="slide">
+            吠陀與印度教背景：佛教興起於前佛教時期的印度文化，深受吠陀（Vedic）哲學的影響 。悉達多·喬達摩（Siddhartha Gautama，即佛陀）出生於印度教家庭，雖然佛教後來在教義上拒絕了吠陀的權威、種姓制度以及對祭祀儀式的依賴，但其早期的哲學探討與當時的奧義書（Upanishads）思想有著深刻的對話關係 。例如，對於意識本質的探索，兩者都強調透過內觀（Insight）來超越表層的感官經驗。
+
+            ref: https://pmc.ncbi.nlm.nih.gov/articles/PMC10063990/
+
+            安那般那念（Ānāpānasati）：在佛教傳統中，正念呼吸的具體修習被稱為「安那般那念」，意即「對入息與出息的覺知」。這不僅是放鬆技巧，更是通往「解脫」的核心路徑。透過觀察呼吸的長短、粗細及伴隨的身體感受，修習者培養出對身心無常（Impermanence）本質的洞察。
+
+            禪宗（Zen）與數息觀：隨著佛教向東傳播，正念呼吸在中國發展為「禪」（Chan），並在日本演變為「Zen」1。日本禪宗特別發展出了「數息觀」（Susokukan）這一獨特的修習法門，強調透過計數呼吸來統一意志與氣息，這與早期佛教的內觀技巧既有傳承又有創新。
+
+            ref: https://plato.stanford.edu/entries/japanese-zen/#TheAdjMin
+
+         </section>
+
+
+         <!-- 以認知神經科學的角度來看正念 -->
+         <section class="slide">
+            正念在西方的現代化轉折點發生在20世紀70年代。
+
+            喬·卡巴金與MBSR：分子生物學博士喬·卡巴金（Jon Kabat-Zinn）是這一運動的關鍵人物。他在麻省理工學院（MIT）求學期間接觸了佛教哲學與禪修 。1979年，他在麻省大學醫學院創立了「減壓門診」（Stress Reduction Clinic），並開發了「正念減壓課程」（Mindfulness-Based Stress Reduction, MBSR）。
+
+            操作性定義的確立：為了讓正念進入主流醫療體系，卡巴金剝離了其中的宗教術語，將正念定義為「一種特定方式的專注：有意識地（on purpose）、在當下（in the present moment）、不加評判地（non-judgmentally）覺察」1。這一定義成為了後續數十年科學研究的黃金標準（Gold Standard）。
+
+            ref: https://www.tandfonline.com/doi/full/10.1080/14639947.2011.564844
+         </section>
+
+        <!-- 自主神經系統的生理調節機制 -->
+        <section class="slide">
+            正念呼吸之所以能對身心健康產生立竿見影的影響，其核心生理機制在於對自主神經系統（Autonomic Nervous System, ANS）的精微調節。呼吸是唯一既受自主神經控制（如睡眠時）又受意識控制（如刻意深呼吸時）的生理功能，因此它被視為通往自主神經系統的「後門」。
+        </section>
+
+        <!-- Slide 4: 這是玄學嗎？不，這是醫學 -->
+        <section class="slide scrollable">
+            <h2>呼吸背後的生理機制 (Physiology)</h2>
+            <div class="two-columns" style="margin-top: 2rem;">
+                <div class="content-section">
+                    <h4>交感神經系統（Sympathetic Nervous System, SNS）</h4>
+                    <p style="font-size: clamp(2rem, 4vw, 3rem); margin: 1rem 0;"></p>
+                    <p><strong>油門</strong></p>
+                    <p>負責「戰鬥或逃跑」，吸氣時啟動。</p>
+                    <p>生理反應：負責「戰鬥或逃跑」（Fight or Flight）反應。當感知到威脅時，SNS激活，導致瞳孔放大、心率加速、支氣管擴張、消化抑制，並促使腎上腺釋放皮質醇（Cortisol）和腎上腺素（Adrenaline/Epinephrine）。</p>
+                </div>
+                <div class="content-section">
+                    <h4>副交感神經系統（Parasympathetic Nervous System, PNS）</h4>
+                    <p style="font-size: clamp(2rem, 4vw, 3rem); margin: 1rem 0;"></p>
+                    <p><strong>煞車</strong></p>
+                    <p>負責「放鬆與修復」，吐氣時啟動。</p>
+                    <p>生理反應：負責「休息與消化」（Rest and Digest）反應。當身體處於休息狀態時，PNS激活，導致瞳孔縮小、心率減慢、支氣管收縮、消化增強，並促使副交感神經釋放乙醯膽鹼（Acetylcholine）。</p>
+                    ref: https://www.utoledo.edu/studentaffairs/counseling/anxietytoolbox/breathingandrelaxation.html
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5: 為什麼要「長吐氣」？ -->
+        <section class="slide">
+            <h2>為什麼要「長吐氣」？</h2>
+            <h4>迷走神經的秘密</h4>
+            <div style="max-width: 800px; margin-top: 2rem;">
+                <p style="font-size: clamp(1.2rem, 2.2vw, 1.6rem); margin-bottom: 1.5rem;">
+                    緩慢吐氣 → 刺激迷走神經 → 大腦接收安全訊號 → 心跳變慢。
+                </p>
+                <div class="highlight-box" style="margin: 2rem auto;">
+                    <p style="font-size: clamp(1.4rem, 2.5vw, 1.9rem); text-align: center; margin: 0;">
+                        <strong style="color: var(--accent-color);">黃金公式</strong><br>
+                        吐氣時間 > 吸氣時間 = 啟動放鬆模式
+                    </p>
+                </div>
+            </div>
+        </section>
+        <!-- 迷走神經 -->
+        <section class="slide">
+            迷走神經（Vagus Nerve）是第十對腦神經，也是副交感神經系統的主要組成部分，其名稱源自拉丁文「Vagus」，意為「流浪」，因為其路徑漫長且分支眾多，從腦幹延伸至頸部、胸腔及腹部內臥。
+
+            解剖路徑與功能：迷走神經連接腦幹的孤束核（Nucleus of the Tractus Solitarius, NTS）與心臟、肺部及消化道 。它不僅傳遞運動指令，更負責傳遞80%的內感官信息（Interoceptive information）回大腦，告知大腦身體的狀態（如飽足、心跳、發炎）。
+
+            抗發炎反射：近年來的研究發現，迷走神經還負責調節體內的發炎反應，這被稱為「膽鹼能抗炎通路」（Cholinergic Anti-inflammatory Pathway）。高迷走神經張力與較低的細胞因子（Cytokine）水平相關，這解釋了為何正念呼吸能對慢性病有輔助療效 。
+        </section>
+
+        <!-- Slide 6: 誰在練正念？ -->
+        <section class="slide">
+            <h2>正念呼吸的社會實證</h2>
+            <h4 style="margin-top: 1rem; margin-bottom: 2rem;">這不是宗教，這是高績效工具</h4>
+            <ul>
+                <li><strong>Google</strong>：搜尋內在自我 (SIY) 課程，提升工程師專注力。</li>
+                <li><strong>NBA</strong>：LeBron James，關鍵時刻的冷靜訓練。</li>
+                <li><strong>美軍海豹部隊</strong>：箱式呼吸 (Box Breathing)，戰場上的壓力管理。</li>
+            </ul>
+        </section>
+
+        <!-- slide 介紹正念呼吸 -->
+        <section class="slide">
+            <h2>正念呼吸的定義</h2>
+            <div style="max-width: 800px; margin-top: 2rem;">
+                <p>正念呼吸是一種呼吸練習，旨在幫助人們放鬆身心，提高注意力，減少壓力。</p>
+            </div>
+        </section>
+
+        <!-- Slide 3: 微體驗 -->
+        <section class="slide">
+            <h2>5 分鐘的系統重啟</h2>
+            <div class="step-card" style="margin-top: 2rem;">
+                <h4>微體驗指引</h4>
+                <ol style="text-align: left; max-width: 500px; margin: 1.5rem auto;">
+                    <li>手機靜音，螢幕朝下。</li>
+                    <li>閉上眼睛。</li>
+                    <li>什麼都不要做，只觀察呼吸。</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- Slide 2: 你的 CPU 過熱了嗎？ -->
+        <section class="slide">
+            <h2>你剛剛產生了多少念頭？</h2>
+            <div style="max-width: 800px; margin-top: 2rem;">
+                <ul style="text-align: left; max-width: 600px; margin: 0 auto;">
+                    <li>午餐吃什麼？</li>
+                    <li>剛剛的 IG 限動？</li>
+                    <li>下一堂課的作業？</li>
+                </ul>
+                <p style="font-size: clamp(1.3rem, 2.5vw, 1.8rem); margin-bottom: 2rem;">
+                    現代人一天接收的資訊量是 100 年前的 <strong style="color: var(--accent-color);">5 倍</strong>。
+                </p>
+            </div>
+        </section>
+
+        <!-- Slide 7: 互動活動 - 身體 Bug 回報 -->
+        <section class="slide">
+            <h2>剛剛發生了什麼雜念？</h2>
+            <h4 style="margin-top: 2rem; margin-bottom: 1.5rem;">即使知道有好處，為什麼我們做不到？</h4>
+            <ul class="checklist" style="max-width: 700px;">
+                <li>系統休眠 (想睡覺)</li>
+                <li>硬體僵硬 (背痛/腳麻)</li>
+                <li>處理器過熱 (煩躁/無聊)</li>
+                <li>系統當機 (不知道在幹嘛)</li>
+            </ul>
+        </section>
+
+        <!-- 自我覺察與後設認知 -->
+        <section class="slide">
+            正念呼吸不僅僅是一種生理放鬆術，它更是一種精密的認知訓練，旨在培養「後設認知」（Metacognition）——即「關於思考的思考」的能力。
+            認知解離（Cognitive Defusion）：正念練習培養了一種「觀察者」（Observer）的視角。透過專注於呼吸，練習者學習，讓大腦建立起「我」與「我的念頭」之間的距離。
+        </section>
+
+        <!-- 心中有雜念非常正常 -->
+        <section class="slide">
+            心中有雜念非常正常。正念呼吸不是要消除雜念，而是要學會與雜念共存。
+            迷思：誤以為正念就是「停止思考」。然而，神經科學表明，正念的訓練效果正是在「心智游移」與「拉回注意力」的循環中產生的 。
+            這一循環包括四個神經認知階段：
+
+            專注維持（Sustained Attention）：專注於呼吸（背外側前額葉皮質dlPFC活躍）。
+
+            分心（Distraction）：心智游移，開始做白日夢（預設模式網絡DMN激活）。
+
+            後設覺知（Meta-awareness）：意識到自己分心了（突顯網絡Salience Network激活，這是正念的「魔術時刻」）。
+
+            轉移與重置（Reorienting）：將注意力溫柔地帶回呼吸（定向注意力網絡活躍）。
+        </section>
+
+        <!-- 4-7-8 呼吸法 -->
+        <section class="slide">
+            4-7-8 呼吸法
+            4 秒吸氣
+            7 秒憋氣
+            8 秒吐氣
+            重複 4 次
+            ref: https://www.medicalnewstoday.com/articles/324417
+        </section>
+
+        <!-- 478 呼吸法的好處 -->
+        <section class="slide">
+            有效解緩焦慮、失眠問題
+            緊張、焦慮時
+            提升專注力
+            最佳練習時間：睡前
+        </section>
+
+        <!-- Slide 8: 用 AI 幫你做一個你自己的呼吸網站工具-->
+        <section class="slide">
+            <h2>用 AI 幫你做一個你自己的呼吸網站工具</h2>
+            <div style="max-width: 800px; margin-top: 2rem;">
+                <div class="content-section">
+                    <h4>任務</h4>
+                    <p>你不用學寫程式，讓 Gemini 幫你寫。</p>
+                </div>
+                <div class="content-section" style="margin-top: 2rem;">
+                    <h4>目標</h4>
+                    <p>打造一個符合醫學原理 (長吐氣) 的視覺引導網頁。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 9: 工具準備 -->
+        <section class="slide">
+            <h2>工具準備 (Setup)</h2>
+            <h4 style="margin-top: 2rem; margin-bottom: 2rem;">請用手機瀏覽器開啟兩個分頁 (不要關閉)</h4>
+            <div style="max-width: 800px; margin: 0 auto;">
+                <div class="content-section" style="margin-bottom: 1.5rem;">
+                    <h4>1. AI 工程師</h4>
+                    <p style="font-size: clamp(1.1rem, 2vw, 1.4rem);">Gemini (gemini.google.com)</p>
+                </div>
+                <div class="content-section">
+                    <h4>2. 程式碼執行器</h4>
+                    <p style="font-size: clamp(1.1rem, 2vw, 1.4rem);">W3Schools Tryit https://www.w3schools.com/html/tryit.asp?filename=tryhtml_basic</p>
+                    <p style="font-size: clamp(1.1rem, 2vw, 1.4rem);">https://codeshack.io/html-viewer/</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 10: 網頁解剖學 I -->
+        <section class="slide">
+            <h2>網頁解剖學 I - 三大支柱</h2>
+            <div class="content-grid" style="margin-top: 2rem;">
+                <div class="content-section">
+                    <h4>HTML (結構)</h4>
+                    <p><strong>功能</strong>：定義有什麼 (What?)</p>
+                    <p style="margin-top: 1rem; font-size: clamp(1.3rem, 2.5vw, 1.8rem);">譬喻：<strong>骨架 (Skeleton)</strong></p>
+                </div>
+                <div class="content-section">
+                    <h4>CSS (樣式)</h4>
+                    <p><strong>功能</strong>：定義長什麼樣 (Looks?)</p>
+                    <p style="margin-top: 1rem; font-size: clamp(1.3rem, 2.5vw, 1.8rem);">譬喻：<strong>皮膚與衣服 (Skin)</strong></p>
+                </div>
+                <div class="content-section">
+                    <h4>JavaScript (行為)</h4>
+                    <p><strong>功能</strong>：定義怎麼動 (Action?)</p>
+                    <p style="margin-top: 1rem; font-size: clamp(1.3rem, 2.5vw, 1.8rem);">譬喻：<strong>肌肉與大腦 (Brain)</strong></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 11: 網頁解剖學 II -->
+        <section class="slide">
+            <h2>網頁解剖學 II - 案例對照</h2>
+            <h4 style="margin-top: 2rem; margin-bottom: 1.5rem;">以我們的呼吸 App 為例</h4>
+            <div style="max-width: 900px; margin: 0 auto; text-align: left;">
+                <div class="content-section" style="margin-bottom: 1rem;">
+                    <p><strong>HTML</strong> = 畫面上那個「氣泡」的存在 <code>&lt;div&gt;</code>。</p>
+                </div>
+                <div class="content-section" style="margin-bottom: 1rem;">
+                    <p><strong>CSS</strong> = 背景是「黑色」的。</p>
+                </div>
+                <div class="content-section">
+                    <p><strong>JS</strong> = 控制圓形「變色」與「4秒變大、8秒變小」的邏輯。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 12: Phase 2 - 詠唱 -->
+        <section class="slide scrollable">
+            <div class="bunch-word-container">
+                <div>
+                    <h2>Phase 2 - 詠唱 (Prompting)</h2>
+                    <h4 style="margin-top: 2rem; margin-bottom: 1.5rem; text-align: center;">請複製以下指令給 Gemini</h4>
+                    <div class="code-block">
+                        你是一個專業的前端工程師。請幫我寫一個 單一檔案 (Single HTML file) 的正念呼吸網頁應用程式。
+                        功能需求：
+                        畫面中間有一個 [有質感的氣泡]。
+                        這個圖形會隨著呼吸放大與縮小。
+                        預設節奏：吸氣 [ 4 ] 秒，閉氣 [ 0 ] 秒，吐氣 [ 6 ] 秒。
+                        泡泡上面有秒數倒數，且顏色會從吸氣的藍色、隨著秒數倒數漸漸黃色、紅色，顏色以低飽和度呈現。
+                        畫面上要有文字提示目前的狀態（吸氣中、吐氣中）。
+                        背景顏色要 [深邃的夜空黑]。
+                        技術限制：
+                        所有 CSS 和 JavaScript 都要寫在同一個 HTML 檔案裡，不要分開。
+                        程式碼要有清楚的中文註解，告訴我哪裡可以修改時間長度。」
+                        請給我完整的程式碼，讓我可以直接複製，直接在 gemini 內給我一個開啟預覽網站的連結。
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 產出程式碼 -->
+        <section class="slide scrollable">
+            <h2>產出程式碼</h2>
+            <div style="max-width: 800px; margin-top: 2rem;">
+                <div class="code-block">
+                    <p>請複製以下程式碼：</p>
+                    <pre><code>&lt;!DOCTYPE html&gt;
+                    &lt;html lang="zh-TW"&gt;
+                    &lt;head&gt;
+                        &lt;meta charset="UTF-8"&gt;
+                        &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+                        &lt;title&gt;正念呼吸 (Mindfulness Breathing)&lt;/title&gt;
+                        &lt;style&gt;
+                            /* * =========================================
+                            * 第一部分：視覺風格設定 (CSS)
+                            * =========================================
+                            */
+
+                            :root {
+                                /* 顏色變數 - 低飽和度設定 */
+                                --color-blue: hsl(210, 40%, 60%);   /* 吸氣起始色 (冷靜) */
+                                --color-yellow: hsl(45, 40%, 60%);  /* 過渡色 (溫暖) */
+                                --color-red: hsl(0, 40%, 65%);      /* 結束前提示色 (沉穩) */
+
+                                --bg-dark: #0b1016; /* 深邃夜空黑 */
+                                --bg-light: #1b2330; /* 漸層用稍亮黑 */
+
+                                --bubble-size: 280px; /* 基礎泡泡大小 */
+                                --font-main: "Helvetica Neue", Arial, sans-serif;
+                            }
+
+                            * {
+                                box-sizing: border-box;
+                                margin: 0;
+                                padding: 0;
+                                user-select: none; /* 防止文字被選取影響體驗 */
+                            }
+
+                            body {
+                                background: radial-gradient(circle at center, var(--bg-light) 0%, var(--bg-dark) 100%);
+                                height: 100vh;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                flex-direction: column;
+                                font-family: var(--font-main);
+                                color: rgba(255, 255, 255, 0.85);
+                                overflow: hidden;
+                            }
+
+                            /* 中央容器 */
+                            .container {
+                                position: relative;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                flex-direction: column;
+                            }
+
+                            /* * 有質感的氣泡 (The Bubble)
+                            * 使用多層 box-shadow 創造玻璃擬態/微光質感
+                            */
+                            .bubble {
+                                width: var(--bubble-size);
+                                height: var(--bubble-size);
+                                border-radius: 50%;
+                                background: rgba(255, 255, 255, 0.03); /* 極淡的透明底 */
+
+                                /* 關鍵：使用 backdrop-filter 增加質感 (毛玻璃效果) */
+                                backdrop-filter: blur(8px);
+                                -webkit-backdrop-filter: blur(8px);
+
+                                /* 內外陰影創造立體感 */
+                                box-shadow:
+                                    inset 0 0 40px rgba(255, 255, 255, 0.05),
+                                    0 0 20px rgba(0, 0, 0, 0.2),
+                                    0 0 60px var(--current-color, var(--color-blue)); /* 動態光暈 */
+
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                position: relative;
+                                z-index: 10;
+
+                                /* 動畫過渡設定：平滑的呼吸感 */
+                                /* transform 會由 JS 動態控制時間 */
+                                transition: transform ease-in-out, box-shadow 1s linear;
+                            }
+
+                            /* 倒數計時文字 */
+                            .timer-text {
+                                font-size: 5rem;
+                                font-weight: 200;
+                                color: #ffffff;
+                                text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                                font-variant-numeric: tabular-nums; /* 防止數字跳動 */
+                            }
+
+                            /* 狀態文字 (吸氣、吐氣) */
+                            .status-text {
+                                margin-top: 40px;
+                                font-size: 1.5rem;
+                                letter-spacing: 4px; /* 增加字距，讓文字看起來更寬鬆、舒適 */
+                                font-weight: 300;
+                                opacity: 0;
+                                transform: translateY(10px);
+                                transition: opacity 1s ease, transform 1s ease;
+                                color: var(--current-color, var(--color-blue)); /* 跟隨泡泡顏色 */
+                            }
+
+                            /* 狀態文字顯示時的 class */
+                            .status-text.visible {
+                                opacity: 0.8;
+                                transform: translateY(0);
+                            }
+
+                            /* * 背景裝飾：星空微粒 (純視覺裝飾)
+                            */
+                            .star {
+                                position: absolute;
+                                background: white;
+                                border-radius: 50%;
+                                opacity: 0.2;
+                                animation: twinkle 4s infinite ease-in-out;
+                            }
+
+                            @keyframes twinkle {
+                                0%, 100% { opacity: 0.1; transform: scale(1); }
+                                50% { opacity: 0.4; transform: scale(1.2); }
+                            }
+
+                        &lt;/style&gt;
+                    &lt;/head&gt;
+                    &lt;body&gt;
+
+                        &lt;!-- 背景星空容器 --&gt;
+                        &lt;div id="stars-container"&gt;&lt;/div&gt;
+
+                        &lt;div class="container"&gt;
+                            &lt;div class="bubble" id="bubble"&gt;
+                                &lt;span class="timer-text" id="timer"&gt;Ready&lt;/span&gt;
+                            &lt;/div&gt;
+                            &lt;div class="status-text" id="status"&gt;準備開始&lt;/div&gt;
+                        &lt;/div&gt;
+
+                        &lt;script&gt;
+                            /**
+                            * =========================================
+                            * 第二部分：參數設定區 (可修改此處)
+                            * =========================================
+                            * 請在這裡修改時間長度 (單位：秒)
+                            */
+                            const CONFIG = {
+                                inhaleTime: 4,  // 吸氣時間
+                                holdTime: 0,    // 閉氣時間 (設為 0 會自動跳過)
+                                exhaleTime: 6,  // 吐氣時間
+
+                                // 呼吸時泡泡的縮放比例
+                                scaleIn: 1.5,   // 吸氣結束時的大小 (1.5倍)
+                                scaleOut: 1.0   // 吐氣結束時的大小 (原始大小)
+                            };
+
+                            /**
+                            * =========================================
+                            * 第三部分：核心邏輯 (JavaScript)
+                            * =========================================
+                            */
+
+                            const bubble = document.getElementById('bubble');
+                            const timerDisplay = document.getElementById('timer');
+                            const statusDisplay = document.getElementById('status');
+
+                            // 顏色轉換輔助函數 (HSL)
+                            // 將剩餘時間映射到顏色區間：藍 -&gt; 黃 -&gt; 紅
+                            function updateColor(progress) {
+                                // progress: 1.0 (開始) -&gt; 0.0 (結束)
+                                // 我們定義 HSL 色相環：藍色約 210, 黃色約 45, 紅色 0
+
+                                let hue;
+                                if (progress &gt; 0.5) {
+                                    // 前半段：藍色 (210) 過渡到 黃色 (45)
+                                    const p = (progress - 0.5) * 2;
+                                    hue = 45 + (p * (210 - 45));
+                                } else {
+                                    // 後半段：黃色 (45) 過渡到 紅色 (0)
+                                    const p = progress * 2;
+                                    hue = 0 + (p * 45);
+                                }
+
+                                // 設定 CSS 變數，讓樣式即時更新
+                                const color = `hsl(${hue}, 40%, 60%)`;
+                                bubble.style.setProperty('--current-color', color);
+                                statusDisplay.style.color = color;
+                            }
+
+                            // 執行單一階段 (吸氣、閉氣、吐氣) 的通用函數
+                            function runPhase(duration, actionType, text) {
+                                return new Promise(resolve =&gt; {
+                                    if (duration &lt;= 0) {
+                                        resolve();
+                                        return;
+                                    }
+
+                                    // 1. 設定狀態文字
+                                    statusDisplay.textContent = text;
+                                    statusDisplay.classList.add('visible');
+
+                                    // 2. 設定動畫與過渡時間
+                                    bubble.style.transition = `transform ${duration}s ease-in-out, box-shadow 0.5s linear`;
+
+                                    // 3. 執行縮放動作
+                                    if (actionType === 'inhale') {
+                                        bubble.style.transform = `scale(${CONFIG.scaleIn})`;
+                                    } else if (actionType === 'exhale') {
+                                        bubble.style.transform = `scale(${CONFIG.scaleOut})`;
+                                    }
+
+                                    // 4. 開始倒數計時器
+                                    let remaining = duration;
+                                    timerDisplay.textContent = remaining;
+
+                                    // 初始顏色重置為藍色
+                                    updateColor(1.0);
+
+                                    const startTime = Date.now();
+                                    const endTime = startTime + (duration * 1000);
+
+                                    const timerInterval = setInterval(() =&gt; {
+                                        const now = Date.now();
+                                        const timeLeft = Math.max(0, Math.ceil((endTime - now) / 1000));
+                                        const preciseProgress = Math.max(0, (endTime - now) / (duration * 1000));
+
+                                        if (timerDisplay.textContent != timeLeft) {
+                                            timerDisplay.textContent = timeLeft;
+                                        }
+
+                                        updateColor(preciseProgress);
+
+                                        if (now &gt;= endTime) {
+                                            clearInterval(timerInterval);
+                                            resolve();
+                                        }
+                                    }, 16);
+                                });
+                            }
+
+                            // 主要循環函數
+                            async function startBreathingCycle() {
+                                while (true) { // 無限循環
+                                    // 吸氣 (Inhale) - 已移除 "中"
+                                    await runPhase(CONFIG.inhaleTime, 'inhale', '吸氣 (Inhale)');
+
+                                    // 閉氣 (Hold)
+                                    if (CONFIG.holdTime &gt; 0) {
+                                        await runPhase(CONFIG.holdTime, 'hold', '閉氣 (Hold)');
+                                    }
+
+                                    // 吐氣 (Exhale) - 已移除 "中"
+                                    await runPhase(CONFIG.exhaleTime, 'exhale', '吐氣 (Exhale)');
+                                }
+                            }
+
+                            // 初始化背景星空
+                            function initStars() {
+                                const container = document.getElementById('stars-container');
+                                for(let i=0; i&lt;50; i++) {
+                                    const star = document.createElement('div');
+                                    star.className = 'star';
+                                    const xy = Math.random() * 100;
+                                    const duration = Math.random() * 3 + 2;
+                                    const size = Math.random() * 2 + 1;
+
+                                    star.style.left = `${Math.random() * 100}%`;
+                                    star.style.top = `${Math.random() * 100}%`;
+                                    star.style.width = `${size}px`;
+                                    star.style.height = `${size}px`;
+                                    star.style.animationDuration = `${duration}s`;
+
+                                    container.appendChild(star);
+                                }
+                            }
+
+                            // 程式進入點
+                            window.onload = () =&gt; {
+                                initStars();
+                                setTimeout(() =&gt; {
+                                    startBreathingCycle();
+                                }, 1000);
+                            };
+
+                        &lt;/script&gt;
+                    &lt;/body&gt;
+                    &lt;/html&gt;</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 12.5: 程式碼核心功能解析 -->
+        <section class="slide scrollable">
+            <div class="bunch-word-container">
+                <div>
+                    <h2>程式碼核心功能解析</h2>
+                    <h4 style="margin-top: 2rem; margin-bottom: 1.5rem;">三大技術的核心作用</h4>
+
+                    <div class="content-section" style="margin-bottom: 1.5rem;">
+                        <h4>HTML (結構層)</h4>
+                        <ul style="text-align: left; margin-top: 1rem;">
+                            <li><code>&lt;div class="bubble"&gt;</code> - 定義中央的氣泡元素</li>
+                            <li><code>&lt;span id="timer"&gt;</code> - 顯示倒數計時的數字</li>
+                            <li><code>&lt;div id="status"&gt;</code> - 顯示「吸氣/吐氣」狀態文字</li>
+                            <li><code>&lt;div id="stars-container"&gt;</code> - 背景星空容器</li>
+                        </ul>
+                        <p style="margin-top: 1rem; font-size: clamp(1rem, 2vw, 1.3rem);">
+                            <strong>功能</strong>：建立網頁的基本骨架，定義「有什麼元素」
+                        </p>
+                    </div>
+
+                    <div class="content-section" style="margin-bottom: 1.5rem;">
+                        <h4>CSS (樣式層)</h4>
+                        <ul style="text-align: left; margin-top: 1rem;">
+                            <li><code>.bubble</code> - 設定氣泡的圓形、大小、陰影、毛玻璃效果</li>
+                            <li><code>transition: transform</code> - 控制縮放動畫的平滑度</li>
+                            <li><code>box-shadow</code> - 創造動態光暈效果（顏色會隨時間變化）</li>
+                            <li><code>@keyframes twinkle</code> - 背景星星的閃爍動畫</li>
+                        </ul>
+                        <p style="margin-top: 1rem; font-size: clamp(1rem, 2vw, 1.3rem);">
+                            <strong>功能</strong>：控制視覺呈現，定義「長什麼樣子」
+                        </p>
+                    </div>
+
+                    <div class="content-section">
+                        <h4>JavaScript (行為層)</h4>
+                        <ul style="text-align: left; margin-top: 1rem;">
+                            <li><code>CONFIG</code> 物件 - 儲存呼吸時間參數（可修改的核心設定）</li>
+                            <li><code>runPhase()</code> - 執行單一呼吸階段（吸氣/閉氣/吐氣）</li>
+                            <li><code>updateColor()</code> - 根據剩餘時間動態改變顏色（藍→黃→紅）</li>
+                            <li><code>startBreathingCycle()</code> - 無限循環執行呼吸週期</li>
+                            <li><code>setInterval()</code> - 每 16 毫秒更新一次倒數計時</li>
+                        </ul>
+                        <p style="margin-top: 1rem; font-size: clamp(1rem, 2vw, 1.3rem);">
+                            <strong>功能</strong>：控制邏輯與互動，定義「如何運作」
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+
+        <!-- Slide 14: 實作流程 -->
+        <section class="slide">
+            <h2>實作流程 (Workflow)</h2>
+            <div style="max-width: 800px; margin-top: 2rem;">
+                <div class="step-card" style="margin-bottom: 1rem;">
+                    <h4>Step 1 (Copy)</h4>
+                    <p>在 Gemini 對話框右上角點擊「複製」。</p>
+                </div>
+                <div class="step-card" style="margin-bottom: 1rem;">
+                    <h4>Step 2 (Paste)</h4>
+                    <p>切換到 W3Schools 分頁，全選刪除舊內容，貼上新程式碼。</p>
+                </div>
+                <div class="step-card" style="margin-bottom: 1rem;">
+                    <h4>Step 3 (Run)</h4>
+                    <p>點擊綠色 <strong>Run</strong> 按鈕。</p>
+                </div>
+                <div class="step-card">
+                    <h4>Step 4 (Experience)</h4>
+                    <p>見證奇蹟。</p>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Slide 16.5: 作業需求說明 -->
+        <section class="slide scrollable">
+            <div class="bunch-word-container">
+                <div>
+                    <h2>作業需求說明</h2>
+                    <h4 style="margin-top: 2rem; margin-bottom: 1.5rem;">請完成以下兩個任務</h4>
+                    作業繳交 Google Form: https://forms.gle/JhRrmnsk2kH5Mxv8A 繳交期限 11/28 23:59 前
+                    <div class="content-section" style="margin-bottom: 1.5rem;">
+                        <h4>任務一：修改中間的圖樣</h4>
+                        <p style="margin-top: 1rem;">目前程式碼中的氣泡是圓形，請發揮創意，改成你喜歡的圖樣：</p>
+                        <ul style="text-align: left; margin-top: 1rem;">
+                            <li>可以改成其他幾何圖形（三角形、正方形、星形等）</li>
+                            <li>可以改成圖案或符號（愛心、花朵、雲朵等）</li>
+                            <li>可以調整顏色、大小、動畫效果</li>
+                        </ul>
+                        <div class="highlight-box" style="margin-top: 1.5rem;">
+                            <p style="text-align: center; margin: 0; font-size: clamp(1rem, 2vw, 1.3rem);">
+                                <strong>提示</strong>：修改 CSS 中的 <code>.bubble</code> 樣式，或詢問 Gemini 如何改變圖樣
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="content-section">
+                        <h4>任務二：自定義呼吸秒數並說明</h4>
+                        <p style="margin-top: 1rem;">請根據你的個人需求，調整呼吸節奏：</p>
+                        <ul style="text-align: left; margin-top: 1rem;">
+                            <li>修改 <code>CONFIG</code> 物件中的時間參數</li>
+                            <li>在作業中說明你選擇的呼吸節奏（例如：4-0-6、4-7-8 等）</li>
+                            <li>說明為什麼選擇這個節奏（例如：適合睡前放鬆、適合專注前準備等）</li>
+                        </ul>
+                        <div class="highlight-box" style="margin-top: 1.5rem;">
+                            <p style="text-align: center; margin: 0; font-size: clamp(1rem, 2vw, 1.3rem);">
+                                <strong>提示</strong>：記得遵循「吐氣時間 > 吸氣時間」的醫學原理
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 17: 結語 -->
+        <section class="slide">
+            <h2>結語</h2>
+            <div style="max-width: 800px; margin-top: 3rem;">
+                <p style="font-size: clamp(1.3rem, 2.5vw, 1.8rem); margin-bottom: 2rem;">
+                    Web 技術不只是為了工作，更是為了照顧自己。
+                </p>
+                <p style="font-size: clamp(1.1rem, 2vw, 1.5rem); color: var(--accent-color); margin-bottom: 2rem;">
+                    Next Step：回家問 Gemini：「如何把背景音樂加進去？」
+                </p>
+                <p style="font-size: clamp(1.2rem, 2.2vw, 1.6rem); margin-top: 3rem;">
+                    Thank You.
+                </p>
+            </div>
+        </section>
+
+        <!-- 導航按鈕 -->
+        <div class="nav">
+            <button id="prev" class="nav-btn">&#8249;</button>
+            <button id="next" class="nav-btn">&#8250;</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = Array.from(document.querySelectorAll('.slide:not(.hidden)'));
+            const totalSlides = slides.length;
+            let currentSlide = 0;
+
+            function showSlide(index) {
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === index);
+                });
+            }
+
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            function prevSlide() {
+                currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            document.getElementById('next').addEventListener('click', nextSlide);
+            document.getElementById('prev').addEventListener('click', prevSlide);
+
+            // 鍵盤支援
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    e.preventDefault();
+                    nextSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    prevSlide();
+                }
+            });
+
+            // 觸控滑動支援（手機版）
+            let touchStartX = 0;
+            let touchEndX = 0;
+
+            document.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            });
+
+            document.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            });
+
+            function handleSwipe() {
+                const swipeThreshold = 50;
+                const diff = touchStartX - touchEndX;
+
+                if (Math.abs(diff) > swipeThreshold) {
+                    if (diff > 0) {
+                        // 向左滑動，下一張
+                        nextSlide();
+                    } else {
+                        // 向右滑動，上一張
+                        prevSlide();
+                    }
+                }
+            }
+
+            // 初始化顯示第一張投影片
+            showSlide(0);
+        });
+    </script>
+</body>
+</html>
+

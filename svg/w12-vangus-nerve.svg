@@ -1,0 +1,91 @@
+<svg width="1920" height="1080" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" aria-labelledby="title desc">
+  <title id="title">迷走神經：身心的靜謐連結</title>
+  <description id="desc">關於迷走神經、內感官訊息傳遞與抗發炎機制的資訊圖表</description>
+
+  <defs>
+    <filter id="paper-texture">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="5" result="noise" />
+      <feDiffuseLighting in="noise" lighting-color="#F4F2EF" surfaceScale="2">
+        <feDistantLight azimuth="45" elevation="60" />
+      </feDiffuseLighting>
+    </filter>
+
+    <filter id="rough-line">
+      <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" result="noise" />
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" />
+    </filter>
+
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#C2B8A3" />
+    </marker>
+  </defs>
+
+  <rect width="100%" height="100%" fill="#F4F2EF" />
+  <rect width="100%" height="100%" filter="url(#paper-texture)" opacity="0.4" />
+
+  <g transform="translate(100, 120)">
+    <text x="0" y="0" font-family="'Noto Serif TC', serif" font-size="90" fill="#333333" font-weight="bold" letter-spacing="2">迷走神經 The Vagus Nerve</text>
+    <text x="0" y="80" font-family="'Noto Sans TC', sans-serif" font-size="45" fill="#5E6C6A" font-weight="normal">身心安頓的第十對腦神經</text>
+    <line x1="0" y1="110" x2="1100" y2="110" stroke="#C2B8A3" stroke-width="3" stroke-linecap="round" filter="url(#rough-line)" />
+  </g>
+
+  <g transform="translate(100, 350)">
+    <path d="M80,0 Q130,-20 180,0 Q210,40 180,80 Q130,100 80,80 Q50,40 80,0 Z" fill="none" stroke="#5E6C6A" stroke-width="5" fill-opacity="0.1" filter="url(#rough-line)"/>
+    <text x="130" y="50" font-size="30" fill="#5E6C6A" text-anchor="middle">Brain</text>
+
+    <path d="M130,80 C130,200 80,250 130,350 C180,450 80,500 130,600" fill="none" stroke="#5E6C6A" stroke-width="4" stroke-dasharray="10,5" filter="url(#rough-line)"/>
+
+    <text x="220" y="50" font-family="'Noto Sans TC', sans-serif" font-size="60" fill="#333333" font-weight="bold">身體的總指揮</text>
+    <text x="220" y="120" font-family="'Noto Sans TC', sans-serif" font-size="40" fill="#333333">
+      <tspan x="220" dy="0">副交感神經系統核心</tspan>
+      <tspan x="220" dy="60">負責放鬆、修復與消化</tspan>
+    </text>
+  </g>
+
+  <g transform="translate(720, 350)">
+    <path d="M100,550 L100,100" stroke="#C2B8A3" stroke-width="15" marker-end="url(#arrow)" opacity="0.8" stroke-linecap="round" filter="url(#rough-line)"/>
+    <circle cx="100" cy="580" r="15" fill="#C2B8A3" opacity="0.8"/>
+
+    <text x="180" y="50" font-family="'Noto Sans TC', sans-serif" font-size="60" fill="#333333" font-weight="bold">80% 向上回傳</text>
+
+    <text x="180" y="120" font-family="'Noto Sans TC', sans-serif" font-size="40" fill="#333333" leading="1.6">
+      <tspan x="180" dy="0">內感官訊息 (Interoception)</tspan>
+      <tspan x="180" dy="60">告訴大腦身體的狀態：</tspan>
+    </text>
+
+    <g transform="translate(180, 220)">
+       <circle cx="10" cy="-10" r="6" fill="#A9B2AE"/>
+       <text x="40" y="0" font-family="'Noto Sans TC', sans-serif" font-size="40" fill="#555">飽足感 (Satiety)</text>
+
+       <circle cx="10" cy="50" r="6" fill="#A9B2AE"/>
+       <text x="40" y="60" font-family="'Noto Sans TC', sans-serif" font-size="40" fill="#555">心跳速率</text>
+
+       <circle cx="10" cy="110" r="6" fill="#A9B2AE"/>
+       <text x="40" y="120" font-family="'Noto Sans TC', sans-serif" font-size="40" fill="#555">發炎反應</text>
+    </g>
+  </g>
+
+  <g transform="translate(1300, 350)">
+    <text x="0" y="50" font-family="'Noto Sans TC', sans-serif" font-size="60" fill="#333333" font-weight="bold">抗炎與療癒</text>
+
+    <rect x="0" y="150" width="450" height="160" rx="10" fill="#A9B2AE" fill-opacity="0.2" />
+    <text x="30" y="210" font-family="'Noto Sans TC', sans-serif" font-size="40" fill="#333333" font-weight="bold">膽鹼能抗炎通路</text>
+    <text x="30" y="270" font-family="'Noto Sans TC', sans-serif" font-size="35" fill="#555">Cholinergic Anti-inflammatory</text>
+
+    <g transform="translate(0, 320)">
+      <path d="M0,0 L400,0" stroke="#5E6C6A" stroke-width="2" />
+      <text x="0" y="60" font-family="'Noto Sans TC', sans-serif" font-size="40" fill="#333333">
+        <tspan x="0" dy="0">高迷走神經張力</tspan>
+        <tspan x="0" dy="60">↓ 降低細胞因子 (發炎)</tspan>
+      </text>
+    </g>
+
+    <g transform="translate(0, 500)">
+       <path d="M-20,-20 L480,-20 L480,120 L-20,120 Z" fill="none" stroke="#C2B8A3" stroke-width="3" filter="url(#rough-line)"/>
+       <text x="0" y="30" font-family="'Noto Sans TC', sans-serif" font-size="40" fill="#5E6C6A" font-weight="bold">
+         <tspan x="0" dy="0">💡 正念呼吸</tspan>
+         <tspan x="0" dy="60">有效改善慢性病機制</tspan>
+       </text>
+    </g>
+  </g>
+</svg>
