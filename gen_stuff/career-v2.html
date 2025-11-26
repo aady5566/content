@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Path Timeline - 7 Stages</title>
+    <style>
+        :root {
+            --bg-color: #F5F4F0;
+            --card-bg: #ffffff;
+            --text-color: #3D3A37;
+            --accent-color: #9A948C;
+            --header-bg: #EAEBE6;
+            --line-color: #d1d1c2;
+            --highlight-color: #8c867b;
+            --font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+            --border-radius: 16px;
+            --shadow: 0 10px 30px rgba(0,0,0,0.08);
+            --danger: #8c6b5a; /* Adjusted for style_1116.md */
+            --calm: #9a8c94; /* Adjusted for style_1116.md */
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: transparent;
+        }
+
+        /* Header / Navigation */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 0 10px;
+        }
+
+        .progress-bar-container {
+            flex: 1;
+            margin: 0 20px;
+            height: 4px;
+            background: var(--line-color);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--text-color);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .nav-btn {
+            background: none;
+            border: 1px solid var(--line-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            color: var(--accent-color);
+            font-weight: 400;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-family);
+        }
+
+        .nav-btn:hover {
+            border-color: var(--accent-color);
+            color: var(--text-color);
+            background-color: var(--header-bg);
+        }
+
+        /* Slide Container */
+        .slide-wrapper {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transform: translateX(50px);
+            transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex;
+            pointer-events: none;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: all;
+            z-index: 10;
+        }
+
+        /* Slide Content Layout */
+        .slide-content {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            overflow: hidden;
+            min-height: 0;
+            max-height: 100%;
+            box-sizing: border-box;
+        }
+
+        .slide-content > div:first-child {
+            flex: 1 1 auto;
+            min-height: 0;
+            max-height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            padding-right: 8px;
+            margin-right: -8px;
+        }
+
+        .slide-content > div:first-child::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .slide-content > div:first-child::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .slide-content > div:first-child::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 3px;
+        }
+
+        .slide-content > div:first-child::-webkit-scrollbar-thumb:hover {
+            background: var(--highlight-color);
+        }
+
+        .slide-visual {
+            flex: 0.8;
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-left: 1px solid var(--line-color);
+            position: relative;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        .slide-visual img {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        /* Sub-slider for slide-3 */
+        .sub-slider-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .sub-slider-wrapper {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .sub-slide {
+            flex: 0 0 100%;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .sub-slide img,
+        .sub-slide video {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .sub-slider-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid var(--line-color);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-color);
+            font-size: 18px;
+            transition: all 0.3s ease;
+            z-index: 20;
+        }
+
+        .sub-slider-nav:hover {
+            background: var(--card-bg);
+            border-color: var(--accent-color);
+            color: var(--text-color);
+        }
+
+        .sub-slider-nav.prev {
+            left: 10px;
+        }
+
+        .sub-slider-nav.next {
+            right: 10px;
+        }
+
+        .sub-slider-indicators {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 20;
+        }
+
+        .sub-slider-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid var(--line-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sub-slider-indicator.active {
+            background: var(--highlight-color);
+            border-color: var(--highlight-color);
+            transform: scale(1.2);
+        }
+
+        /* Typography */
+        .role-title {
+            font-size: 2.7rem;
+            color: var(--text-color);
+            font-weight: 400;
+            line-height: 1.2;
+            margin: 0 0 5px 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--header-bg);
+        }
+
+        .role-subtitle {
+            font-size: 1.65rem;
+            color: var(--text-color);
+            font-weight: 300;
+            margin-top: 0;
+            margin-bottom: 15px;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--header-bg);
+            display: inline-block;
+        }
+
+        .meta-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .meta-tag {
+            display: inline-block;
+            background: var(--header-bg);
+            color: var(--accent-color);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 1.275rem;
+            font-weight: 400;
+        }
+
+        .section-header {
+            font-size: 1.35rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-color);
+            margin-bottom: 6px;
+            margin-top: 15px;
+            font-weight: 400;
+        }
+
+        .section-header:first-of-type {
+            margin-top: 0;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 0;
+            margin-bottom: 0;
+            text-align: left;
+            max-width: 100%;
+            font-family: var(--font-family);
+        }
+
+        li {
+            margin-bottom: 8px;
+            position: relative;
+            padding-left: 1.5em;
+            font-size: 1.5rem;
+            line-height: 1.5;
+            color: var(--text-color);
+        }
+
+        li::before {
+            content: '- ';
+            color: var(--accent-color);
+            font-weight: bold;
+            display: inline-block;
+            position: absolute;
+            left: 0;
+        }
+
+        /* Time Perspective Dots */
+        .time-perspective {
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid var(--line-color);
+            flex-shrink: 0;
+        }
+
+        .time-perspective-label {
+            font-size: 1.2rem;
+            color: var(--text-color);
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .time-dots {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .time-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--line-color);
+            border: 2px solid var(--line-color);
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .time-dot.active {
+            background-color: var(--highlight-color);
+            border-color: var(--highlight-color);
+            transform: scale(1.3);
+        }
+
+        .time-dot-label {
+            font-size: 1.125rem;
+            color: var(--accent-color);
+            margin-top: 4px;
+            text-align: center;
+        }
+
+        .time-dot-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* SVG Styles - Keep for backward compatibility */
+        .svg-icon {
+            width: 200px;
+            height: 200px;
+        }
+
+        .svg-icon path, .svg-icon rect, .svg-icon circle, .svg-icon line, .svg-icon polyline {
+            fill: none;
+            stroke: var(--text-color);
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .stroke-accent { stroke: var(--accent-color); }
+        .stroke-highlight { stroke: var(--highlight-color); }
+        .stroke-danger { stroke: var(--danger); }
+        .stroke-calm { stroke: var(--calm); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .slide {
+                flex-direction: column-reverse;
+                overflow-y: auto;
+            }
+            .slide-visual {
+                flex: 0.4;
+                min-height: 200px;
+                border-left: none;
+                border-bottom: 1px solid var(--line-color);
+            }
+            .slide-wrapper {
+                height: 800px;
+            }
+            .role-title {
+                font-size: 2.25rem;
+            }
+            .slide-content {
+                padding: 30px;
+            }
+            .time-dots {
+                gap: 12px;
+            }
+            .time-dot {
+                width: 10px;
+                height: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="globalProgress"></div>
+        </div>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <div class="slide-wrapper">
+
+        <div class="slide active" id="slide-0">
+            <div class="slide-content">
+                <div>
+                    <h1 class="role-title">Campaign Manager</h1>
+                    <div class="role-subtitle">新手村的試煉</div>
+                    <div class="meta-container">
+                        <span class="meta-tag">1 Year</span>
+                    </div>
+
+                    <div class="section-header">經歷 Experience</div>
+                    <ul>
+                        <li>產業知識的建立、輪班值班</li>
+                        <li>加速工作流 (偷偷開發小工具)</li>
+                    </ul>
+
+                    <div class="section-header">收穫 Gains</div>
+                    <ul>
+                        <li>時間管理與基礎建設</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="slide-visual">
+                <img src="../pic/1126/1.jpg" alt="Campaign Manager">
+            </div>
+        </div>
+
+        <div class="slide" id="slide-1">
+            <div class="slide-content">
+                <div>
+                    <h1 class="role-title">Product Manager</h1>
+                    <div class="role-subtitle">初出新手村</div>
+                    <div class="meta-container">
+                        <span class="meta-tag">1 Year</span>
+                    </div>
+
+                    <div class="section-header">經歷 Experience</div>
+                    <ul>
+                        <li>前後端軟體開發協作</li>
+                        <li>既有產品維運與迭代</li>
+                    </ul>
+
+                    <div class="section-header">收穫 Gains</div>
+                    <ul>
+                        <li>團隊溝通技巧</li>
+                    </ul>
+                </div>
+
+                <div class="time-perspective">
+                    <div class="time-perspective-label">
+                        <span>Time Perspective</span>
+                    </div>
+                    <div class="time-dots">
+                        <div class="time-dot-wrapper">
+                            <div class="time-dot active" data-time="quarterly"></div>
+                            <div class="time-dot-label">季</div>
+                        </div>
+                        <div class="time-dot-wrapper">
+                            <div class="time-dot" data-time="monthly"></div>
+                            <div class="time-dot-label">月</div>
+                        </div>
+                        <div class="time-dot-wrapper">
+                            <div class="time-dot" data-time="daily"></div>
+                            <div class="time-dot-label">日</div>
+                        </div>
+                        <div class="time-dot-wrapper">
+                            <div class="time-dot" data-time="hourly"></div>
+                            <div class="time-dot-label">小時</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-visual">
+                <img src="../pic/1126/2.jpg" alt="Product Manager">
+            </div>
+        </div>
+
+        <div class="slide" id="slide-2">
+            <div class="slide-content">
+                <div>
+                    <h1 class="role-title">Sr. Product Manager</h1>
+                    <div class="role-subtitle">AI <> UI 的邂逅</div>
+                    <div class="meta-container">
+                        <span class="meta-tag">6 Months</span>
+                    </div>
+
+                    <div class="section-header">經歷 Experience</div>
+                    <ul>
+                        <li>內部系統與核心 AI 模型的重整</li>
+                        <li>連結技術邏輯與使用者介面</li>
+                    </ul>
+
+                    <div class="section-header">收穫 Gains</div>
+                    <ul>
+                        <li>知其所以然，才能知其然</li>
+                    </ul>
+                </div>
+
+                <div class="time-perspective">
+                    <div class="time-perspective-label">
+                        <span>Time Perspective</span>
+                    </div>
+                    <div class="time-dots">
+                        <div class="time-dot-wrapper">
+                            <div class="time-dot" data-time="quarterly"></div>
+                            <div class="time-dot-label">季</div>
+                        </div>
+                        <div class="time-dot-wrapper">
+                            <div class="time-dot active" data-time="monthly"></div>
+                            <div class="time-dot-label">月</div>
+                        </div>
+                        <div class="time-dot-wrapper">
+                            <div class="time-dot" data-time="daily"></div>
+                            <div class="time-dot-label">日</div>
+                        </div>
+                        <div class="time-dot-wrapper">
+                            <div class="time-dot" data-time="hourly"></div>
+                            <div class="time-dot-label">小時</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-visual">
+                <img src="../pic/1126/3.jpg" alt="Sr. Product Manager">
+            </div>
+        </div>
+
+        <div class="slide" id="slide-3">
+            <div class="slide-content">
+                <div>
+                    <h1 class="role-title">Associate Director</h1>
+                    <div class="role-subtitle">Zero to One (SaaS)</div>
+                    <div class="meta-container">
+                        <span class="meta-tag">3 Years 6 Months</span>
+                    </div>
+
+                    <div class="section-header">經歷 Experience</div>
+                    <ul>
+                        <li>全新產品線開發</li>
+                        <li>牌價、合約、招募、銷售、開發</li>
+                    </ul>
+
+                    <div class="section-header">收穫 Gains</div>
+                    <ul>
+                        <li>從 0 到 1 的完整商業生態系</li>
+                    </ul>
+                </div>
+
+                <div class="time-perspective">
+                    <div class="time-perspective-label">
+                        <span>Time Perspective</span>
+                    </div>
+                    <div class="time-dots">
+                        <div class="time-dot-wrapper">
+                            <div class="time-dot" data-time="quarterly"></div>
+                            <div class="time-dot-label">季</div>
+                        </div>
+                        <div class="time-dot-wrapper">
+                            <div class="time-dot" data-time="monthly"></div>
+                            <div class="time-dot-label">月</div>
+                        </div>
+                        <div class="time-dot-wrapper">
+                            <div class="time-dot active" data-time="daily"></div>
+                            <div class="time-dot-label">日</div>
+                        </div>
+                        <div class="time-dot-wrapper">
+                            <div class="time-dot" data-time="hourly"></div>
+                            <div class="time-dot-label">小時</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-visual">
+                <div class="sub-slider-container" id="subSlider3">
+                    <button class="sub-slider-nav prev" onclick="prevSubSlide(3)">‹</button>
+                    <div class="sub-slider-wrapper">
+                        <div class="sub-slide">
+                            <img src="../pic/1126/4.jpg" alt="Associate Director">
+                        </div>
+                        <div class="sub-slide">
+                            <!-- 可以在這裡插入第二張圖片或影片 -->
+                            <img src="../pic/1126/asa.png" alt="Additional content">
+                            <!-- 或 -->
+                            <!-- <video controls><source src="your-video.mp4" type="video/mp4"></video> -->
+                        </div>
+                    </div>
+                    <button class="sub-slider-nav next" onclick="nextSubSlide(3)">›</button>
+                    <div class="sub-slider-indicators" id="subSliderIndicators3">
+                        <div class="sub-slider-indicator active" onclick="goToSubSlide(3, 0)"></div>
+                        <div class="sub-slider-indicator" onclick="goToSubSlide(3, 1)"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" id="slide-4">
+            <div class="slide-content">
+                <div>
+                    <h1 class="role-title">Director (Part I)</h1>
+                    <div class="role-subtitle">最大產品線負責人</div>
+                    <div class="meta-container">
+                        <span class="meta-tag">1 Year</span>
+                    </div>
+
+                    <div class="section-header">經歷 Experience</div>
+                    <ul>
+                        <li>百人以上跨部門合作</li>
+                        <li>多任務同步處理 (Multitasking)</li>
+                    </ul>
+
+                    <div class="section-header">收穫 Gains</div>
+                    <ul>
+                        <li>缺席的睡眠，爆掉的身體</li>
+                    </ul>
+                </div>
+
+                <div class="time-perspective">
+                    <div class="time-perspective-label">
+                        <span>Time Perspective</span>
+                    </div>
+                    <div class="time-dots">
+                        <div class="time-dot-wrapper">
+                            <div class="time-dot" data-time="quarterly"></div>
+                            <div class="time-dot-label">季</div>
+                        </div>
+                        <div class="time-dot-wrapper">
+                            <div class="time-dot" data-time="monthly"></div>
+                            <div class="time-dot-label">月</div>
+                        </div>
+                        <div class="time-dot-wrapper">
+                            <div class="time-dot active" data-time="daily"></div>
+                            <div class="time-dot-label">日</div>
+                        </div>
+                        <div class="time-dot-wrapper">
+                            <div class="time-dot" data-time="hourly"></div>
+                            <div class="time-dot-label">小時</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-visual">
+                <img src="../pic/1126/5.jpg" alt="Director of PM (I)">
+            </div>
+        </div>
+
+        <div class="slide" id="slide-5">
+            <div class="slide-content">
+                <div>
+                    <h1 class="role-title" style="color:var(--calm)">Short Break</h1>
+                    <div class="role-subtitle" style="color:var(--calm)">雙朝聖之路</div>
+                    <div class="meta-container">
+                        <span class="meta-tag">2.5 Months</span>
+                        <span class="meta-tag">Sabbatical</span>
+                    </div>
+
+                    <div class="section-header">經歷 Experience</div>
+                    <ul>
+                        <li>中離職場的自由</li>
+                        <li>西班牙、日本熊野古道朝聖</li>
+                    </ul>
+
+                    <div class="section-header">收穫 Gains</div>
+                    <ul>
+                        <li>Solo leveling</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="slide-visual">
+                <div class="sub-slider-container" id="subSlider5">
+                    <button class="sub-slider-nav prev" onclick="prevSubSlide(5)">‹</button>
+                    <div class="sub-slider-wrapper">
+                        <div class="sub-slide">
+                            <img src="../pic/1126/6.jpg" alt="The Gap">
+                        </div>
+                        <div class="sub-slide">
+                            <!-- 可以在這裡插入第二張圖片或影片 -->
+                            <img src="../pic/1126/sp.png" alt="Additional content">
+                            <!-- 或 -->
+                            <!-- <video controls><source src="your-video.mp4" type="video/mp4"></video> -->
+                        </div>
+                        <div class="sub-slide">
+                            <!-- 可以在這裡插入第二張圖片或影片 -->
+                            <img src="../pic/1126/jp.png" alt="Additional content">
+                            <!-- 或 -->
+                            <!-- <video controls><source src="your-video.mp4" type="video/mp4"></video> -->
+                        </div>
+                    </div>
+                    <button class="sub-slider-nav next" onclick="nextSubSlide(5)">›</button>
+                    <div class="sub-slider-indicators" id="subSliderIndicators5">
+                        <div class="sub-slider-indicator active" onclick="goToSubSlide(5, 0)"></div>
+                        <div class="sub-slider-indicator" onclick="goToSubSlide(5, 1)"></div>
+                        <div class="sub-slider-indicator" onclick="goToSubSlide(5, 2)"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" id="slide-6">
+            <div class="slide-content">
+                <div>
+                    <h1 class="role-title">Director (Part II)</h1>
+                    <div class="role-subtitle">內部核心系統負責人</div>
+                    <div class="meta-container">
+                        <span class="meta-tag">1 Year 9 Months+</span>
+                        <span class="meta-tag">Current</span>
+                    </div>
+
+                    <div class="section-header">經歷 Experience</div>
+                    <ul>
+                        <li>Agentic AI 開發、產品轉型</li>
+                        <li>內部轉職培訓與團隊塑形</li>
+                    </ul>
+
+                    <div class="section-header">收穫 Gains</div>
+                    <ul>
+                        <li>團隊文化建立</li>
+                    </ul>
+                </div>
+
+                <div class="time-perspective">
+                    <div class="time-perspective-label">
+                        <span>Time Perspective</span>
+                    </div>
+                    <div class="time-dots">
+                        <div class="time-dot-wrapper">
+                            <div class="time-dot" data-time="quarterly"></div>
+                            <div class="time-dot-label">季</div>
+                        </div>
+                        <div class="time-dot-wrapper">
+                            <div class="time-dot" data-time="monthly"></div>
+                            <div class="time-dot-label">月</div>
+                        </div>
+                        <div class="time-dot-wrapper">
+                            <div class="time-dot" data-time="daily"></div>
+                            <div class="time-dot-label">日</div>
+                        </div>
+                        <div class="time-dot-wrapper">
+                            <div class="time-dot active" data-time="hourly"></div>
+                            <div class="time-dot-label">小時</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-visual">
+                <img src="../pic/1126/7.jpg" alt="Director of PM (II)">
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const slides = document.querySelectorAll('.slide');
+    const globalProgress = document.getElementById('globalProgress');
+    let currentIndex = 0;
+    const totalSlides = slides.length;
+
+    function updateSlide(index) {
+        // Bounds check
+        if (index < 0) index = 0;
+        if (index >= totalSlides) index = totalSlides - 1;
+        currentIndex = index;
+
+        // Update active class
+        slides.forEach((slide, i) => {
+            slide.classList.remove('active');
+            if (i === currentIndex) {
+                slide.classList.add('active');
+            }
+        });
+
+        // Update top progress bar
+        const progressPercentage = ((currentIndex + 1) / totalSlides) * 100;
+        globalProgress.style.width = `${progressPercentage}%`;
+    }
+
+    function nextSlide() {
+        updateSlide(currentIndex + 1);
+    }
+
+    function prevSlide() {
+        updateSlide(currentIndex - 1);
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') nextSlide();
+        if (e.key === 'ArrowLeft') prevSlide();
+    });
+
+    // Initial load
+    updateSlide(0);
+
+    // Sub-slider functionality for slide-3 and slide-5
+    const subSliders = {
+        3: {
+            currentIndex: 0,
+            totalSlides: 2,
+            wrapper: null,
+            indicators: null
+        },
+        5: {
+            currentIndex: 0,
+            totalSlides: 3,
+            wrapper: null,
+            indicators: null
+        }
+    };
+
+    function initSubSlider(slideId) {
+        const container = document.getElementById(`subSlider${slideId}`);
+        if (!container) return;
+
+        const wrapper = container.querySelector('.sub-slider-wrapper');
+        const indicators = container.querySelectorAll('.sub-slider-indicator');
+
+        subSliders[slideId].wrapper = wrapper;
+        subSliders[slideId].indicators = indicators;
+        updateSubSlider(slideId);
+    }
+
+    function updateSubSlider(slideId) {
+        const slider = subSliders[slideId];
+        if (!slider || !slider.wrapper) return;
+
+        const translateX = -slider.currentIndex * 100;
+        slider.wrapper.style.transform = `translateX(${translateX}%)`;
+
+        // Update indicators
+        if (slider.indicators) {
+            slider.indicators.forEach((indicator, index) => {
+                if (index === slider.currentIndex) {
+                    indicator.classList.add('active');
+                } else {
+                    indicator.classList.remove('active');
+                }
+            });
+        }
+    }
+
+    function nextSubSlide(slideId) {
+        const slider = subSliders[slideId];
+        if (!slider) return;
+
+        slider.currentIndex = (slider.currentIndex + 1) % slider.totalSlides;
+        updateSubSlider(slideId);
+    }
+
+    function prevSubSlide(slideId) {
+        const slider = subSliders[slideId];
+        if (!slider) return;
+
+        slider.currentIndex = (slider.currentIndex - 1 + slider.totalSlides) % slider.totalSlides;
+        updateSubSlider(slideId);
+    }
+
+    function goToSubSlide(slideId, index) {
+        const slider = subSliders[slideId];
+        if (!slider) return;
+
+        slider.currentIndex = index;
+        updateSubSlider(slideId);
+    }
+
+    // Initialize sub-slider when slide-3 or slide-5 becomes active
+    const originalUpdateSlide = updateSlide;
+    updateSlide = function(index) {
+        originalUpdateSlide(index);
+        if (index === 3) {
+            setTimeout(() => initSubSlider(3), 100);
+        }
+        if (index === 5) {
+            setTimeout(() => initSubSlider(5), 100);
+        }
+    };
+
+    // Initialize on load if slide-3 or slide-5 is active
+    if (currentIndex === 3) {
+        setTimeout(() => initSubSlider(3), 100);
+    }
+    if (currentIndex === 5) {
+        setTimeout(() => initSubSlider(5), 100);
+    }
+</script>
+
+</body>
+</html>
