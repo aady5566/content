@@ -1217,7 +1217,7 @@
             <div class="text-column">
                 <h1 style="font-size: 5rem;">Q&A?</h1>
                 <blockquote style="width: 100%; max-width: none;">
-                <p style="font-weight: 600; margin-top: 1rem; font-size: clamp(2rem, 3.12vw, 2.18rem); white-space: nowrap; width: fit-content;">你我不認識，但你想了解什麼？</p>
+                <p style="font-weight: 600; margin-top: 1rem; font-size: clamp(2rem, 3.12vw, 2.18rem); white-space: nowrap; width: fit-content;">你會在這裡，肯定想了解什麼。</p>
                 </blockquote>
             </div>
             <div class="image-column">
@@ -1358,8 +1358,10 @@
                 <!-- <p>好，有了基礎原理和核心架構，我們來看看 AI 界的術語和應用。</p> -->
             </div>
         </section><section class="layout-title">
+            <h1>請問心理系的學弟妹</h1>
             <div class="slide-content">
-                <h2 style="font-size: clamp(2rem, 3vw, 1.75rem); font-weight: 400; color: var(--accent-color); margin-top: 2rem; margin-bottom: 1rem;">想像一下，假如要製作一個大腦代理人，它需要具備哪些核心功能？</h2>
+                <h2 style="font-size: clamp(2rem, 3vw, 1.75rem); font-weight: 400; color: var(--accent-color); margin-top: 2rem; margin-bottom: 1rem;">
+                    假如要製作一個大腦代理人，它需要具備哪些核心功能？</h2>
             </div>
         </section><section class="layout-iframe">
             <iframe src="../1115-rotary-club/ai-agent-figure.html" title="代理人大腦本體" frameborder="0" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms">
@@ -1368,7 +1370,166 @@
             <div class="slide-content">
                 <h1 style="font-size: 3rem;"><b>內部核心 (Brain Itself)</b></h1>
             </div>
-        </section><section class="layout-default">
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>大腦本體 (Transformer)</h1>
+                <p><b>論文：</b><a href="https://proceedings.neurips.cc/paper_files/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf" target="_blank" rel="noopener noreferrer">《Attention is All You Need》(2017, Google)</a></p>
+                <p><b>解決的問題：</b>傳統 AI 必須「依序」閱讀，讀到後面就忘了前面。</p>
+                <p><b>Transformer 的創新：</b>「自我注意力」(Self-Attention)。</p>
+                <!-- <p><b>白話文：</b>它不是一個一個字讀，它是一口氣把整篇文章「看透」，它理解的是「上下文」。</p>
+                <p style="font-weight: 600;">這項創新讓 AI 的訓練可以「大規模並行化」，效率和效果都產生了核彈級的飛躍。</p> -->
+            </div>
+        </section>
+
+        <section class="layout-default">
+            <div class="slide-content" style="text-align: center;">
+                <h1><span style="color: var(--current-blue);">蘋果</span>妹介紹<span style="color: var(--current-blue);">蘋果</span>給不喜歡吃<span style="color: var(--current-blue);">蘋果</span>的粉絲</h1>
+                <p style="font-size: 2rem; color: var(--accent-color);">同一個詞，不同的語境，不同的意義</p>
+            </div>
+        </section>
+
+        <!-- 投影片 5: AI 下一個詞預測 -->
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>AI 下一個詞的預測</h1>
+                <h2 style="font-size: clamp(1.2rem, 3vw, 1.75rem); font-weight: 300; color: var(--accent-color); margin-top: 1rem;">Next-Word Prediction</h2>
+            </div>
+        </section>
+
+        <!-- 投影片 6: AI 文字生成原理 -->
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>AI 文字生成原理：機率接龍</h1>
+                <p>Transformer 模型核心原則：給定一段文字輸入，它會預測接下來最可能出現的下一個詞是什麼。</p>
+
+                <div class="interactive-diagram" style="margin: 2rem auto; max-width: 800px;">
+                    <div style="text-align: center; margin-bottom: 1.5rem;">
+                        <h4 style="color: var(--accent-color); margin-bottom: 1rem; font-size: clamp(1.2rem, 2.5vw, 1.75rem);">輸入：「無心插柳柳..」</h4>
+                        <button class="game-button" onclick="showNextWordProbabilities()">點擊查看 AI 預測的下一個詞機率</button>
+                    </div>
+
+                    <div id="probability-display" style="display: none;">
+                        <h5 style="color: var(--highlight-color); margin-bottom: 1rem; font-size: clamp(1.1rem, 2.2vw, 1.5rem); font-weight: 600;">AI 預測的下一個詞機率分佈：</h5>
+                        <div id="word-probabilities" style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin: 1rem 0;">
+                            <!-- 機率條會在這裡動態生成 -->
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <p style="font-size: clamp(1rem, 1.8vw, 1.3rem); color: var(--text-color);">AI 會根據上下文「無心插柳柳成蔭」的語境，給出最符合詩意和邏輯的下一個詞。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 投影片 7: 數學原理 Logits 與 Softmax -->
+        <section class="layout-default">
+            <div class="slide-content">
+                <h1>Logits 與 Softmax (參考資訊)</h1>
+                <p>Transformer 計算出每個詞彙的<strong>原始分數 (Logits)</strong>。Logits 代表了每個詞彙的可能性，但尚未標準化。</p>
+                <p>Softmax 函數將原始分數轉換為機率分佈，確保所有選項的機率總和為1。</p>
+                <div class="math-container">
+                    <p style="font-weight: 600; margin-bottom: 1.5rem;">公式：Logit $z_i$ 轉換為機率 $P_i$：</p>
+                    <div style="text-align: center; margin: 2rem 0; font-size: clamp(1.5rem, 3vw, 2rem);">
+                        $$P_i = \frac{e^{z_i}}{\sum_{j=1}^{N} e^{z_j}}$$
+                    </div>
+                    <p style="margin-top: 1.5rem;">• 轉換後，所有詞彙的機率總和為 1，就是下一個字詞</p>
+                </div>
+            </div>
+        </section>
+
+
+        <section class="layout-default hidden">
+            <div class="slide-content">
+                <h1>QKV (Query, Key, Value)</h1>
+                <p>Transformer「注意力機制」的運作核心。</p>
+                <ul>
+                    <li><b>Query (查詢)：</b>你的「問題」。</li>
+                    <li><b>Key (鍵)：</b>每本書的「標籤」或「索引」。</li>
+                    <li><b>Value (價值)：</b>書的「真正內容」。</li>
+                </ul>
+                <p style="font-weight: 600;">QKV 就是 AI 用來「在上下文中快速索引」的機制。</p>
+            </div>
+        </section>
+
+        <!-- 投影片：QKV 數學原理 -->
+        <section class="layout-default scrollable">
+            <div class="slide-content">
+                <h1>QKV 數學原理：用「暴君的廚師」來理解</h1>
+
+                <h2 style="font-size: clamp(1.4rem, 2.8vw, 1.8rem); font-weight: 600; color: var(--accent-color); margin-top: 2rem; margin-bottom: 1rem;">生活化類比：暴君的廚師</h2>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 2rem 0;">
+                    <div style="background: linear-gradient(135deg, rgba(154, 148, 140, 0.8), rgba(154, 148, 140, 0.6)); padding: 2rem; border-radius: 10px; text-align: center; border: 1px solid var(--line-color);">
+                        <h4 style="color: white; margin: 0 0 1.5rem 0; font-size: clamp(1.8rem, 3.5vw, 2.2rem);">🔍 Query (Q)</h4>
+                        <p style="color: white; margin: 0; font-size: clamp(1.3rem, 2.5vw, 1.6rem);"><strong>「暴君今天想吃什麼？」</strong></p>
+                        <p style="color: white; margin: 1rem 0 0 0; font-size: clamp(1.1rem, 2vw, 1.3rem);">搜尋的目標</p>
+                    </div>
+                    <div style="background: linear-gradient(135deg, rgba(140, 134, 123, 0.8), rgba(140, 134, 123, 0.6)); padding: 2rem; border-radius: 10px; text-align: center; border: 1px solid var(--line-color);">
+                        <h4 style="color: white; margin: 0 0 1.5rem 0; font-size: clamp(1.8rem, 3.5vw, 2.2rem);">🏷️ Key (K)</h4>
+                        <p style="color: white; margin: 0; font-size: clamp(1.3rem, 2.5vw, 1.6rem);"><strong>「這個食材適合做什麼？」</strong></p>
+                        <p style="color: white; margin: 1rem 0 0 0; font-size: clamp(1.1rem, 2vw, 1.3rem);">被搜尋的標籤</p>
+                    </div>
+                    <div style="background: linear-gradient(135deg, rgba(107, 139, 164, 0.8), rgba(107, 139, 164, 0.6)); padding: 2rem; border-radius: 10px; text-align: center; border: 1px solid var(--line-color);">
+                        <h4 style="color: white; margin: 0 0 1.5rem 0; font-size: clamp(1.8rem, 3.5vw, 2.2rem);">🍽️ Value (V)</h4>
+                        <p style="color: white; margin: 0; font-size: clamp(1.3rem, 2.5vw, 1.6rem);"><strong>「實際的料理內容」</strong></p>
+                        <p style="color: white; margin: 1rem 0 0 0; font-size: clamp(1.1rem, 2vw, 1.3rem);">內容的價值</p>
+                    </div>
+                </div>
+
+                <!-- <h2 style="font-size: clamp(1.4rem, 2.8vw, 1.8rem); font-weight: 600; color: var(--accent-color); margin-top: 2rem; margin-bottom: 1rem;">數學原理：</h2>
+                <p>• 先確認暴君的今天的口味（使用者的問題即是 Query）</p>
+                <p>• 每個食材（詞彙嵌入 $X$）就像一塊生肉，有無限的料理可能性（產生向量）</p>
+                <p>• 透過不同的「料理手法」（權重矩陣），我們可以從同一塊肉做出不同的料理（產出回應）</p> -->
+
+                <h2 style="font-size: clamp(1.4rem, 2.8vw, 1.8rem); font-weight: 600; color: var(--accent-color); margin-top: 2rem; margin-bottom: 1rem; cursor: pointer;">數學原理：縮放點積注意力 （參考資訊）</h2>
+                <div class="reveal-text reveal-block">
+                    <p>• Transformer 採用的是「縮放點積注意力」（Scaled Dot-Product Attention）。</p>
+                    <p>• 注意力分數計算 ( $Q K^T$ )：將 Query 矩陣與 Key 矩陣的轉置相乘 (點積)，計算出所有詞彙之間的相似度或相關性。</p>
+                    <p>• 公式：</p>
+                    <div style="text-align: center; margin: 2rem 0;">
+                        <div style="font-size: clamp(1.5rem, 3vw, 2rem);">
+                            $$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right) V$$
+                        </div>
+                    </div>
+
+                    <table style="margin-top: 2rem;">
+                        <thead>
+                            <tr>
+                                <th>數學符號</th>
+                                <th>意義</th>
+                                <th>白話解釋</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>$Q K^T$</td>
+                                <td>點積相似度</td>
+                                <td>查詢 (Q) 與所有標題 (K) 的比對結果。</td>
+                            </tr>
+                            <tr>
+                                <td>$\sqrt{d_k}$</td>
+                                <td>縮放因子</td>
+                                <td>用於防止向量維度 $d_k$ 過大時，點積結果也變得太大，導致 Softmax 運算後梯度變得不穩定。</td>
+                            </tr>
+                            <tr>
+                                <td>Softmax</td>
+                                <td>正規化</td>
+                                <td>將相似度分數轉換成總和為 1 的加權機率分佈。</td>
+                            </tr>
+                            <tr>
+                                <td>$\times V$</td>
+                                <td>加權求和</td>
+                                <td>根據機率權重，從 Value (內容) 中提取上下文資訊。</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-default">
             <div class="slide-content">
                 <h1>MoE <span style="font-size: 50%;">(Mixture of Experts)</span></h1>
                 <p>一種讓大型語言模型<b>內部分工協作</b>的架構。</p>
