@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>思考的遊戲 - DeepMind 紀錄片</title>
+    <script src="../../sidebar_tools/sidebar.js"></script>
+    <style>
+        /* ============================================
+           CSS 變數定義（來自 style_1116.md）
+           ============================================ */
+        :root {
+            --bg-color: #F5F4F0;        /* Warm, off-white, like aged paper */
+            --text-color: #3D3A37;      /* Dark, soft brown/gray */
+            --accent-color: #9A948C;    /* Muted stone gray */
+            --header-bg: #EAEBE6;       /* Very light, muted moss */
+            --line-color: #d1d1c2;      /* For borders and lines */
+            --highlight-color: #8c867b; /* For highlights */
+            --font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+        }
+
+        /* 投影片容器 */
+        .slides-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: var(--bg-color);
+        }
+
+        /* 投影片基礎樣式 */
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5vw;
+            box-sizing: border-box;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+            transform: scale(0.98);
+            text-align: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+            font-family: var(--font-family);
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            z-index: 1;
+        }
+
+        .slide.hidden {
+            display: none !important;
+        }
+
+        .slide.scrollable {
+            justify-content: flex-start;
+        }
+
+        /* 標題層級 */
+        h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 400;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 400;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--header-bg);
+        }
+
+        h3 {
+            font-size: clamp(1.8rem, 4.5vw, 3rem);
+            font-weight: 300;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--header-bg);
+        }
+
+        h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+        }
+
+        p {
+            font-size: clamp(1.2rem, 2.5vw, 1.75rem);
+            color: var(--text-color);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .slide-subtitle {
+            color: var(--accent-color);
+            font-size: clamp(1.2rem, 3vw, 1.75rem);
+            font-weight: 400;
+            margin-top: -1rem;
+        }
+
+        /* 導航系統 */
+        .nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 98%;
+            left: 1%;
+            display: flex;
+            justify-content: space-between;
+            z-index: 1002;
+            pointer-events: none;
+        }
+
+        .nav-btn {
+            pointer-events: all;
+            background: none;
+            border: 1px solid var(--line-color);
+            color: var(--accent-color);
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.4;
+            font-family: var(--font-family);
+        }
+
+        .nav-btn:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            opacity: 1;
+        }
+
+        /* 字多版本容器 */
+        .bunch-word-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            padding: 1.5vh 2vw;
+            overflow-y: auto;
+            overflow-x: hidden;
+            text-align: left;
+            height: 100%;
+            box-sizing: border-box;
+            font-family: var(--font-family);
+            direction: ltr;
+        }
+
+        .bunch-word-container > div {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0;
+        }
+
+        .bunch-word-container.full-page-scroll {
+            height: auto;
+            min-height: 100%;
+            overflow: visible;
+            padding-bottom: 5vh;
+        }
+
+        .bunch-word-container h2 {
+            font-size: clamp(1.8rem, 3.5vw, 2.2rem);
+            margin-bottom: 1.5vh;
+            text-align: center;
+            width: 100%;
+            color: var(--highlight-color);
+            font-weight: 400;
+        }
+
+        /* 列表系統 */
+        ul {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            max-width: 800px;
+            margin: 1rem 0;
+            font-family: var(--font-family);
+        }
+
+        ul li {
+            margin-bottom: 15px;
+            position: relative;
+            padding-left: 1.5em;
+            font-size: clamp(1rem, 2.5vw, 1.75rem);
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+
+        ul li::before {
+            content: '- ';
+            color: var(--accent-color);
+            font-weight: bold;
+            display: inline-block;
+            position: absolute;
+            left: 0;
+        }
+
+        /* 兩欄佈局 */
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            align-items: start;
+        }
+
+        .two-columns > div {
+            width: 100%;
+        }
+
+        .two-columns h4 {
+            font-size: clamp(1.344rem, 2.52vw, 1.68rem);
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .two-columns p {
+            font-size: clamp(1.2096rem, 2.268vw, 1.512rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .two-columns img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid var(--line-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        /* 投影片圖片樣式系統 */
+        .slide-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border: 1px solid var(--line-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: block;
+        }
+
+        /* 影片投影片系統 */
+        .slide.video-slide {
+            padding: 2vw;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+
+        .slide.video-slide h3 {
+            width: 100%;
+            max-width: none;
+            text-align: center;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 400;
+            color: var(--text-color);
+        }
+
+        .video-container {
+            width: 80%;
+            max-width: 800px;
+            height: auto;
+            aspect-ratio: 16 / 9;
+            margin-top: 20px;
+            border: 1px solid var(--line-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .video-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 8px;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 767px) {
+            .nav {
+                width: 95%;
+                left: 2.5%;
+            }
+
+            .nav-btn {
+                width: 44px;
+                height: 44px;
+                font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+                opacity: 0.6;
+            }
+
+            .bunch-word-container {
+                padding: 2vh 3vw;
+            }
+
+            .bunch-word-container h2 {
+                font-size: clamp(1.3rem, 3vw, 1.6rem);
+                margin-bottom: 2vh;
+                margin-top: 1vh;
+            }
+
+            .two-columns {
+                grid-template-columns: 1fr;
+            }
+
+            .two-columns > div {
+                width: 100%;
+            }
+
+            .slide.video-slide .video-container {
+                margin: 10px 0;
+                width: 90%;
+                max-width: 450px;
+            }
+
+        }
+
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .video-container {
+                width: 75%;
+                max-width: 700px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="slides-container">
+
+        <!-- 課程安排時間說明 -->
+        <section class="slide">
+            <h1>重要公告</h1>
+            <div class="two-columns" style="margin-top: 2rem; align-items: center;">
+                <div style="text-align: left; margin-left: 80px;">
+                    <p style="font-size: clamp(1.45rem, 2.72vw, 1.81rem);">12/16 調課至 <b> 12/4 本週四 0800:0950</b></p>
+                    <p style="font-size: clamp(1.45rem, 2.72vw, 1.81rem);">這週 12/2, 12/4 影片欣賞 (120 分鐘)</p>
+                </div>
+                <div>
+                    <img src="../../pic/w13/calendar.jpg" alt="課程行事曆">
+                </div>
+            </div>
+        </section>
+
+        <!-- 圖片 -->
+        <section class="slide">
+            <img src="../../pic/w13/fuji.jpg" alt="遊戲" class="slide-image">
+        </section>
+
+
+        <!-- 課程安排時間說明 -->
+        <section class="slide">
+            <h1>課程內容安排</h1>
+            <h2 style="filter: blur(10px); opacity: 0.6;">製作屬於你們的 RPG 遊戲</h2>
+            <div class="two-columns" style="margin-top: 2rem; align-items: center;">
+                <div style="text-align: right; margin-left: 30px;">
+                    <p style="font-size: clamp(1.45rem, 2.72vw, 1.81rem);"><b>12/9</b> <span style="filter: blur(10px); opacity: 0.6;">遊戲製作教學和規則說明</span></p>
+                    <p style="font-size: clamp(1.45rem, 2.72vw, 1.81rem);"><b>12/23</b> <span style="filter: blur(10px); opacity: 0.6;">分組討論和遊戲實作</span></p>
+                    <p style="font-size: clamp(1.45rem, 2.72vw, 1.81rem);"><b>12/30</b> <span style="filter: blur(10px); opacity: 0.6;">遊戲競賽</span></p>
+                    <p style="font-size: clamp(1.45rem, 2.72vw, 1.81rem);"><b>1/6</b> <span style="filter: blur(10px); opacity: 0.6;">評分和總結</span></p>
+                </div>
+                <div>
+                    <img src="../../pic/w13/calendar2.jpg" alt="課程行事曆">
+                </div>
+            </div>
+        </section>
+
+        <!-- 翻轉教室 -->
+        <section class="slide">
+            <style>
+                .slide ul.no-bullet li::before {
+                    content: none;
+                }
+            </style>
+            <h1>如何評量期末考？</h1>
+            <ul class="no-bullet" style="max-width: 1400px; margin-left: auto; margin-right: auto; list-style: none;">
+                <li style="font-size: clamp(3rem, 2.7625vw, 1.93375rem); padding-left: 0;">A. 分組</li>
+                <li style="font-size: clamp(3rem, 2.7625vw, 1.93375rem); padding-left: 0;">B. 單兵作戰</li>
+            </ul>
+        </section>
+
+        <!-- 標題頁 -->
+        <section class="slide active">
+            <h1>The Thinking Game</h1>
+            <p class="slide-subtitle">DeepMind 紀錄片</p>
+            <p style="margin-top: 2rem; font-size: clamp(1rem, 2vw, 1.3rem); color: var(--accent-color);">
+                通用 AI 的發展路徑、核心技術概念，以及隨之而來的倫理與社會責任
+            </p>
+        </section>
+
+        <!-- 影片前導介紹 -->
+        <section class="slide">
+            <div>
+                <h2>AI 界的超級英雄起源電影，從遊戲到科學</h2>
+
+                <p style="margin-top: 1.5rem; margin-bottom: 1rem; text-align: left; max-width: 1400px; margin-left: auto; margin-right: auto;">影片中記錄了 DeepMind 的三大突破</p>
+                <ul style="max-width: 1400px;">
+                    <li style="font-size: clamp(0.85rem, 2.125vw, 1.4875rem);"><strong>電玩高手：</strong> AI 首先在 Atari 遊戲中展現出超人水準，能從像素中學會玩數十種遊戲，證明了<strong>「通用學習機」</strong>的潛力。</li>
+                    <li style="font-size: clamp(0.85rem, 2.125vw, 1.4875rem);"><strong>聖杯征服者：</strong> 圍棋曾被認為是 AI 難以攻克的頂峰。而 AlphaGo 甚至下出了連人類專家都難以預測的創造性棋步。</li>
+                    <li style="font-size: clamp(0.85rem, 2.125vw, 1.4875rem);"><strong>拯救世界的科學家：</strong> 從遊戲到科學，用 AlphaFold 解決半世紀的生物學難題，蛋白質摺疊問題，作為「人類的禮物」。</li>
+                </ul>
+                <p style="margin-top: 2rem; color: var(--accent-color);">（這部紀錄片證明了：最強大的學習，往往從遊戲開始，但最終目標，卻是解決科學最深層的奧秘。）</p>
+            </div>
+        </section>
+
+        <!-- 影片架構 -->
+        <section class="slide">
+            <h2>影片架構</h2>
+            <div style="text-align: left; max-width: 1000px; margin-top: 2rem;">
+                <h4 style="margin-top: 1.5rem;">A. 奠基與初期探索：DeepMind 的成立初衷、人才招募策略</h4>
+                <h4 style="margin-top: 1.5rem;">B. 登峰造極與倫理反思：AlphaGo vs. AlphaZero </h4>
+                <h4 style="margin-top: 1.5rem;">C. 邁向真實世界的應用：AlphaFold 與 AGI 的迫近</h4>
+            </div>
+        </section>
+
+        <!-- 正片即將開始 -->
+        <section class="slide">
+            <h1>正片即將開始</h1>
+            <p style="margin-top: 2rem; font-size: clamp(1rem, 2vw, 1.3rem); color: var(--accent-color);">請放下手機，開啟靜音，認真觀看。<br>（找回你們的持續專注力）</p>
+        </section>
+
+        <!-- 影片欣賞 -->
+        <section class="slide video-slide hidden">
+            <h3>影片欣賞</h3>
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/d95J8yzvjbQ"
+                        title="The Thinking Game - DeepMind Documentary"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
+            </div>
+        </section>
+    </div>
+
+    <!-- 導航按鈕 -->
+    <div class="nav">
+        <button class="nav-btn" id="prevBtn">&#8249;</button>
+        <button class="nav-btn" id="nextBtn">&#8250;</button>
+    </div>
+
+    <script>
+        // 投影片導航系統
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        function showSlide(index) {
+            // 如果目標投影片有 hidden class，不顯示
+            if (slides[index] && slides[index].classList.contains('hidden')) {
+                return;
+            }
+
+            slides.forEach((slide, i) => {
+                if (i === index) {
+                    slide.classList.add('active');
+                    // 不移除 hidden class，尊重 hidden 狀態
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+            currentSlide = index;
+        }
+
+        function getNextVisibleSlide(currentIndex) {
+            for (let i = currentIndex + 1; i < slides.length; i++) {
+                if (!slides[i].classList.contains('hidden')) {
+                    return i;
+                }
+            }
+            return currentIndex;
+        }
+
+        function getPrevVisibleSlide(currentIndex) {
+            for (let i = currentIndex - 1; i >= 0; i--) {
+                if (!slides[i].classList.contains('hidden')) {
+                    return i;
+                }
+            }
+            return currentIndex;
+        }
+
+        function nextSlide() {
+            const nextIndex = getNextVisibleSlide(currentSlide);
+            if (nextIndex !== currentSlide) {
+                showSlide(nextIndex);
+            }
+        }
+
+        function prevSlide() {
+            const prevIndex = getPrevVisibleSlide(currentSlide);
+            if (prevIndex !== currentSlide) {
+                showSlide(prevIndex);
+            }
+        }
+
+        // 導航按鈕事件
+        document.getElementById('nextBtn').addEventListener('click', nextSlide);
+        document.getElementById('prevBtn').addEventListener('click', prevSlide);
+
+        // 鍵盤導航
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                prevSlide();
+            }
+        });
+
+
+        // 初始化顯示第一張非 hidden 的投影片
+        let firstVisibleIndex = 0;
+        for (let i = 0; i < slides.length; i++) {
+            if (!slides[i].classList.contains('hidden')) {
+                firstVisibleIndex = i;
+                break;
+            }
+        }
+        showSlide(firstVisibleIndex);
+    </script>
+</body>
+</html>
+

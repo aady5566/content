@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>神諭與賭局：DeepMind 的技術救世論</title>
+    <style>
+        :root {
+            /* Wabi-Sabi Palette: Earthy, Muted, Organic */
+            --bg-color: #f0f1eb; /* Rice paper */
+            --text-main: #464542; /* Sumi ink (soft charcoal) */
+            --text-light: #7a7672; /* Stone */
+            --accent: #8c9184; /* Dried Sage */
+            --highlight: #bfaea0; /* Clay */
+            --slide-transition: 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Calibri', 'Candara', 'Segoe UI', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            line-height: 1.6;
+        }
+
+        /* Slide Container */
+        .deck-container {
+            position: relative;
+            width: 90vw;
+            height: 85vh;
+            max-width: 1200px;
+            background: transparent;
+        }
+
+        /* Individual Slides */
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 4rem 6rem;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: opacity var(--slide-transition), transform var(--slide-transition), visibility var(--slide-transition);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        /* Typography & Layout */
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 300;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+            color: var(--text-main);
+        }
+
+        h2 {
+            font-size: 2.2rem;
+            font-weight: 400;
+            margin-bottom: 2rem;
+            color: var(--accent);
+            border-bottom: 1px solid rgba(140, 145, 132, 0.3);
+            padding-bottom: 1rem;
+            display: inline-block;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        p {
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            max-width: 1100px;
+            color: var(--text-main);
+            font-weight: 300;
+        }
+
+        .quote-block {
+            border-left: 4px solid var(--highlight);
+            padding-left: 20px;
+            margin: 2rem 0;
+            font-style: italic;
+            color: var(--text-light);
+            font-size: 1.6rem;
+            max-width: 1100px;
+        }
+
+        .highlight-text {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .sub-text {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-top: 2rem;
+        }
+
+        /* List Styles */
+        ul {
+            list-style: none;
+            padding-left: 10px;
+            max-width: 1100px;
+        }
+
+        li {
+            font-size: 1.4rem;
+            margin-bottom: 12px;
+            position: relative;
+            padding-left: 25px;
+            font-weight: 300;
+        }
+
+        li::before {
+            content: "•";
+            color: var(--highlight);
+            position: absolute;
+            left: 0;
+            font-size: 1.5em;
+            line-height: 1;
+        }
+
+        /* Navigation Controls */
+        .controls {
+            position: absolute;
+            bottom: 30px;
+            right: 60px;
+            display: flex;
+            gap: 20px;
+            z-index: 10;
+        }
+
+        button {
+            background: transparent;
+            border: 1px solid var(--text-light);
+            color: var(--text-light);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button:hover {
+            border-color: var(--text-main);
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        button:disabled {
+            opacity: 0.3;
+            cursor: default;
+            border-color: transparent;
+        }
+
+        /* Progress Indicator */
+        .progress-container {
+            position: absolute;
+            bottom: 45px;
+            left: 60px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #d1cfcd;
+            transition: background-color 0.4s ease;
+        }
+
+        .dot.active {
+            background-color: var(--accent);
+        }
+
+        /* Decorative Elements */
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(181, 171, 162, 0.08);
+            z-index: -1;
+        }
+
+        .circle-1 { width: 600px; height: 600px; top: -100px; right: -100px; }
+        .circle-2 { width: 400px; height: 400px; bottom: -50px; left: -100px; }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .slide { padding: 2rem; }
+            h1 { font-size: 2.2rem; }
+            h2 { font-size: 1.6rem; }
+            p, li, .quote-block { font-size: 1.1rem; }
+            .controls { bottom: 20px; right: 20px; }
+            .progress-container { left: 20px; bottom: 35px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-circle circle-1"></div>
+    <div class="bg-circle circle-2"></div>
+
+    <div class="deck-container">
+
+        <div class="slide active">
+            <p style="color: var(--accent); letter-spacing: 2px; text-transform: uppercase; font-size: 0.9rem;">Deep-Critics Review</p>
+            <h1>神諭與賭局<br><span style="font-size: 0.6em; color: var(--text-light); font-weight: normal;">Oracles and Gambles</span></h1>
+            <p class="quote-block" style="border: none; padding-left: 0; font-size: 1.5rem;">
+                評 DeepMind 紀錄片《The Thinking Game》中的技術救世論與認識論危機
+            </p>
+        </div>
+
+        <div class="slide">
+            <h2>技術的史詩與焦慮</h2>
+            <p>《The Thinking Game》表面上是一部關於 Atari、圍棋到 AlphaFold 的技術編年史。</p>
+            <p>若剝開其精緻的剪輯，這是一份當代的<strong>認識論宣言</strong>，拋出了一個誘人卻危險的命題：</p>
+            <div class="quote-block">
+                "只要解決了智慧 (Intelligence)，我們就能解決一切 (Everything else)。"
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>01. 遊戲的隱喻</h2>
+            <h3>從完美資訊到混亂現實</h3>
+            <p>影片邏輯：遊戲是現實的縮影。如果 AI 能在《星海爭霸》稱王，自然也能解決氣候變遷。</p>
+            <ul>
+                <li><strong>本體論謬誤：</strong>將「封閉系統」的成功，外推至「開放系統」。</li>
+                <li><strong>現實的模糊性：</strong>人類社會沒有統一的「獎勵函數」。</li>
+                <li><strong>技術解決主義：</strong>將政治與倫理困境，化約為單純的「優化問題」。</li>
+            </ul>
+            <p style="margin-top: 1rem; font-size: 1.2rem; color: var(--text-light);">現實世界中，並沒有一個上帝來定義何謂「贏」。</p>
+        </div>
+
+        <div class="slide">
+            <h2>02. 科學的轉向</h2>
+            <h3>從尋求解釋到乞求神諭</h3>
+            <p>AlphaFold 是科學工具的飛躍，但也標誌著科學範式的斷裂。</p>
+            <ul>
+                <li><strong>傳統科學 (Logos)：</strong>理解「為什麼」(Why) —— 解釋因果。</li>
+                <li><strong>神諭科學 (Oracle)：</strong>精準預測「是什麼」(What) —— 黑箱運算。</li>
+            </ul>
+            <div class="quote-block" style="font-size: 1.4rem;">
+                我們獲得了效率，卻失去了對自然法則的解釋權。科學家從探險者變成了向算法乞求答案的祭司。
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>03. 權力的博弈</h2>
+            <h3>數位封建主義與仁慈獨裁</h3>
+            <p>影片隱喻 DeepMind 為當代的曼哈頓計畫，卻淡化了背後的政治經濟學。</p>
+            <ul>
+                <li><strong>資源集中：</strong>算力與數據日益集中在極少數科技巨頭 (Google) 手中。</li>
+                <li><strong>數位封建主義：</strong>領主擁有算力農場，科學家在恩賜下使用工具。</li>
+                <li><strong>菁英主義視角：</strong>寄望於「仁慈的獨裁者」，而非民主監督。</li>
+            </ul>
+            <div class="quote-block" style="font-size: 1.4rem;">這是全人類的勝利，還是矽谷資本對知識權的再一次壟斷？</div>
+        </div>
+
+        <div class="slide">
+            <h2>04. 李世乭的眼淚</h2>
+            <h3>效率的極致 vs. 意義的追尋</h3>
+            <p>李世乭的落敗象徵著人類中心主義的葬禮，但在那神之一手 (Move 78) 中，我們看見了人性的光輝。</p>
+            <ul>
+                <li><strong>AI 的智慧：</strong>來自大數據的暴力窮舉與優化。</li>
+                <li><strong>人的智慧：</strong>來自有限生命與壓力下的掙扎。</li>
+            </ul>
+            <div class="quote-block" style="font-size: 1.4rem;">
+                DeepMind 贏得了博弈，但尚未理解「意義」。它能算出勝率，卻無法理解下棋的快樂或痛苦。
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>結語</h2>
+            <p>DeepMind 證明了 AI 是強大的工具，AlphaFold 足以載入史冊。但我們必須保持警惕：</p>
+            <ul>
+                <li>拒絕將一切社會問題簡化為計算問題。</li>
+                <li>警惕將解釋權完全讓渡給黑箱算法。</li>
+            </ul>
+        </div>
+
+        <div class="progress-container" id="progress">
+            </div>
+
+        <div class="controls">
+            <button id="prevBtn" aria-label="Previous Slide">←</button>
+            <button id="nextBtn" aria-label="Next Slide">→</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const progressContainer = document.getElementById('progress');
+            let currentSlide = 0;
+            const totalSlides = slides.length;
+
+            // Initialize Progress Dots
+            slides.forEach((_, index) => {
+                const dot = document.createElement('div');
+                dot.classList.add('dot');
+                if (index === 0) dot.classList.add('active');
+                progressContainer.appendChild(dot);
+            });
+
+            const dots = document.querySelectorAll('.dot');
+
+            function updateSlide(index) {
+                // Bounds Check
+                if (index < 0) index = 0;
+                if (index >= totalSlides) index = totalSlides - 1;
+
+                currentSlide = index;
+
+                // Update Slides
+                slides.forEach((slide, i) => {
+                    slide.classList.remove('active');
+                    if (i === currentSlide) {
+                        slide.classList.add('active');
+                    }
+                });
+
+                // Update Dots
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === currentSlide);
+                });
+
+                // Update Button State
+                prevBtn.disabled = currentSlide === 0;
+                nextBtn.disabled = currentSlide === totalSlides - 1;
+            }
+
+            // Event Listeners
+            prevBtn.addEventListener('click', () => updateSlide(currentSlide - 1));
+            nextBtn.addEventListener('click', () => updateSlide(currentSlide + 1));
+
+            // Keyboard Navigation
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft') {
+                    updateSlide(currentSlide - 1);
+                } else if (e.key === 'ArrowRight' || e.key === ' ') {
+                    updateSlide(currentSlide + 1);
+                }
+            });
+
+            // Initial State
+            updateSlide(0);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+{
+    "gameTitle": "大稻埕迷霧：消失的茶葉",
+    "characters": [
+      {
+        "id": "char_001",
+        "name": "林志遠",
+        "role": "熱血初學者",
+        "description": "林家茶行的獨生子，年僅19歲。性格衝動直率，對振興家族茶業抱有極大的熱情，但缺乏社會經驗。",
+        "special_skill": "絕對嗅覺 (Absolute Smell) - 能在混雜的氣味中瞬間分辨出茶葉的產地與烘焙程度。"
+      },
+      {
+        "id": "char_002",
+        "name": "王萬金",
+        "role": "貪婪的商賈",
+        "description": "大稻埕勢力龐大的暴發戶，穿著不合身的西裝，手指戴滿金戒指。為了壟斷茶葉出口市場，不惜使用卑鄙手段打壓同行。",
+        "special_skill": "黑市操盤 (Market Manipulation) - 能夠動用金錢力量封鎖消息或賄賂官員。"
+      },
+      {
+        "id": "char_003",
+        "name": "小泥鰍",
+        "role": "街頭情報販子",
+        "description": "在大稻埕碼頭討生活的孤兒，身手矯健，平時偽裝成擦鞋童或報童。只要給錢，大稻埕沒有他不知道的秘密。",
+        "special_skill": "如影隨形 (Shadow Eavesdrop) - 能在不被發現的情況下潛入人群偷聽對話。"
+      }
+    ],
+    "scenes": [
+      {
+        "scene_id": "scene_01",
+        "text": "1924年的大稻埕，午後雷陣雨剛過。你剛回到自家的『林記茶行』，卻發現店內一片狼藉，櫃檯後的暗格被撬開，父親視若性命的『特級東方美人茶秘方』不翼而飛！空氣中殘留著一股陌生的古龍水味和泥土味。",
+        "background_description": "1920s Taipei Dadaocheng tea shop interior, messy wooden drawers, spilled tea leaves on the floor, cinematic lighting, sepia tone, retro aesthetic, detailed textures.",
+        "choices": [
+          {
+            "text": "冷靜下來，仔細檢查暗格周圍的痕跡。",
+            "next_scene_id": "scene_02",
+            "score_change": 10
+          },
+          {
+            "text": "太生氣了！直接衝出門去街上大吼大叫尋找目擊者。",
+            "next_scene_id": "scene_02",
+            "score_change": -5
+          }
+        ]
+      },
+      {
+        "scene_id": "scene_02",
+        "text": "你追查線索來到了淡水河畔的碼頭。此時正值貨船出港的高峰期，苦力們忙著搬運貨物。你在泥濘的地上發現了一串特殊的皮鞋腳印，這不是普通苦力穿得起的鞋子。腳印延伸向一條堆滿木箱的小巷。",
+        "background_description": "Busy wharf at Tamsui River, 1920s Taiwan, red brick buildings in the background, coolies carrying sacks, wet muddy ground, sunset, historical atmosphere, bustle.",
+        "choices": [
+          {
+            "text": "這可能是陷阱，先找附近的擦鞋童打聽消息。",
+            "next_scene_id": "scene_03",
+            "score_change": 5
+          },
+          {
+            "text": "不管了，順著腳印直接衝進巷子裡！",
+            "next_scene_id": "scene_04",
+            "score_change": -10
+          }
+        ]
+      },
+      {
+        "scene_id": "scene_03",
+        "text": "你在路邊找到了正在擦鞋的『小泥鰍』。他狡黠地笑了笑，伸出了髒兮兮的手掌。'林少爺，這年頭消息可是要收費的。我看見王萬金的管家剛剛慌慌張張地進了那邊的紅磚倉庫，身上還帶著那股刺鼻的洋人香水味。'",
+        "background_description": "Close up shot of a street urchin in 1920s clothing, holding a shoe shine kit, smiling slyly, crowded street market background, steam from food stalls, anime style art.",
+        "choices": [
+          {
+            "text": "給他一塊銀元，感謝他的情報。",
+            "next_scene_id": "scene_04",
+            "score_change": 10
+          },
+          {
+            "text": "抓住他的領子，逼他說出更多細節。",
+            "next_scene_id": "scene_04",
+            "score_change": -5
+          }
+        ]
+      },
+      {
+        "scene_id": "scene_04",
+        "text": "夜幕降臨，你來到了王萬金名下的私人倉庫外。大門緊鎖，兩個身材魁梧的保鑣正在門口抽菸。透過高處的氣窗，你隱約看見王萬金正拿著一張泛黃的紙張——那是你家的秘方！",
+        "background_description": "Night scene, exterior of a gloomy red brick warehouse, two guards smoking, dim gas street lamp, shadows, noir detective atmosphere, 1920s architecture.",
+        "choices": [
+          {
+            "text": "發動『絕對嗅覺』，尋找倉庫通風口的茶香來源，從後方潛入。",
+            "next_scene_id": "scene_05",
+            "score_change": 15
+          },
+          {
+            "text": "聲東擊西，朝反方向扔石頭引開守衛。",
+            "next_scene_id": "scene_05",
+            "score_change": 5
+          }
+        ]
+      },
+      {
+        "scene_id": "scene_05",
+        "text": "你成功潛入倉庫內部。王萬金正得意地將秘方放入保險箱。就在這時，他不小心碰倒了一個茶罐，發出巨響。他轉身看向你躲藏的貨架方向，手伸向了腰間的手槍。此刻是奪回秘方的最後機會！",
+        "background_description": "Inside a warehouse, stacks of tea crates, a wealthy fat merchant looking suspicious near a safe, tense atmosphere, dramatic lighting, low angle shot.",
+        "choices": [
+          {
+            "text": "趁他還沒拔槍，利用周圍的茶箱掩護，衝過去搶奪秘方！",
+            "next_scene_id": "scene_06",
+            "score_change": 20
+          },
+          {
+            "text": "大聲喝斥，謊稱警察已經包圍了這裡，試圖嚇唬他。",
+            "next_scene_id": "scene_06",
+            "score_change": 10
+          }
+        ]
+      },
+      {
+        "scene_id": "scene_06",
+        "text": "一陣混亂後，你緊緊抓住了秘方，撞開側門逃入大稻埕錯綜復雜的巷弄中。身後的叫罵聲越來越遠。隔天清晨，林記茶行的煙囪再次升起焙茶的白煙，那是屬於大稻埕最道地的香氣。你成功守護了家族的榮耀。",
+        "background_description": "Sunrise over Dadaocheng streets, traditional baroque facade buildings, peaceful morning, a silhouette of a young man looking at the sky, hopeful atmosphere, watercolor style.",
+        "choices": [
+          {
+            "text": "重新開始遊戲",
+            "next_scene_id": "scene_01",
+            "score_change": 0
+          }
+        ]
+      }
+    ]
+  }
