@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI vs Human: RL Demo (Fixed)</title>
+    <style>
+        body { margin: 0; background-color: #1a1a1a; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; height: 100vh; overflow: hidden; touch-action: none; }
+        #ui-panel { width: 100%; max-width: 400px; padding: 15px; background: #2d2d2d; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.6); z-index: 10; }
+        .row { display: flex; justify-content: space-between; align-items: center; }
+        h2 { margin: 0; font-size: 1.1rem; color: #4CAF50; letter-spacing: 1px; }
+        .switch-container { display: flex; align-items: center; gap: 10px; }
+        button { border: none; padding: 8px 16px; color: white; border-radius: 6px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; font-weight: 600; }
+        button:active { transform: scale(0.95); }
+        .mode-human { background-color: #4CAF50; box-shadow: 0 4px 0 #2E7D32; }
+        .mode-human:active { box-shadow: 0 0 0 #2E7D32; transform: translateY(4px); }
+        .mode-ai { background-color: #2196F3; box-shadow: 0 4px 0 #1565C0; }
+        .mode-ai:active { box-shadow: 0 0 0 #1565C0; transform: translateY(4px); }
+        .train-btn { background: #FF9800; width: 100%; margin-top: 5px; box-shadow: 0 4px 0 #E65100; }
+        .train-btn:active { box-shadow: 0 0 0 #E65100; transform: translateY(4px); }
+        .train-btn:disabled { background: #555; box-shadow: none; cursor: not-allowed; opacity: 0.5; transform: none; }
+        #stats { font-size: 0.8rem; color: #bbb; display: flex; justify-content: space-between; margin-top: 5px; background: #222; padding: 8px; border-radius: 4px; }
+        canvas { background: #222; flex-grow: 1; width: 100%; max-width: 400px; cursor: crosshair; }
+    </style>
+</head>
+<body>
+    <div id="ui-panel">
+        <div class="row">
+            <h2>Gemini RL 訓練場</h2>
+            <div class="switch-container">
+                <span id="modeText" style="font-weight:bold; color:#4CAF50; font-size: 0.9rem;">🖐 手動模式</span>
+                <button id="toggleBtn" class="mode-human" onclick="toggleMode()">切換 AI</button>
+            </div>
+        </div>
+        <div id="stats">
+            <span>得分: <b id="scoreDisplay" style="color:#fff">0</b></span>
+            <span>AI回合: <b id="episodeDisplay" style="color:#fff">0</b></span>
+            <span>探索率(ε): <b id="epsilonDisplay" style="color:#fff">0</b></span>
+        </div>
+        <button id="trainBtn" class="train-btn" onclick="fastTrain()" disabled>🚀 AI 速成 (快轉 2000 回合)</button>
+    </div>
+    <canvas id="gameCanvas"></canvas>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const uiPanel = document.getElementById('ui-panel');
+
+    // Config
+    const player = { width: 60, height: 15, x: 0, speed: 8, color: '#4CAF50' }; // speed increased slightly for better responsiveness
+    const target = { size: 10, x: 0, y: 0, speed: 6, color: '#FF5252' };
+    const ACTIONS = [-1, 0, 1];
+    const LEARNING_RATE = 0.2; // 稍微調高學習率
+    const DISCOUNT_FACTOR = 0.95; // 重視未來獎勵
+
+    // State vars
+    let score = 0;
+    let isAI = false;
+    let animationId;
+    let qTable = {};
+    let epsilon = 0.5;
+    let episodeCount = 0;
+
+    // --- Resizing Logic ---
+    function resize() {
+        // 設定 Canvas 內部解析度
+        canvas.width = Math.min(window.innerWidth, 400);
+        canvas.height = window.innerHeight - uiPanel.offsetHeight;
+
+        // 確保 resize 後板子不會跑到外面
+        if (player.x > canvas.width - player.width) {
+            player.x = canvas.width - player.width;
+        }
+    }
+    window.addEventListener('resize', resize);
+    resize(); // Init
+
+    function resetTarget() {
+        target.x = Math.random() * (canvas.width - target.size * 2) + target.size; // 確保球不會生成在牆壁裡
+        target.y = -target.size;
+    }
+
+    // Init game state
+    player.x = canvas.width/2 - player.width/2;
+    resetTarget();
+
+    function getState() {
+        // 狀態標準化：將相對位置離散化
+        // 增加解析度：原本 /10 可能太粗糙，改成 /40 (約 10 個 buckets)
+        const dx = target.x - (player.x + player.width / 2);
+        const bucketSize = 40;
+        return Math.floor(dx / bucketSize);
+    }
+
+    function getQ(state, actionIdx) {
+        if (!qTable[state]) qTable[state] = [0, 0, 0];
+        return qTable[state][actionIdx];
+    }
+
+    function chooseAction(state) {
+        // Epsilon-Greedy
+        if (Math.random() < epsilon) return Math.floor(Math.random() * 3);
+
+        const qs = [getQ(state, 0), getQ(state, 1), getQ(state, 2)];
+        const maxQ = Math.max(...qs);
+        // 如果有多個動作 Q 值相同，隨機選一個 (避免 AI 僵直)
+        const bestActions = qs.map((q, i) => q === maxQ ? i : -1).filter(i => i !== -1);
+        return bestActions[Math.floor(Math.random() * bestActions.length)];
+    }
+
+    function updateQ(state, actionIdx, reward, nextState) {
+        const currentQ = getQ(state, actionIdx);
+        const maxNextQ = Math.max(getQ(nextState, 0), getQ(nextState, 1), getQ(nextState, 2));
+        qTable[state][actionIdx] = currentQ + LEARNING_RATE * (reward + DISCOUNT_FACTOR * maxNextQ - currentQ);
+    }
+
+    function checkCollision() {
+        // 修正後的碰撞判定：考慮球的半徑 (寬容判定)
+        const hitY = target.y + target.size >= canvas.height - player.height;
+        // 判定 X 軸：球的右緣 >= 板子左緣 AND 球的左緣 <= 板子右緣
+        const hitX = (target.x + target.size >= player.x) && (target.x - target.size <= player.x + player.width);
+        return hitY && hitX;
+    }
+
+    function gameLoop() {
+        const state = getState();
+        let actionIdx = 1; // Default stay
+
+        if (isAI) {
+            actionIdx = chooseAction(state);
+            player.x += ACTIONS[actionIdx] * player.speed;
+        }
+
+        // Boundary Check
+        if (player.x < 0) player.x = 0;
+        if (player.x > canvas.width - player.width) player.x = canvas.width - player.width;
+
+        // Move Target
+        target.y += target.speed;
+
+        let reward = 0;
+        let isDone = false;
+
+        // Collision Logic
+        if (checkCollision()) {
+            score += 10;
+            reward = 10;
+            isDone = true;
+            resetTarget();
+        } else if (target.y > canvas.height) {
+            score -= 10;
+            reward = -10;
+            isDone = true;
+            resetTarget();
+        }
+
+        if (isAI) {
+            const nextState = getState();
+            updateQ(state, actionIdx, reward, nextState);
+            if (isDone) {
+                episodeCount++;
+                // Decay epsilon
+                if (epsilon > 0.01) epsilon *= 0.995;
+            }
+        }
+
+        // Draw
+        ctx.fillStyle = '#222';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Draw Target
+        ctx.beginPath();
+        ctx.arc(target.x, target.y, target.size, 0, Math.PI*2);
+        ctx.fillStyle = target.color;
+        ctx.fill();
+
+        // Draw Player
+        ctx.fillStyle = player.color;
+        ctx.fillRect(player.x, canvas.height - player.height, player.width, player.height);
+
+        // UI Updates
+        document.getElementById('scoreDisplay').innerText = score;
+        document.getElementById('episodeDisplay').innerText = episodeCount;
+        document.getElementById('epsilonDisplay').innerText = epsilon.toFixed(3);
+
+        animationId = requestAnimationFrame(gameLoop);
+    }
+
+    // Input Handling
+    function handleInput(clientX) {
+        if (isAI) return;
+        const rect = canvas.getBoundingClientRect();
+        let relativeX = clientX - rect.left;
+        // Center the paddle on mouse/touch
+        player.x = relativeX - player.width / 2;
+
+        // Visual clamp for immediate feedback
+        if (player.x < 0) player.x = 0;
+        if (player.x > canvas.width - player.width) player.x = canvas.width - player.width;
+    }
+
+    canvas.addEventListener('mousemove', e => handleInput(e.clientX));
+    canvas.addEventListener('touchmove', e => {
+        e.preventDefault(); // Prevent scrolling
+        handleInput(e.touches[0].clientX);
+    }, { passive: false });
+
+    function toggleMode() {
+        isAI = !isAI;
+        const btn = document.getElementById('toggleBtn');
+        const txt = document.getElementById('modeText');
+        const trainBtn = document.getElementById('trainBtn');
+
+        if (isAI) {
+            btn.innerText = "切回手動";
+            btn.className = "mode-ai";
+            txt.innerText = "🤖 AI 代管中";
+            txt.style.color = "#2196F3";
+            player.color = "#2196F3";
+            trainBtn.disabled = false;
+        } else {
+            btn.innerText = "切換 AI";
+            btn.className = "mode-human";
+            txt.innerText = "🖐 手動模式";
+            txt.style.color = "#4CAF50";
+            player.color = "#4CAF50";
+            trainBtn.disabled = true;
+        }
+    }
+
+    function fastTrain() {
+        if (!isAI) return;
+
+        // Pause rendering
+        cancelAnimationFrame(animationId);
+
+        const trainBtn = document.getElementById('trainBtn');
+        trainBtn.innerText = "訓練中...";
+        trainBtn.disabled = true;
+
+        // Use setTimeout to allow UI to update "Training..." text before freezing
+        setTimeout(() => {
+            const episodesToTrain = 2000;
+
+            for(let i=0; i<episodesToTrain; i++) {
+                let tempDone = false;
+
+                // Temp variables for simulation so we don't mess up visual state abruptly
+                let simPlayerX = Math.random() * (canvas.width - player.width); // Random start pos helps generalization
+                let simTargetX = Math.random() * (canvas.width - target.size * 2) + target.size;
+                let simTargetY = -target.size;
+
+                while(!tempDone) {
+                    // 1. Get State
+                    const dx = simTargetX - (simPlayerX + player.width / 2);
+                    const bucketSize = 40;
+                    const state = Math.floor(dx / bucketSize);
+
+                    // 2. Choose Action
+                    let actionIdx;
+                    if (Math.random() < epsilon) {
+                        actionIdx = Math.floor(Math.random() * 3);
+                    } else {
+                        const qs = [getQ(state, 0), getQ(state, 1), getQ(state, 2)];
+                        const maxQ = Math.max(...qs);
+                        const bestActions = qs.map((q, k) => q === maxQ ? k : -1).filter(k => k !== -1);
+                        actionIdx = bestActions[Math.floor(Math.random() * bestActions.length)];
+                    }
+
+                    // 3. Move Player
+                    simPlayerX += ACTIONS[actionIdx] * player.speed;
+                    if (simPlayerX < 0) simPlayerX = 0;
+                    if (simPlayerX > canvas.width - player.width) simPlayerX = canvas.width - player.width;
+
+                    // 4. Move Target
+                    simTargetY += target.speed;
+
+                    // 5. Reward & Collision
+                    let reward = 0;
+                    // Check logic copy-pasted for consistency
+                    const hitY = simTargetY + target.size >= canvas.height - player.height;
+                    const hitX = (simTargetX + target.size >= simPlayerX) && (simTargetX - target.size <= simPlayerX + player.width);
+
+                    if (hitY && hitX) {
+                        reward = 10;
+                        tempDone = true;
+                    } else if (simTargetY > canvas.height) {
+                        reward = -10;
+                        tempDone = true;
+                    }
+
+                    // 6. Update Q
+                    const nextDx = simTargetX - (simPlayerX + player.width / 2);
+                    const nextState = Math.floor(nextDx / bucketSize);
+
+                    const currentQ = getQ(state, actionIdx);
+                    const maxNextQ = Math.max(getQ(nextState, 0), getQ(nextState, 1), getQ(nextState, 2));
+                    qTable[state][actionIdx] = currentQ + LEARNING_RATE * (reward + DISCOUNT_FACTOR * maxNextQ - currentQ);
+                }
+
+                episodeCount++;
+                if (epsilon > 0.01) epsilon *= 0.995;
+            }
+
+            // Resume Game
+            score = 0; // 重置分數，因為 AI 變強了，讓使用者重新看它表現
+            resetTarget(); // 重置球的位置，避免視覺瞬移
+            player.x = canvas.width/2 - player.width/2; // 重置板子
+
+            alert(`⚡ 訓練完成！\n已模擬 ${episodesToTrain} 回合。\n探索率 (Epsilon) 已降至: ${epsilon.toFixed(3)}\n分數已重置。`);
+
+            trainBtn.innerText = "🚀 AI 速成 (快轉 2000 回合)";
+            trainBtn.disabled = false;
+            gameLoop();
+
+        }, 50); // Small delay to let UI render
+    }
+
+    // Start
+    gameLoop();
+</script>
+</body>
+</html>
+
+
+

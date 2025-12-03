@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI Breakout: Physics Fix</title>
+    <style>
+        body { margin: 0; background-color: #121212; color: #eee; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; height: 100vh; overflow: hidden; touch-action: none; }
+
+        #ui-panel {
+            width: 100%; max-width: 400px; padding: 10px; background: #1e1e1e;
+            border-bottom: 2px solid #333; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 10;
+            box-sizing: border-box;
+        }
+
+        .row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        h2 { margin: 0; font-size: 1.1rem; color: #ff5252; display: flex; align-items: center; gap: 5px; }
+
+        .btn-group { display: flex; gap: 8px; }
+        button { border: none; padding: 6px 12px; color: white; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: bold; transition: 0.2s; white-space: nowrap; }
+        button:active { transform: scale(0.96); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .mode-human { background-color: #4CAF50; }
+        .mode-ai { background-color: #2196F3; }
+        .btn-train { background-color: #FF9800; flex-grow: 1; }
+        .btn-reset { background-color: #607D8B; }
+
+        /* Toggle Switch 樣式 */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            background-color: #4CAF50;
+            border-radius: 13px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch.ai-mode {
+            background-color: #2196F3;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background-color: white;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .toggle-switch.ai-mode::after {
+            transform: translateX(24px);
+        }
+
+        .toggle-label {
+            color: #aaa;
+            font-size: 0.85rem;
+            user-select: none;
+        }
+
+        #stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; font-size: 0.8rem; color: #aaa; background: #252525; padding: 8px; border-radius: 4px; }
+        .stat-item { text-align: center; }
+        .stat-item b { color: #fff; display: block; font-size: 1rem; }
+
+        canvas { background: #000; display: block; max-width: 100%; cursor: none; touch-action: none; }
+    </style>
+</head>
+<body>
+
+<div id="ui-panel">
+    <div class="row">
+        <h2>AI Breakout <small style="font-size:0.7em; color:#888;">(Physics Fix)</small></h2>
+        <div class="btn-group">
+            <div class="toggle-container">
+                <span class="toggle-label">手動</span>
+                <div id="toggleSwitch" class="toggle-switch" onclick="toggleMode()"></div>
+                <span class="toggle-label">AI</span>
+            </div>
+            <button class="btn-reset" onclick="resetGameFull()">重置</button>
+        </div>
+    </div>
+
+    <div id="stats">
+        <div class="stat-item">分數<b id="s_score">0</b></div>
+        <div class="stat-item">回合<b id="s_episode">0</b></div>
+        <div class="stat-item">探索率<b id="s_epsilon">0.00</b></div>
+    </div>
+    <div id="debug-stats" style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; font-size: 0.7rem; color: #888; background: #252525; padding: 6px; border-radius: 4px; margin-top: 5px;">
+        <div>Q表大小: <b id="s_qsize" style="color:#4CAF50">0</b> / <span style="font-size:0.65em">10000</span></div>
+        <div>Q更新次數: <b id="s_qupdates" style="color:#2196F3">0</b></div>
+        <div>最大Q值: <b id="s_maxq" style="color:#FF9800">0.00</b></div>
+        <div>平均Q值: <b id="s_avgq" style="color:#9C27B0">0.00</b> <span style="font-size:0.65em">(採樣)</span></div>
+    </div>
+
+    <div class="row" style="margin-top: 8px;">
+        <button id="trainBtn" class="btn-train" onclick="startFastTrain()" disabled>AI 集訓 (x2000)</button>
+    </div>
+    <div class="row" style="margin-top: 5px;">
+        <button class="btn-reset" onclick="clearQTable()" style="font-size: 0.75rem; padding: 4px 8px;">清除 Q 表</button>
+    </div>
+</div>
+
+<canvas id="gameCanvas"></canvas>
+
+<script>
+    // --- 1. 基礎設定 ---
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // 遊戲參數
+    const PADDLE = { w: 80, h: 10, y: 0, speed: 7, color: '#4CAF50' };
+    const BALL = { r: 6, speed: 6, color: '#fff' };
+    const BRICK = { rows: 5, cols: 6, w: 0, h: 20, padding: 5, offsetTop: 40, offsetLeft: 10 };
+
+    let ball = { x: 0, y: 0, dx: 0, dy: 0 };
+    let paddle = { x: 0 };
+    let bricks = [];
+    let score = 0;
+    let animId;
+
+    // AI 變數
+    let isAI = false;
+    let qTable = {};
+    let epsilon = 0.5;
+    const ALPHA = 0.1;
+    const GAMMA = 0.9;
+    const ACTIONS = [-1, 0, 1];
+    let episodeCount = 0;
+    let totalQUpdates = 0; // 追蹤 Q 值更新次數
+    let maxQValue = 0; // 追蹤最大 Q 值
+    let avgQValue = 0; // 緩存平均 Q 值
+    let avgQUpdateCounter = 0; // 計數器，每 N 幀更新一次平均 Q 值
+    const MAX_Q_TABLE_SIZE = 10000; // Q 表最大大小限制
+
+    // RWD 處理
+    function resizeCanvas() {
+        const uiHeight = document.getElementById('ui-panel').offsetHeight;
+        canvas.width = Math.min(window.innerWidth, 400);
+        canvas.height = window.innerHeight - uiHeight;
+
+        // 更新磚塊寬度
+        if (BRICK.cols > 0) {
+            BRICK.w = (canvas.width - (BRICK.offsetLeft * 2) - (BRICK.padding * (BRICK.cols - 1))) / BRICK.cols;
+        }
+
+        // 更新板子 Y 軸位置 (保持在底部)
+        PADDLE.y = canvas.height - 30;
+
+        // 防止球在視窗改變大小後卡在牆外
+        if (ball.x > canvas.width - BALL.r) ball.x = canvas.width - BALL.r;
+    }
+
+    // 初始化
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    function initBricks() {
+        bricks = [];
+        for(let c=0; c<BRICK.cols; c++) {
+            bricks[c] = [];
+            for(let r=0; r<BRICK.rows; r++) {
+                bricks[c][r] = { x: 0, y: 0, status: 1, animFrame: 0, originalHue: c * 60 };
+            }
+        }
+    }
+
+
+    function resetBall() {
+        ball.x = canvas.width / 2;
+        // 確保球在板子上方，且不會立即碰撞
+        ball.y = canvas.height - 60;
+        // 隨機發球角度，但給一個基本的垂直分量
+        // 正規化速度向量，確保速度大小恆定為 BALL.speed
+        const angle = (Math.random() * 0.6 - 0.3) * Math.PI; // -0.3 到 0.3 弧度（約 -17° 到 17°）
+        ball.dx = BALL.speed * Math.sin(angle);
+        ball.dy = -Math.abs(BALL.speed * Math.cos(angle)); // 確保向上
+
+        paddle.x = (canvas.width - PADDLE.w) / 2;
+        PADDLE.y = canvas.height - 30;
+    }
+
+    function resetGameFull() {
+        score = 0;
+        initBricks();
+        resetBall();
+        updateStats();
+    }
+
+    // --- 2. Q-Learning 核心 ---
+    function getState() {
+        // 改進狀態表示：更精細的離散化，但限制狀態空間大小
+        const bx = Math.floor(ball.x / (canvas.width / 8)); // 8 格
+        const by = Math.floor(ball.y / (canvas.height / 8));
+        const px = Math.floor(paddle.x / (canvas.width / 8));
+        const bdx = ball.dx > 0 ? 1 : 0;
+        const bdy = ball.dy > 0 ? 1 : 0;
+        // 添加球與板子的相對位置（幫助 AI 學習追球），限制範圍
+        const ballToPaddle = Math.max(-10, Math.min(10, Math.floor((ball.x - paddle.x) / 20))); // 限制在 -10 到 10
+        return `${bx}_${by}_${px}_${bdx}_${bdy}_${ballToPaddle}`;
+    }
+
+    function getQ(state, actionIdx) {
+        if (!qTable[state]) {
+            // 如果 Q 表太大，清理一些舊的或很少使用的狀態
+            if (Object.keys(qTable).length >= MAX_Q_TABLE_SIZE) {
+                cleanupQTable();
+            }
+            qTable[state] = [0, 0, 0];
+        }
+        return qTable[state][actionIdx];
+    }
+
+    // 清理 Q 表：移除 Q 值接近 0 的狀態（可能是無效或很少使用的狀態）
+    function cleanupQTable() {
+        const states = Object.keys(qTable);
+        if (states.length < MAX_Q_TABLE_SIZE) return;
+
+        // 計算每個狀態的平均 Q 值絕對值
+        const stateValues = states.map(state => {
+            const qs = qTable[state];
+            const avgAbsQ = (Math.abs(qs[0]) + Math.abs(qs[1]) + Math.abs(qs[2])) / 3;
+            return { state, avgAbsQ };
+        });
+
+        // 排序，移除平均 Q 值最小的 20% 狀態
+        stateValues.sort((a, b) => a.avgAbsQ - b.avgAbsQ);
+        const removeCount = Math.floor(states.length * 0.2);
+
+        for (let i = 0; i < removeCount; i++) {
+            delete qTable[stateValues[i].state];
+        }
+    }
+
+    function chooseAction(state) {
+        if (Math.random() < epsilon) return Math.floor(Math.random() * 3);
+        const qs = [getQ(state, 0), getQ(state, 1), getQ(state, 2)];
+        const maxQ = Math.max(...qs);
+        const candidates = qs.map((q, i) => q === maxQ ? i : -1).filter(i => i !== -1);
+        return candidates[Math.floor(Math.random() * candidates.length)];
+    }
+
+    function updateQ(state, actionIdx, reward, nextState) {
+        const currentQ = getQ(state, actionIdx);
+        const maxNextQ = Math.max(...qTable[nextState] || [0,0,0]);
+        const newQ = currentQ + ALPHA * (reward + GAMMA * maxNextQ - currentQ);
+        qTable[state][actionIdx] = newQ;
+
+        // 追蹤更新
+        totalQUpdates++;
+        if (Math.abs(newQ) > maxQValue) maxQValue = Math.abs(newQ);
+    }
+
+    // --- 3. 物理邏輯 (修復穿牆與增加物理感) ---
+    function step(actionIdx) {
+        let reward = 0;
+        let done = false;
+
+        // A. 板子移動
+        if (actionIdx !== undefined) {
+            paddle.x += ACTIONS[actionIdx] * PADDLE.speed;
+        }
+        if (paddle.x < 0) paddle.x = 0;
+        if (paddle.x + PADDLE.w > canvas.width) paddle.x = canvas.width - PADDLE.w;
+
+        // B. 球移動（先預測碰撞，再移動）
+        let nextX = ball.x + ball.dx;
+        let nextY = ball.y + ball.dy;
+
+        // C. 牆壁碰撞檢測（在移動前預測，防止穿牆）
+        // 右牆
+        if (nextX + BALL.r > canvas.width) {
+            ball.x = canvas.width - BALL.r;
+            ball.dx = -Math.abs(ball.dx); // 反彈往左
+        }
+        // 左牆
+        else if (nextX - BALL.r < 0) {
+            ball.x = BALL.r;
+            ball.dx = Math.abs(ball.dx);  // 反彈往右
+        }
+        // 正常移動
+        else {
+            ball.x = nextX;
+        }
+
+        // 天花板
+        if (nextY - BALL.r < 0) {
+            ball.y = BALL.r;
+            ball.dy = Math.abs(ball.dy); // 反彈往下
+        }
+        // 正常移動
+        else {
+            ball.y = nextY;
+        }
+
+        // D. 板子碰撞 (增加角度物理，保持速度大小恆定)
+        if (ball.dy > 0 &&
+            ball.y + BALL.r >= PADDLE.y &&
+            ball.y - BALL.r <= PADDLE.y + PADDLE.h &&
+            ball.x >= paddle.x &&
+            ball.x <= paddle.x + PADDLE.w) {
+
+            // 算出擊球點相對位置 (-1 到 1，0 是正中間)
+            let hitPoint = (ball.x - (paddle.x + PADDLE.w/2)) / (PADDLE.w/2);
+
+            // 限制 hitPoint 範圍，避免極端值
+            hitPoint = Math.max(-1, Math.min(1, hitPoint));
+
+            // 根據擊球點計算角度（最大 60 度）
+            const maxAngle = Math.PI / 3; // 60 度
+            const angle = hitPoint * maxAngle;
+
+            // 正規化速度向量，保持速度大小恆定為 BALL.speed
+            ball.dx = BALL.speed * Math.sin(angle);
+            ball.dy = -BALL.speed * Math.cos(angle); // 確保向上
+
+            // 防止水平速度歸零 (垂直彈跳太無聊)
+            if (Math.abs(ball.dx) < 1) {
+                ball.dx = (hitPoint < 0 ? -1 : 1);
+                ball.dy = -Math.sqrt(BALL.speed * BALL.speed - ball.dx * ball.dx);
+            }
+
+            ball.y = PADDLE.y - BALL.r - 1; // 推離板子，防黏
+            reward = 10;
+        } else if (ball.dy > 0 && ball.y > canvas.height * 0.7) {
+            // 中間獎勵：球在下半場且向下時，根據板子與球的距離給獎勵
+            // 幫助 AI 學習追球
+            const distance = Math.abs(ball.x - (paddle.x + PADDLE.w/2));
+            const maxDistance = canvas.width / 2;
+            reward = 0.1 * (1 - distance / maxDistance); // 越靠近板子獎勵越高
+        }
+
+        // E. 磚塊碰撞（改進碰撞檢測，考慮球半徑）
+        let bricksLeft = 0;
+        for(let c=0; c<BRICK.cols; c++) {
+            for(let r=0; r<BRICK.rows; r++) {
+                let b = bricks[c][r];
+                if(b.status === 1) {
+                    bricksLeft++;
+                    let brickX = (c*(BRICK.w+BRICK.padding))+BRICK.offsetLeft;
+                    let brickY = (r*(BRICK.h+BRICK.padding))+BRICK.offsetTop;
+
+                    // 更精確的碰撞檢測：考慮球的半徑
+                    if(ball.x + BALL.r > brickX &&
+                       ball.x - BALL.r < brickX + BRICK.w &&
+                       ball.y + BALL.r > brickY &&
+                       ball.y - BALL.r < brickY + BRICK.h) {
+
+                        // 判斷碰撞方向（簡化版：主要看垂直方向）
+                        // 如果球從上方或下方接近，反轉 dy
+                        // 如果球從左側或右側接近，反轉 dx
+                        const ballCenterX = ball.x;
+                        const ballCenterY = ball.y;
+                        const brickCenterX = brickX + BRICK.w / 2;
+                        const brickCenterY = brickY + BRICK.h / 2;
+
+                        const dx = ballCenterX - brickCenterX;
+                        const dy = ballCenterY - brickCenterY;
+
+                        // 判斷主要碰撞方向
+                        if (Math.abs(dx / BRICK.w) > Math.abs(dy / BRICK.h)) {
+                            // 左右碰撞
+                            ball.dx = -ball.dx;
+                        } else {
+                            // 上下碰撞
+                            ball.dy = -ball.dy;
+                        }
+
+                        // 觸發特效：變色動畫
+                        b.status = 2; // 2 = 正在消失動畫
+                        b.animFrame = 0; // 重置動畫幀數
+
+                        score += 10;
+                        reward = 50;
+                    }
+                } else if(b.status === 2) {
+                    // 正在動畫中的磚塊不計入剩餘數量
+                    // 但需要更新動畫
+                    b.animFrame++;
+                    if(b.animFrame > 10) {
+                        // 動畫結束，完全移除
+                        b.status = 0;
+                    }
+                }
+            }
+        }
+
+        // F. 死亡判定（使用正確的半徑）
+        if (ball.y - BALL.r > canvas.height) {
+            reward = -100;
+            done = true;
+        }
+
+        if (bricksLeft === 0) {
+            reward = 100;
+            done = true;
+        }
+
+        return { reward, done };
+    }
+
+    // --- 4. 渲染與主迴圈 ---
+    function draw() {
+        // 清除畫面
+        ctx.fillStyle = '#121212';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // 畫磚塊
+        for(let c=0; c<BRICK.cols; c++) {
+            for(let r=0; r<BRICK.rows; r++) {
+                let b = bricks[c][r];
+                if(b.status === 1) {
+                    // 正常磚塊
+                    let brickX = (c*(BRICK.w+BRICK.padding))+BRICK.offsetLeft;
+                    let brickY = (r*(BRICK.h+BRICK.padding))+BRICK.offsetTop;
+                    ctx.fillStyle = `hsl(${b.originalHue}, 70%, 50%)`;
+                    ctx.fillRect(brickX, brickY, BRICK.w, BRICK.h);
+                } else if(b.status === 2) {
+                    // 正在消失動畫的磚塊：變色 + 縮放 + 透明度
+                    let brickX = (c*(BRICK.w+BRICK.padding))+BRICK.offsetLeft;
+                    let brickY = (r*(BRICK.h+BRICK.padding))+BRICK.offsetTop;
+
+                    // 動畫進度 (0 到 1)
+                    const progress = b.animFrame / 10;
+
+                    // 顏色變化：先變亮（變白），再消失
+                    // 前半段：變亮變白（progress 0-0.5）
+                    // 後半段：逐漸消失（progress 0.5-1）
+                    let hue, lightness, saturation, alpha;
+
+                    if (progress < 0.5) {
+                        // 前半段：快速變亮變白
+                        const phase = progress / 0.5;
+                        hue = b.originalHue + phase * 30; // 色相稍微偏移
+                        lightness = 50 + phase * 40; // 變亮到 90%
+                        saturation = 70 - phase * 50; // 降低飽和度
+                        alpha = 1;
+                    } else {
+                        // 後半段：逐漸消失
+                        const phase = (progress - 0.5) / 0.5;
+                        hue = b.originalHue + 30;
+                        lightness = 90;
+                        saturation = 20;
+                        alpha = 1 - phase; // 透明度逐漸降低
+                    }
+
+                    // 縮放效果：先稍微放大，再縮小消失
+                    const scale = progress < 0.5
+                        ? 1 + Math.sin(progress * Math.PI) * 0.15  // 前半段放大
+                        : 1 + (1 - progress) * 0.15; // 後半段縮小
+
+                    const scaledW = BRICK.w * scale;
+                    const scaledH = BRICK.h * scale;
+                    const offsetX = (BRICK.w - scaledW) / 2;
+                    const offsetY = (BRICK.h - scaledH) / 2;
+
+                    ctx.save();
+                    ctx.globalAlpha = alpha;
+                    ctx.fillStyle = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+                    ctx.fillRect(brickX + offsetX, brickY + offsetY, scaledW, scaledH);
+                    ctx.restore();
+                }
+            }
+        }
+
+        // 畫板子
+        ctx.fillStyle = isAI ? '#2196F3' : '#4CAF50';
+        ctx.fillRect(paddle.x, PADDLE.y, PADDLE.w, PADDLE.h);
+
+        // 畫球
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, BALL.r, 0, Math.PI*2);
+        ctx.fillStyle = '#fff';
+        ctx.fill();
+        ctx.closePath();
+    }
+
+    function loop() {
+        if (!isAI) {
+            const result = step(undefined);
+            if (result.done) resetBall();
+        } else {
+            const state = getState();
+            const actionIdx = chooseAction(state);
+            const result = step(actionIdx);
+            const nextState = getState();
+
+            updateQ(state, actionIdx, result.reward, nextState);
+
+            if (result.done) {
+                episodeCount++;
+                if (epsilon > 0.01) epsilon *= 0.995;
+                resetGameFull();
+            }
+        }
+
+        draw();
+        updateStats(); // 現在 updateStats 已經優化，不會每幀都遍歷整個 Q 表
+        animId = requestAnimationFrame(loop);
+    }
+
+    // --- 5. 互動與訓練 ---
+    function handleInput(clientX) {
+        if (isAI) return;
+        const rect = canvas.getBoundingClientRect();
+        const relativeX = clientX - rect.left;
+        paddle.x = relativeX - PADDLE.w/2;
+        if (paddle.x < 0) paddle.x = 0;
+        if (paddle.x + PADDLE.w > canvas.width) paddle.x = canvas.width - PADDLE.w;
+    }
+    canvas.addEventListener('mousemove', e => handleInput(e.clientX));
+    canvas.addEventListener('touchmove', e => { e.preventDefault(); handleInput(e.touches[0].clientX); }, { passive: false });
+
+    // 點擊開始
+    canvas.addEventListener('click', () => {
+        if(!isAI && score === 0 && ball.dx === 0 && ball.y > canvas.height/2) resetBall();
+    });
+
+    function toggleMode() {
+        isAI = !isAI;
+        const toggleSwitch = document.getElementById('toggleSwitch');
+        const trainBtn = document.getElementById('trainBtn');
+        if (isAI) {
+            toggleSwitch.classList.add('ai-mode');
+            trainBtn.disabled = false;
+        } else {
+            toggleSwitch.classList.remove('ai-mode');
+            trainBtn.disabled = true;
+        }
+        resetGameFull();
+    }
+
+    function clearQTable() {
+        if (confirm(`確定要清除 Q 表嗎？\n當前 Q 表大小：${Object.keys(qTable).length}\n這會重置所有學習成果。`)) {
+            qTable = {};
+            totalQUpdates = 0;
+            maxQValue = 0;
+            avgQValue = 0;
+            episodeCount = 0;
+            epsilon = 0.5;
+            updateStats();
+            resetGameFull();
+            alert('Q 表已清除！');
+        }
+    }
+
+
+    function updateStats() {
+        document.getElementById('s_score').innerText = score;
+        document.getElementById('s_episode').innerText = episodeCount;
+        document.getElementById('s_epsilon').innerText = epsilon.toFixed(2);
+
+        // 更新調試資訊（快速更新）
+        const qSize = Object.keys(qTable).length;
+        document.getElementById('s_qsize').innerText = qSize;
+        document.getElementById('s_qupdates').innerText = totalQUpdates;
+        document.getElementById('s_maxq').innerText = maxQValue.toFixed(2);
+
+        // 平均 Q 值計算：每 60 幀才更新一次（約每秒一次），避免性能問題
+        avgQUpdateCounter++;
+        if (avgQUpdateCounter >= 60) {
+            avgQUpdateCounter = 0;
+            if (qSize > 0) {
+                // 使用採樣而非遍歷全部，提高性能
+                const sampleSize = Math.min(100, qSize); // 最多採樣 100 個狀態
+                const states = Object.keys(qTable);
+                let totalQ = 0;
+                let qCount = 0;
+
+                // 隨機採樣
+                for (let i = 0; i < sampleSize; i++) {
+                    const randomState = states[Math.floor(Math.random() * states.length)];
+                    const qs = qTable[randomState];
+                    for (let q of qs) {
+                        totalQ += Math.abs(q);
+                        qCount++;
+                    }
+                }
+
+                // 根據採樣比例估算平均值
+                avgQValue = qCount > 0 ? (totalQ / qCount) : 0;
+            } else {
+                avgQValue = 0;
+            }
+        }
+        document.getElementById('s_avgq').innerText = avgQValue.toFixed(2);
+    }
+
+    function startFastTrain() {
+        cancelAnimationFrame(animId);
+        const TRAIN_TOTAL = 2000;
+        let trained = 0;
+        const btn = document.getElementById('trainBtn');
+        const originalText = btn.innerText;
+        btn.disabled = true;
+
+        // 記錄訓練前的狀態
+        const qSizeBefore = Object.keys(qTable).length;
+        const updatesBefore = totalQUpdates;
+
+        function processBatch() {
+            const BATCH_SIZE = 50;
+            for(let i=0; i<BATCH_SIZE && trained < TRAIN_TOTAL; i++) {
+                resetGameFull(); // 使用 resetGameFull 確保磚塊重置
+                let done = false;
+                let steps = 0;
+                while(!done && steps < 2500) {
+                    const state = getState();
+                    const actionIdx = chooseAction(state);
+                    const result = step(actionIdx);
+                    const nextState = getState();
+                    updateQ(state, actionIdx, result.reward, nextState);
+                    done = result.done;
+                    steps++;
+                }
+                trained++;
+                episodeCount++;
+                if (epsilon > 0.01) epsilon *= 0.99;
+            }
+
+            btn.innerText = `訓練中... ${(trained/TRAIN_TOTAL*100).toFixed(0)}%`;
+            updateStats();
+
+            if (trained < TRAIN_TOTAL) {
+                setTimeout(processBatch, 0);
+            } else {
+                const qSizeAfter = Object.keys(qTable).length;
+                const updatesAfter = totalQUpdates;
+                alert(`訓練完成！\n已快速模擬 ${TRAIN_TOTAL} 回合。\n\n訓練統計：\n- Q表大小：${qSizeBefore} → ${qSizeAfter} (+${qSizeAfter - qSizeBefore})\n- Q值更新：${updatesBefore} → ${updatesAfter} (+${updatesAfter - updatesBefore})\n- 最大Q值：${maxQValue.toFixed(2)}`);
+                btn.innerText = originalText;
+                btn.disabled = false;
+                resetGameFull();
+                loop();
+            }
+        }
+        processBatch();
+    }
+
+    // 啟動
+    initBricks();
+    resetBall();
+    loop();
+
+</script>
+</body>
+</html>
