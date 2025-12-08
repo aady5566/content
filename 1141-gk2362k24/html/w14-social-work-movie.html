@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社會工作電影：逆轉人生 (The Intouchables)</title>
+    <script src="../../sidebar_tools/sidebar.js"></script>
+    <style>
+        /* ============================================
+           CSS 變數定義（來自 style_1116.md）
+           ============================================ */
+        :root {
+            --bg-color: #F5F4F0;        /* Warm, off-white, like aged paper */
+            --text-color: #3D3A37;      /* Dark, soft brown/gray */
+            --accent-color: #9A948C;    /* Muted stone gray */
+            --header-bg: #EAEBE6;       /* Very light, muted moss */
+            --line-color: #d1d1c2;      /* For borders and lines */
+            --highlight-color: #8c867b; /* For highlights */
+            --font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+        }
+
+        /* 投影片容器 */
+        .slides-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: var(--bg-color);
+        }
+
+        /* 投影片基礎樣式 */
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5vw;
+            box-sizing: border-box;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+            transform: scale(0.98);
+            text-align: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+            font-family: var(--font-family);
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            z-index: 1;
+        }
+
+        .slide.hidden {
+            display: none !important;
+        }
+
+        .slide.scrollable {
+            justify-content: flex-start;
+        }
+
+        /* 標題層級 */
+        h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 400;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 400;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--header-bg);
+        }
+
+        h3 {
+            font-size: clamp(1.8rem, 4.5vw, 3rem);
+            font-weight: 300;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--header-bg);
+        }
+
+        h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+        }
+
+        p {
+            font-size: clamp(1.2rem, 2.5vw, 1.75rem);
+            color: var(--text-color);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .slide-subtitle {
+            color: var(--accent-color);
+            font-size: clamp(1.2rem, 3vw, 1.75rem);
+            font-weight: 400;
+            margin-top: -1rem;
+        }
+
+        /* 導航系統 */
+        .nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 98%;
+            left: 1%;
+            display: flex;
+            justify-content: space-between;
+            z-index: 1002;
+            pointer-events: none;
+        }
+
+        .nav-btn {
+            pointer-events: all;
+            background: none;
+            border: 1px solid var(--line-color);
+            color: var(--accent-color);
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.4;
+            font-family: var(--font-family);
+        }
+
+        .nav-btn:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            opacity: 1;
+        }
+
+        /* 內容佈局系統 */
+        .content-section {
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            font-family: var(--font-family);
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        .content-section h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .content-section p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        /* 列表系統 */
+        ul {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            max-width: 800px;
+            margin: 1rem 0;
+            font-family: var(--font-family);
+        }
+
+        ul li {
+            margin-bottom: 15px;
+            position: relative;
+            padding-left: 1.5em;
+            font-size: clamp(1rem, 2.5vw, 1.75rem);
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+
+        ul li::before {
+            content: '- ';
+            color: var(--accent-color);
+            font-weight: bold;
+            display: inline-block;
+            position: absolute;
+            left: 0;
+        }
+
+        /* 影片投影片系統 */
+        .slide.video-slide {
+            padding: 2vw;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+
+        .slide.video-slide h3 {
+            width: 100%;
+            max-width: none;
+            text-align: center;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 400;
+            color: var(--text-color);
+        }
+
+        .video-container {
+            width: 80%;
+            max-width: 800px;
+            height: auto;
+            aspect-ratio: 16 / 9;
+            margin-top: 20px;
+            border: 1px solid var(--line-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .video-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 8px;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 767px) {
+            .nav {
+                width: 95%;
+                left: 2.5%;
+            }
+
+            .nav-btn {
+                width: 44px;
+                height: 44px;
+                font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+                opacity: 0.6;
+            }
+
+            .slide.video-slide .video-container {
+                margin: 10px 0;
+                width: 90%;
+                max-width: 450px;
+            }
+
+            .content-section {
+                padding: 1rem;
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .video-container {
+                width: 75%;
+                max-width: 700px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="slides-container">
+        <!-- Slide 1: 標題頁 -->
+        <section class="slide active">
+            <h1>電影欣賞<br>《逆轉人生》<br>(The Intouchables)</h1>
+            <p class="slide-subtitle">法國影史經典 — 跨越階級的社會工作</p>
+        </section>
+
+        <!-- Slide 2: 導演與主演 -->
+        <section class="slide">
+            <h2>導演與主演</h2>
+            <ul style="margin-top: 2rem;">
+                <li>導演：奧力佛·那卡契 (Olivier Nakache)</li>
+                <li>主演：佛朗索瓦·克魯塞 (François Cluzet)、歐馬·希 (Omar Sy)</li>
+            </ul>
+        </section>
+
+        <!-- Slide 3: 劇情簡介 -->
+        <section class="slide">
+            <h2>劇情簡介與推薦理由</h2>
+            <ul style="margin-top: 2rem;">
+                <li><strong>劇情簡介：</strong>改編自真人真事。一位富有的白人四肢癱瘓貴族，雇用了一位剛出獄的黑人青年作為看護。兩個背景天差地遠的人，在衝突與磨合中碰撞出瘋狂又感人的火花，建立起一段不可思議的友誼。</li>
+                <li>探討社會工作、階級差異、尊嚴與生命意義。</li>
+            </ul>
+        </section>
+
+        <!-- Slide 5: YouTube 影片 -->
+        <section class="slide video-slide">
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/gZ3ofgG_NCM"
+                        title="YouTube video player"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
+            </div>
+        </section>
+
+        <!-- 導航按鈕 -->
+        <div class="nav">
+            <button id="prev" class="nav-btn">&#8249;</button>
+            <button id="next" class="nav-btn">&#8250;</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = Array.from(document.querySelectorAll('.slide:not(.hidden)'));
+            const totalSlides = slides.length;
+            let currentSlide = 0;
+
+            function showSlide(index) {
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === index);
+                });
+            }
+
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            function prevSlide() {
+                currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            document.getElementById('next').addEventListener('click', nextSlide);
+            document.getElementById('prev').addEventListener('click', prevSlide);
+
+            // 鍵盤支援
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    e.preventDefault();
+                    nextSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    prevSlide();
+                }
+            });
+
+            // 觸控滑動支援（手機版）
+            let touchStartX = 0;
+            let touchEndX = 0;
+
+            document.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            });
+
+            document.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            });
+
+            function handleSwipe() {
+                const swipeThreshold = 50;
+                const diff = touchStartX - touchEndX;
+
+                if (Math.abs(diff) > swipeThreshold) {
+                    if (diff > 0) {
+                        // 向左滑動，下一張
+                        nextSlide();
+                    } else {
+                        // 向右滑動，上一張
+                        prevSlide();
+                    }
+                }
+            }
+
+            // 初始化顯示第一張投影片
+            showSlide(0);
+        });
+    </script>
+</body>
+</html>
