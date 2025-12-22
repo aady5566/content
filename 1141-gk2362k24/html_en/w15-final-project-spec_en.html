@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Project: RPG Game Design (12/23 - 01/06)</title>
+    <script src="../../sidebar_tools/sidebar.js"></script>
+    <style>
+        /* ============================================
+           CSS 變數定義（來自 style_1116.md）
+           ============================================ */
+        :root {
+            --bg-color: #F5F4F0;        /* Warm, off-white, like aged paper */
+            --text-color: #3D3A37;      /* Dark, soft brown/gray */
+            --accent-color: #9A948C;    /* Muted stone gray */
+            --header-bg: #EAEBE6;       /* Very light, muted moss */
+            --line-color: #d1d1c2;      /* For borders and lines */
+            --highlight-color: #8c867b; /* For highlights */
+            --font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+        }
+
+        /* 投影片容器 */
+        .slides-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: var(--bg-color);
+        }
+
+        /* 投影片基礎樣式 */
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5vw;
+            box-sizing: border-box;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+            transform: scale(0.98);
+            text-align: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+            font-family: var(--font-family);
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            z-index: 1;
+        }
+
+        .slide.hidden {
+            display: none !important;
+        }
+
+        .slide.scrollable {
+            justify-content: flex-start;
+        }
+
+        /* 標題層級 */
+        h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 400;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 400;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--header-bg);
+        }
+
+        h3 {
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            font-weight: 400;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        /* 內容樣式 */
+        .content {
+            max-width: 90%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .section {
+            margin-bottom: 2rem;
+        }
+
+        .highlight {
+            background: var(--header-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .list-item {
+            margin-bottom: 0.8rem;
+            line-height: 1.6;
+        }
+
+        .sub-list {
+            margin-left: 2rem;
+            margin-top: 0.5rem;
+        }
+
+        .speaker-notes {
+            background: var(--highlight-color);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-size: 0.9em;
+            font-style: italic;
+        }
+
+        /* 導航控制 */
+        .nav-controls {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 10;
+        }
+
+        .nav-button {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-button:hover {
+            background: var(--highlight-color);
+            transform: translateY(-2px);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* 進度指示器 */
+        .progress-indicator {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            background: var(--header-bg);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: var(--text-color);
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .slide {
+                padding: 3rem 1rem;
+                font-size: clamp(1rem, 4vw, 1.2rem);
+            }
+
+            h1 {
+                font-size: clamp(2rem, 8vw, 3rem);
+            }
+
+            h2 {
+                font-size: clamp(1.5rem, 6vw, 2.5rem);
+            }
+
+            .nav-controls {
+                bottom: 1rem;
+                gap: 0.5rem;
+            }
+
+            .nav-button {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* 列表樣式優化 */
+        ul, ol {
+            text-align: left;
+            max-width: 100%;
+            margin: 1rem auto;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        /* 強調文字 */
+        strong {
+            color: var(--text-color);
+            font-weight: 600;
+        }
+
+        /* 代碼區塊 */
+        code {
+            background: var(--header-bg);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        /* 鍵盤快捷鍵提示 */
+        .keyboard-hint {
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            font-size: 0.8rem;
+            color: var(--accent-color);
+            opacity: 0.7;
+        }
+
+        @media (max-width: 768px) {
+            .keyboard-hint {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="slides-container">
+        <!-- Slide 1: Project Core Goals -->
+        <div class="slide active" data-slide="1">
+            <div class="content">
+                <h1>Final Project: RPG Game Design</h1>
+                <h2>(12/23 - 01/06)</h2>
+
+                <div class="section">
+                    <h2>Section 1: Project Core Goals</h2>
+
+                    <h3>Slide 1.1: What are we building?</h3>
+
+                    <div class="highlight">
+                        <h4>Project Goal: Creating AI-driven Interactive Historical RPG Games</h4>
+                    </div>
+
+                    <div class="list-item">
+                        <strong>Core Concept:</strong>
+                        <ul>
+                            <li>Combining all course learnings in prompt engineering, literature, fact-checking, and Gemini app outputs into interactive web experiences.</li>
+                            <li>Utilizing AI toolchains to transform creativity into actual playable programs.</li>
+                        </ul>
+                    </div>
+
+                    <div class="list-item">
+                        <strong>Final Deliverable:</strong>
+                        <ul>
+                            <li><strong>Format:</strong> Standalone HTML (Single HTML file).</li>
+                            <li><strong>Features:</strong>
+                                <ul class="sub-list">
+                                    <li>No installation, no server required.</li>
+                                    <li>Plug & Play - open and play immediately.</li>
+                                    <li>Complete CSS styling and JavaScript interactive logic included.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="speaker-notes">
+                        Speaker Notes: Classmates, our final project isn't just a report - it's a real playable game. Don't worry about difficult programming - our goal this time is to produce a "Standalone HTML" file. That means after you finish, you send it to your friends and they can play it directly in their browser with no installation required.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: What will we learn? -->
+        <div class="slide" data-slide="2">
+            <div class="content">
+                <h1>Final Project: RPG Game Design</h1>
+
+                <div class="section">
+                    <h3>Slide 1.2: What will we learn from this project?</h3>
+
+                    <div class="highlight">
+                        <h4>Three Core Skills Development</h4>
+                    </div>
+
+                    <div class="list-item">
+                        <strong>1. AI Character Design:</strong>
+                        <ul class="sub-list">
+                            <li><strong>Technical Skills:</strong> Prompt Engineering + MBTI.</li>
+                            <li><strong>Content:</strong> Learn how to set prompts and combine MBTI personality frameworks so game NPCs have unique personalities and reactions, no longer just robots with fixed dialogue.</li>
+                        </ul>
+                    </div>
+
+                    <div class="list-item">
+                        <strong>2. Deep Narrative & Research:</strong>
+                        <ul class="sub-list">
+                            <li><strong>Technical Skills:</strong> NotebookLM + Historical Data Exploration.</li>
+                            <li><strong>Content:</strong> Use NotebookLM to digest large amounts of historical literature and generate scripts that are creative yet based on historical context.</li>
+                        </ul>
+                    </div>
+
+                    <div class="list-item">
+                        <strong>3. Interactive Interface Implementation:</strong>
+                        <ul class="sub-list">
+                            <li><strong>Technical Skills:</strong> Gemini Canvas + Frontend Integration.</li>
+                            <li><strong>Content:</strong> Transform generated stories and characters through Gemini Canvas to assist in writing code and integrate into complete RPG interactive interfaces.</li>
+                        </ul>
+                    </div>
+
+                    <div class="speaker-notes">
+                        Speaker Notes: This project will train you in three valuable skills: First, how to use prompts and MBTI to make AI act as specific characters. Second, how to use NotebookLM to help you read historical data and write deep scripts instead of making things up. Third, how to use Gemini Canvas to help you write code and turn these into beautiful web interfaces.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Game Design Focus -->
+        <div class="slide" data-slide="3">
+            <div class="content">
+                <h1>Final Project: RPG Game Design</h1>
+
+                <div class="section">
+                    <h2>Section 2: Game Design Focus</h2>
+
+                    <h3>Slide 2.1: The 4 Pillars</h3>
+
+                    <div class="highlight">
+                        <h4>Game Design Standards: Required Elements</h4>
+                    </div>
+
+                    <div class="list-item">
+                        <strong>1. N+1 Variable System:</strong>
+                        <ul class="sub-list">
+                            <li>Besides basic A/B options (N), the backend must calculate at least one hidden value (+1) (such as favorability, physical strength, money, morality values, etc.) and affect endings accordingly.</li>
+                        </ul>
+                    </div>
+
+                    <div class="list-item">
+                        <strong>2. Historical Research:</strong>
+                        <ul class="sub-list">
+                            <li>Story content must be based on real historical backgrounds (specific dynasties, events, or laws), not completely fictional.</li>
+                        </ul>
+                    </div>
+
+                    <div class="list-item">
+                        <strong>3. Win/Loss Judgment:</strong>
+                        <ul class="sub-list">
+                            <li>The game must have clear victory and loss conditions, not just a single ending.</li>
+                        </ul>
+                    </div>
+
+                    <div class="list-item">
+                        <strong>4. Tool Application:</strong>
+                        <ul class="sub-list">
+                            <li>Use specified GenAI tools to assist in generating code, text, and artwork.</li>
+                        </ul>
+                    </div>
+
+                    <div class="speaker-notes">
+                        Speaker Notes: Your games can't just be click options and see stories. The backend must have "math" running. For example, if a player chooses a certain option, on the surface nothing happens, but the backend deducts 10 points from "public support". When public support drops below 0, the game forces an end. This is the N+1 variable system.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Tools & Technical Standards -->
+        <div class="slide" data-slide="4">
+            <div class="content">
+                <h1>Final Project: RPG Game Design</h1>
+
+                <div class="section">
+                    <h2>Section 3: Tools & Technical Standards</h2>
+
+                    <h3>Slide 3.1: Recommended Toolchain</h3>
+
+                    <div class="highlight">
+                        <h4>Technical Implementation: How to turn ideas into code?</h4>
+                    </div>
+
+                    <div class="list-item">
+                        <strong>Code Generation (Logic & UI):</strong>
+                        <ul class="sub-list">
+                            <li>Gemini Canvas / Claude 3.5 / GPT-4o.</li>
+                            <li>Instructions: Generate single integrated HTML5 + CSS + JavaScript files.</li>
+                        </ul>
+                    </div>
+
+                    <div class="list-item">
+                        <strong>Asset Generation:</strong>
+                        <ul class="sub-list">
+                            <li><strong>Midjourney / DALL-E 3:</strong> Generate character portraits and backgrounds matching the era's style.</li>
+                            <li><strong>NotebookLM:</strong> Import historical PDFs to generate dialogue or event scripts.</li>
+                        </ul>
+                    </div>
+
+                    <div class="list-item">
+                        <strong>Delivery Format Check:</strong>
+                        <ul class="sub-list">
+                            <li>Files must contain <code>&lt;style&gt;</code> (CSS) and <code>&lt;script&gt;</code> (JS).</li>
+                            <li>Ensure image links are valid (use Base64 encoding or stable image hosting).</li>
+                        </ul>
+                    </div>
+
+                    <div class="speaker-notes">
+                        Speaker Notes: We recommend using Gemini Canvas for coding because it provides live previews. For images, ensure your generated images can display properly on the web. The simplest method is to ask AI to convert images to Base64 encoding and write them directly into the HTML.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Game Rules -->
+        <div class="slide" data-slide="5">
+            <div class="content">
+                <h1>Final Project: RPG Game Design</h1>
+
+                <div class="section">
+                    <h2>Section 4: Game Rules</h2>
+
+                    <h3>Slide 4.1: Core Interactive Loop</h3>
+
+                    <div class="highlight">
+                        <h4>Game Logic Architecture Diagram</h4>
+                    </div>
+
+                    <div class="list-item">
+                        <strong>Process Steps:</strong>
+                        <ol>
+                            <li><strong>Situation Setup:</strong> Display historical background and current events.</li>
+                            <li><strong>Player Decision:</strong> Provide 2-3 options.</li>
+                            <li><strong>Variable Calculation (N+1):</strong> Update backend values based on choices (e.g., funds -50, morale +10).</li>
+                            <li><strong>Judgment Check:</strong> Check if values trigger endings (e.g., funds <= 0 → bankruptcy ending).</li>
+                            <li><strong>Narrative Progression:</strong> Move to next situation or ending screen.</li>
+                        </ol>
+                    </div>
+
+                    <div class="speaker-notes">
+                        Speaker Notes: This is the core logic you need to write for AI: Display situation → Player chooses → Update values → Check if they lost → Continue to next situation. Make sure your prompts clearly describe this loop.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Examples -->
+        <div class="slide" data-slide="6">
+            <div class="content">
+                <h1>Final Project: RPG Game Design</h1>
+
+                <div class="section">
+                    <h2>Section 5: Examples</h2>
+
+                    <h3>Slide 5.1: Gold Standard</h3>
+
+                    <div class="highlight">
+                        <h4>Reference Example: 'Republic Era Legal Romance'</h4>
+                    </div>
+
+                    <div class="list-item">
+                        <strong>Project Overview:</strong>
+                        <ul class="sub-list">
+                            <li><strong>Background:</strong> Early Republic era, transition from old to new laws.</li>
+                            <li><strong>Core Conflict:</strong> Traditional family concepts vs. modern individual legal rights.</li>
+                        </ul>
+                    </div>
+
+                    <div class="list-item">
+                        <strong>Technical Breakdown:</strong>
+                        <ul class="sub-list">
+                            <li><strong>Variables:</strong> MBTI (T/F dimension) + legal awareness value (0-100).</li>
+                            <li><strong>Research:</strong> Cite real articles from the Republic of China Civil Code Family Chapter.</li>
+                            <li><strong>Judgments:</strong>
+                                <ul>
+                                    <li>If "legal value < 50" and forces divorce → judged guilty (social death).</li>
+                                    <li>If "legal value > 80" and cites correct law → judged innocent (independent new woman).</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="speaker-notes">
+                        Speaker Notes: Look at this example - 'Republic Era Legal Romance' is fun because it's not random choices. You must understand the laws of that time (research), and accumulate enough "legal value" (variables) to win the divorce case (win/loss judgment). This is the depth we're looking for.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Grouping & Rivalry Structure -->
+        <div class="slide" data-slide="7">
+            <div class="content">
+                <h1>Final Project: RPG Game Design</h1>
+
+                <div class="section">
+                    <h2>Section 6: Grouping & Rivalry Structure</h2>
+
+                    <h3>Slide 6.1: Team Structure</h3>
+
+                    <div class="highlight">
+                        <h4>Team Structure: Lightweight Special Forces</h4>
+                    </div>
+
+                    <div class="list-item">
+                        <strong>Core Rules:</strong>
+                        <ul class="sub-list">
+                            <li><strong>Strict Size Limit:</strong> 1-3 people per group, no more than 3 allowed, Solo Mode permitted.</li>
+                            <li><strong>Decision Timeline:</strong> Use self-selection mechanism, Deadline: Complete roster confirmation before end of today's class.</li>
+                        </ul>
+                    </div>
+
+                    <div class="speaker-notes">
+                        Speaker Notes: We only allow up to 3 people per group this time. You can find the best partners, or challenge yourself to do it alone. The important thing is that you know who your teammates are before you leave the classroom today.
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>Slide 6.2: The Rivalry System</h3>
+
+                    <div class="highlight">
+                        <h4>Establish Competitive Relationships: Find Your Rival</h4>
+                    </div>
+
+                    <div class="list-item">
+                        <strong>Core Mechanism:</strong>
+                        <ul class="sub-list">
+                            <li><strong>Rule of Three Rivals:</strong> Each group must proactively find and register 3 rival groups.</li>
+                            <li><strong>Rivals' Roles:</strong> They are your first beta testers and judges who will score your games in the final.</li>
+                        </ul>
+                    </div>
+
+                    <div class="speaker-notes">
+                        Speaker Notes: This isn't just homework - it's a competition. Each group needs to find 3 rival groups now. These rivals will be responsible for playing your games and scoring them in the final. Please find teams willing to mutually test and give feedback.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Sprint Timeline & Delivery -->
+        <div class="slide" data-slide="8">
+            <div class="content">
+                <h1>Final Project: RPG Game Design</h1>
+
+                <div class="section">
+                    <h2>Section 7: Sprint Timeline & Delivery</h2>
+
+                    <h3>Slide 7.1: The 3-Week Sprint</h3>
+
+                    <div class="highlight">
+                        <h4>Critical Timeline: 21 Days from Concept to Release</h4>
+                    </div>
+
+                    <div class="list-item">
+                        <strong>W1 Launch & Anchoring (12/23 - Today):</strong>
+                        <ul class="sub-list">
+                            <li><strong>Tasks:</strong> Complete grouping, confirm rivals.</li>
+                            <li><strong>Output:</strong> One-sentence concept and topic direction.</li>
+                        </ul>
+                    </div>
+
+                    <div class="list-item">
+                        <strong>W2 Development & Delivery (12/30):</strong>
+                        <ul class="sub-list">
+                            <li><strong>Tasks:</strong> In-class Hackathon, two class sessions of intensive production.</li>
+                            <li><strong>Output:</strong> Code Freeze, deliver 1.0 version before end of class.</li>
+                        </ul>
+                    </div>
+
+                    <div class="list-item">
+                        <strong>W3 Results & Showdown (01/06):</strong>
+                        <ul class="sub-list">
+                            <li><strong>Tasks:</strong> Everyone plays, mutual peer evaluation.</li>
+                            <li><strong>Output:</strong> Final score settlement.</li>
+                        </ul>
+                    </div>
+
+                    <div class="speaker-notes">
+                        Speaker Notes: We don't have a whole semester - only three weeks. Today is topic setting, next week is in-class Hackathon - we directly make the games and submit them in class. January 6th is the final showdown. The pace is very fast, please keep up.
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>Slide 7.2: Submission Specifications Detailed</h3>
+
+                    <div class="highlight">
+                        <h4>12/30 Delivery Standards: Three Required Outputs</h4>
+                    </div>
+
+                    <div class="list-item">
+                        <strong>1. Game Build:</strong>
+                        <ul class="sub-list">
+                            <li><strong>Format:</strong> Public link or single HTML file.</li>
+                            <li><strong>Standard:</strong> No login required, no installation setup, directly playable.</li>
+                        </ul>
+                    </div>
+
+                    <div class="list-item">
+                        <strong>2. Design Blueprint:</strong>
+                        <ul class="sub-list">
+                            <li><strong>Content:</strong> Original prompt records or system architecture diagrams.</li>
+                            <li><strong>Purpose:</strong> Prove technical implementation ability and logical thinking.</li>
+                        </ul>
+                    </div>
+
+                    <div class="list-item">
+                        <strong>3. Design Concept:</strong>
+                        <ul class="sub-list">
+                            <li><strong>Content:</strong> 300-word short essay.</li>
+                            <li><strong>Focus:</strong> Explain historical research sources and N+1 variable design.</li>
+                        </ul>
+                    </div>
+
+                    <div class="speaker-notes">
+                        Speaker Notes: Next week you need to submit three things: game link, prompt records, and a 300-word explanation. Special reminder: the game must be open-and-play without complex installation steps. If your rivals can't open your game, points will be deducted from that item.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Grading & Validation -->
+        <div class="slide" data-slide="9">
+            <div class="content">
+                <h1>Final Project: RPG Game Design</h1>
+
+                <div class="section">
+                    <h2>Section 8: Grading & Validation</h2>
+
+                    <h3>Slide 8.1: Dual-Dimensional Scoring Model</h3>
+
+                    <div class="highlight">
+                        <h4>Scoring Standards: Balance of Quality and Market</h4>
+                    </div>
+
+                    <div class="list-item">
+                        <strong>A. Production Quality (60%):</strong>
+                        <ul class="sub-list">
+                            <li><strong>Technical Implementation:</strong> Are variable logics smooth? Any bugs?</li>
+                            <li><strong>Narrative Depth:</strong> Is historical research solid? Are scripts reasonable?</li>
+                            <li><strong>Art/UI:</strong> Visual style and user experience.</li>
+                        </ul>
+                    </div>
+
+                    <div class="list-item">
+                        <strong>B. Competitive Results (40%):</strong>
+                        <ul class="sub-list">
+                            <li><strong>Source:</strong> From your locked "3 rival groups".</li>
+                            <li><strong>Based on:</strong> Scoring matrix.</li>
+                        </ul>
+                    </div>
+
+                    <div class="speaker-notes">
+                        Speaker Notes: Scores come from two parts: 60% looks at production quality - is the program stable, has history been made up? The remaining 40% depends on rival scores. If the game experience is poor or too many bugs make it unplayable, this 40% will be affected.
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>Slide 8.2: Scoring Matrix</h3>
+
+                    <div class="highlight">
+                        <h4>Rival Evaluation Perspective: Three Dimensions of Scoring</h4>
+                    </div>
+
+                    <div class="list-item">
+                        <strong>Peer Evaluation Indicators:</strong>
+                        <ol>
+                            <li><strong>Fun Factor:</strong> Is the game process interesting? Does it have replay value?</li>
+                            <li><strong>Creative Factor:</strong> Is the variable design creative? Does it show technical highlights?</li>
+                            <li><strong>Completion Factor:</strong> Is the flow complete? Are there serious logic loopholes?</li>
+                        </ol>
+                    </div>
+
+                    <div class="speaker-notes">
+                        Speaker Notes: When doing peer evaluations, score based on these three standards. To get high scores, focus on "variable design" - let players' choices really affect endings. This is what best demonstrates creativity.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Controls -->
+    <div class="nav-controls">
+        <button class="nav-button" id="prevBtn" disabled>Previous</button>
+        <button class="nav-button" id="nextBtn">Next</button>
+    </div>
+
+    <!-- Progress Indicator -->
+    <div class="progress-indicator" id="progressIndicator">1 / 9</div>
+
+    <!-- Keyboard Shortcut Hint -->
+    <div class="keyboard-hint">Use ← → keys or Spacebar to switch slides</div>
+
+    <script>
+        class Slideshow {
+            constructor() {
+                this.slides = document.querySelectorAll('.slide');
+                this.currentSlide = 0;
+                this.totalSlides = this.slides.length;
+                this.prevBtn = document.getElementById('prevBtn');
+                this.nextBtn = document.getElementById('nextBtn');
+                this.progressIndicator = document.getElementById('progressIndicator');
+
+                this.init();
+            }
+
+            init() {
+                this.showSlide(this.currentSlide);
+                this.bindEvents();
+            }
+
+            bindEvents() {
+                this.prevBtn.addEventListener('click', () => this.prevSlide());
+                this.nextBtn.addEventListener('click', () => this.nextSlide());
+
+                // Keyboard controls
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowLeft' || e.key === ' ') {
+                        e.preventDefault();
+                        this.prevSlide();
+                    } else if (e.key === 'ArrowRight' || e.key === ' ') {
+                        e.preventDefault();
+                        this.nextSlide();
+                    }
+                });
+
+                // Touch swipe support
+                let startX = 0;
+                let endX = 0;
+
+                document.addEventListener('touchstart', (e) => {
+                    startX = e.touches[0].clientX;
+                });
+
+                document.addEventListener('touchend', (e) => {
+                    endX = e.touches[0].clientX;
+                    const diff = startX - endX;
+
+                    if (Math.abs(diff) > 50) { // Minimum swipe distance
+                        if (diff > 0) {
+                            this.nextSlide();
+                        } else {
+                            this.prevSlide();
+                        }
+                    }
+                });
+            }
+
+            showSlide(index) {
+                // Hide all slides
+                this.slides.forEach(slide => {
+                    slide.classList.remove('active');
+                });
+
+                // Show current slide
+                this.slides[index].classList.add('active');
+
+                // Update button states
+                this.prevBtn.disabled = index === 0;
+                this.nextBtn.disabled = index === this.totalSlides - 1;
+
+                // Update progress indicator
+                this.progressIndicator.textContent = `${index + 1} / ${this.totalSlides}`;
+            }
+
+            nextSlide() {
+                if (this.currentSlide < this.totalSlides - 1) {
+                    this.currentSlide++;
+                    this.showSlide(this.currentSlide);
+                }
+            }
+
+            prevSlide() {
+                if (this.currentSlide > 0) {
+                    this.currentSlide--;
+                    this.showSlide(this.currentSlide);
+                }
+            }
+        }
+
+        // Initialize slideshow
+        document.addEventListener('DOMContentLoaded', () => {
+            new Slideshow();
+        });
+    </script>
+</body>
+</html>

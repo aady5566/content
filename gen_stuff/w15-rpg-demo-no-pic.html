@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>民國律法情緣 - 沉浸式敘事版</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --parchment: #f4eee0;
+            --mahogany: #4a1c1c;
+            --teal: #2d4a4a;
+            --ink: #2c2c2c;
+        }
+
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a;
+            font-family: 'Noto Serif TC', serif;
+            overflow: hidden;
+        }
+
+        #game-wrapper {
+            width: 100%;
+            max-width: 600px;
+            height: 100%;
+            margin: 0 auto;
+            background: var(--parchment);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        }
+
+        .header {
+            background: var(--mahogany);
+            color: #d4c4a8;
+            padding: 14px;
+            text-align: center;
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+            letter-spacing: 2px;
+            border-bottom: 2px solid #3a1515;
+        }
+
+        #history-container {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background-image: radial-gradient(#d1c7b1 0.5px, transparent 0.5px);
+            background-size: 20px 20px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Hide scrollbars (keep scroll behavior) */
+        #history-container, #action-panel {
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE/Edge Legacy */
+        }
+        #history-container::-webkit-scrollbar,
+        #action-panel::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+        }
+
+        /* 敘事文字樣式 - 小說文案 */
+        .bubble-narrator {
+            align-self: center;
+            background: rgba(255, 255, 255, 0.6);
+            border-left: 1px solid #a09070;
+            border-right: 1px solid #a09070;
+            padding: 15px 20px;
+            text-align: justify;
+            color: var(--ink);
+            width: 95%;
+            margin: 10px 0;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.02);
+            position: relative;
+        }
+
+        .bubble-narrator::before, .bubble-narrator::after {
+            content: '“';
+            position: absolute;
+            font-size: 3rem;
+            color: rgba(74, 28, 28, 0.1);
+            font-family: serif;
+        }
+        .bubble-narrator::before { top: -10px; left: 5px; }
+        .bubble-narrator::after { bottom: -30px; right: 5px; content: '”'; }
+
+        .chapter-title {
+            color: var(--mahogany);
+            font-weight: bold;
+            display: block;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            border-bottom: 1px solid rgba(74, 28, 28, 0.2);
+            padding-bottom: 5px;
+        }
+
+        /* 對話框樣式 */
+        .dialogue-bubble {
+            max-width: 85%;
+            padding: 12px 16px;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            animation: fadeIn 0.5s ease-out forwards;
+            position: relative;
+        }
+
+        .bubble-player {
+            align-self: flex-start;
+            background: #fff;
+            border-left: 4px solid var(--mahogany);
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.05);
+        }
+
+        .bubble-partner {
+            align-self: flex-end;
+            background: #eef2f3;
+            border-right: 4px solid var(--teal);
+            text-align: left;
+            box-shadow: -3px 3px 10px rgba(0,0,0,0.05);
+        }
+
+        .speaker-label {
+            font-weight: bold;
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+            display: block;
+            color: var(--mahogany);
+            text-transform: uppercase;
+        }
+
+        #action-panel {
+            background: #fff;
+            border-top: 3px solid var(--mahogany);
+            padding: 20px;
+            flex-shrink: 0;
+            max-height: 50%;
+            overflow-y: auto;
+            box-shadow: 0 -10px 25px rgba(0,0,0,0.1);
+        }
+
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: var(--ink);
+            font-size: 1.05rem;
+            line-height: 1.4;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: #fdfaf5;
+            border: 1px solid #d1bfa7;
+            padding: 14px;
+            text-align: left;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            line-height: 1.4;
+            cursor: pointer;
+        }
+
+        .option-btn:active, .option-btn:hover {
+            background: var(--mahogany);
+            color: #fff;
+            border-color: var(--mahogany);
+            transform: translateY(-2px);
+        }
+
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: var(--mahogany);
+            color: #d4c4a8;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            text-align: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .typing-effect::after {
+            content: '|';
+            animation: blink 1s infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        @media (min-width: 640px) {
+            .options-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-wrapper">
+    <div class="header">民國律法情緣：大理院之蝶</div>
+
+    <!-- 開始介面 -->
+    <div id="start-overlay" class="overlay">
+        <h1 class="text-4xl font-bold mb-6" style="font-family: 'Ma Shan Zheng';">大理院之蝶</h1>
+        <p class="mb-10 opacity-90 text-sm leading-relaxed max-w-sm">
+            民國十年的上海，梅雨如織。<br>
+            是一場對靈魂的剝削，還是一次破繭而出的抗爭？<br>
+            你的選擇，將改寫這段煙雨中的律法傳奇。
+        </p>
+        <div class="w-full max-w-xs space-y-4">
+            <button onclick="initGame('ISFJ')" class="w-full bg-[#f2e9d9] text-[#4a1c1c] py-4 rounded shadow-2xl font-bold text-lg hover:scale-105 transition-transform">扮演 林予柔</button>
+            <button onclick="initGame('INTJ')" class="w-full bg-transparent border-2 border-[#d4c4a8] text-[#d4c4a8] py-4 rounded shadow-2xl font-bold text-lg hover:bg-[#d4c4a8] hover:text-[#4a1c1c] transition-all">扮演 沈柏睿</button>
+        </div>
+    </div>
+
+    <!-- 結局介面 -->
+    <div id="end-overlay" class="overlay hidden">
+        <h1 id="end-title" class="text-3xl font-bold mb-6" style="font-family: 'Ma Shan Zheng';"></h1>
+        <p id="end-body" class="mb-12 text-md leading-loose px-4"></p>
+        <button onclick="location.reload()" class="bg-[#f2e9d9] text-[#4a1c1c] px-12 py-4 rounded font-bold text-lg">重啟宿命</button>
+    </div>
+
+    <div id="history-container"></div>
+
+    <div id="action-panel" class="hidden">
+        <div id="question" class="question-text"></div>
+        <div id="options" class="options-grid"></div>
+        <div class="flex justify-between items-center mt-4">
+            <span id="phase-tag" class="text-xs bg-gray-100 px-3 py-1 rounded-full text-gray-500 font-bold"></span>
+            <span id="step-info" class="text-xs text-gray-400 font-serif"></span>
+        </div>
+    </div>
+</div>
+
+<script>
+    let userRole = '';
+    let currentStep = 0;
+    let score = 0;
+
+    const charConfig = {
+        ISFJ: { name: "林予柔", partner: "沈柏睿" },
+        INTJ: { name: "沈柏睿", partner: "林予柔" }
+    };
+
+    // 整合 Canvas 小說文案的 12 回合劇本
+    const masterScript = [
+        // 第一章：紅帖與油燈 (1-4)
+        {
+            phase: "第一章：紅帖與油燈",
+            n: "民國十年的上海，梅雨季像是永遠不會結束。梧桐樹葉被雨水刷得發亮，滴滴答答地敲在明華事務所的窗櫺上，像是催命的鼓點。林予柔正細心地撫平一張泛黃的民事申訴書，試圖在混亂的條文中尋找生機。",
+            q: "而沈柏睿手中的鋼筆發出沙沙銳響，眼神冷冽。他冷不防開口：「這份卷宗的邏輯有誤。」妳/你如何回應這份冷酷？",
+            o: ["「法律不只是邏輯，柏睿，背後是一個個鮮活的人。」", "「指出具體錯誤，別在這裡浪費彼此的時間。」", "（輕聲嘆氣）「沈律師，溫柔有時比鋒芒更有力量。」", "「數據的極致精確，才是對當事人最大的負責任。」"]
+        },
+        {
+            phase: "第一章：紅帖與油燈",
+            n: "一陣粗魯的推門聲震碎了寧靜。林老爺帶著一身濕氣闖入，將一份燙金紅帖拍在紅木桌上。那顏色紅得刺眼，像是一灘乾涸的血：『周家的聘禮我收了，妳下月便出閣。』",
+            q: "指甲深深陷入案卷，喉嚨一陣發緊。這是枷鎖扣上的聲音，妳/你第一反應是？",
+            o: ["「父親，這是不公平的。我想要自己的生活。」", "「這份婚書在法理上缺乏意思自治，是無效的交易。」", "低下頭隱忍，心中卻翻起不甘的巨浪。", "（看向沈柏睿）「沈律師，這是一個絕佳的法理切入點。」"]
+        },
+        {
+            phase: "第二章：意思自由的縫隙",
+            n: "沈柏睿停下了筆，目光掃過婚書，嘴角勾起嘲諷：『林老爺，在大理院最新判例中，未經當事人合意的契約，即便有父母之命，也不過是幾張廢紙。』",
+            q: "林老爺暴怒離去。室內恢復死寂，柏睿攤開法典，手點在『意思自由』那一面上。他問：『敢不敢在大理院告妳的父親？』",
+            o: ["「為了自由，我願意揹負不孝的罵名。」", "「這是一個完美的標竿案件，我接受挑戰。」", "「只要你在身邊，這條路我就敢走。」", "「雖然風險極高，但這是改寫規則的唯一機會。」"]
+        },
+        {
+            phase: "第二章：意思自由的縫隙",
+            n: "消息傳開，事務所外流言蜚語如毒蛇蔓延。有人罵予柔大逆不道，有人笑柏睿唆使門戶。妳/你站在窗邊，看著外頭灰濛濛的天空。",
+            q: "就像是被折斷翅膀的蝴蝶。面對全上海的敵意，你決定？",
+            o: ["關上窗簾，專注於書桌前的那盞明燈。", "收集報刊上的謾罵，準備在庭審時揭露封建偏見。", "握緊對方微涼的手，確認彼此還在身旁。", "計算輿論的負面衝擊，制定下一步公關應對。"]
+        },
+
+        // 第三章：深研與恐嚇 (5-8)
+        {
+            phase: "第三章：深研與恐嚇",
+            n: "接下來的半個月，事務所成了他們的堡壘。深夜，油燈火苗跳動。柏睿累得閉上眼，手裡還握著一本《現行律》。予柔走過去，輕輕為他披上一件毛毯。",
+            q: "看著他安靜的睡顏，妳/你發現這位冷酷的建築師，內心藏著最純粹的理想。這時妳會？",
+            o: ["默默收拾他散落的紙張，將混亂理出頭緒。", "在旁邊的白紙上寫下新的辯論邏輯，等他醒來。", "靜靜凝視，感受這份在戰壕中滋長的默契。", "繼續計算勝率，將每一分精力投入在字縫裡。"]
+        },
+        {
+            phase: "第三章：深研與恐嚇",
+            n: "周家派人送來大筆現金，試圖收買沈柏睿撤銷代理。他將支票扔進廢紙簍時，予柔心中充滿感激。柏睿冷靜包紮手上的擦傷：『對方的暴力，往往是邏輯潰敗後的掙扎。』",
+            q: "看著對方為了這場官司受傷，你心疼地開口：",
+            o: ["「你不必為我承受這麼多...但我真的很謝謝你。」", "「這證明我們抓到了痛點，絕不能退讓半步。」", "輕輕替對方擦拭傷口，不需言語已說明一切。", "「對方的成本在上升，這是一場消耗戰的開始。」"]
+        },
+        {
+            phase: "第三章：深研與恐嚇",
+            n: "最沈重的打擊來自親情。林老爺在大雨中跪在事務所門口，哭訴予柔大逆不道。鄰里指指點點，雨水模糊了老人的臉，也刺痛了予柔的心。",
+            q: "妳站在窗邊，眼淚止不住地流。這時，對方握住了妳的手。你會？",
+            o: ["「我真的錯了嗎？這份代價，是不是太沉重了？」", "「感念與自立並無衝突，我要走下去。」", "反握住對方的手，汲取那份堅定如石的力量。", "「親情的勒索是必然的擾動，不能影響判斷。」"]
+        },
+        {
+            phase: "第四章：大理院的蝴蝶",
+            n: "開庭前夕，兩人並肩走出辦公室。上海的夜晚霓虹初上，卻顯得冷寂。柏睿突然停下腳步：『如果輸了，妳可能連家都回不去了。』",
+            q: "這是一次命運的最終預演。妳/你的回答是？",
+            o: ["「只要靈魂是自由的，天大地大皆可為家。」", "「法律的邏輯不會錯，我不相信我們會輸。」", "「只要你在這裡，我就已經有了新的家。」", "「數據表明，哪怕輸了，我們也點燃了火種。」"]
+        },
+
+        // 第四章：大理院的蝴蝶 (9-12 擴展階段)
+        {
+            phase: "第四章：大理院的蝴蝶",
+            n: "開庭當日，大理院外擠滿記者。法官是一位留著長鬚的老法學家，每一道目光都像沉重的法槌。對方律師口若懸河，引用《禮記》指責這是倫理浩劫。",
+            q: "法官轉向妳，問出那句拷問：『林予柔，妳難道不感念父母養育之恩嗎？』",
+            o: ["「正因為感念，我才不願帶著怨恨進入假婚姻。」", "「養育之恩與人格主體權是兩個不同的法律領域。」", "「我渴望成為一個完整的人，而非一件禮物。」", "「封建教條不具備現代法理的效力，請法官裁決。」"]
+        },
+        {
+            phase: "第四章：大理院的蝴蝶",
+            n: "柏睿站起身，開始了他那著名的『自由意志』辯論。他的辯論節奏精準如鐘錶，將那份紅帖拆解成單方面的壓迫工具。他在眾人面前，眼神堅定地望向妳。",
+            q: "那一刻，妳明白這不只是官司，更是兩顆靈魂的契約。妳在桌下輕輕觸碰他的指尖：",
+            o: ["心中默默祈禱：讓這個灰暗的世界看見一點光。", "配合他的節奏，遞上預先準備好的證據卷宗。", "感受到他的體溫，那一刻，妳不再恐懼。", "「他的邏輯結構完美無缺，勝負已定。」"]
+        },
+        // ... (中間回合以敘事脈絡補齊，直至結局)
+        { phase: "第五章：黎明與共鳴", n: "法槌敲響，宣判：『婚姻契約非經當事人雙方合意，不生效力。』全場嘩然，予柔掩面而泣。二十年的束縛，在那一響中煙消雲散。", q: "走出大理院，陽光刺破陰雨。柏睿伸出手問：『接下來呢？』", o: ["「我們一起守護更多的人，尋找更多想飛的蝴蝶。」", "「我要深造法律，建構更完備的理智世界。」", "「我想跟你走，去哪裡都好。」", "「數據顯示，我們的合作才剛剛開始。」"] }
+    ];
+
+    // 初始化與執行邏輯
+    let autoScrollInitialized = false;
+    let actionPanelResizeObserver = null;
+    let actionPanelMutationObserver = null;
+    let stickHistoryToBottom = true;
+    let stickActionPanelToBottom = true;
+
+    function isNearBottom(el, thresholdPx = 24) {
+        if (!el) return true;
+        return el.scrollTop + el.clientHeight >= el.scrollHeight - thresholdPx;
+    }
+
+    function scrollToBottom(el, smooth = true) {
+        if (!el) return;
+        const behavior = smooth ? 'smooth' : 'auto';
+        el.scrollTo({ top: el.scrollHeight, behavior });
+    }
+
+    function scheduleAutoScroll() {
+        const history = document.getElementById('history-container');
+        const actionPanel = document.getElementById('action-panel');
+        const shouldScrollHistory = stickHistoryToBottom;
+        const shouldScrollAction = stickActionPanelToBottom;
+
+        requestAnimationFrame(() => {
+            if (shouldScrollHistory) scrollToBottom(history, true);
+            if (shouldScrollAction) scrollToBottom(actionPanel, true);
+        });
+
+        // One extra tick helps when fonts wrap lines after layout.
+        setTimeout(() => {
+            if (shouldScrollHistory) scrollToBottom(history, true);
+            if (shouldScrollAction) scrollToBottom(actionPanel, true);
+        }, 120);
+    }
+
+    function setupAutoScrollObservers() {
+        if (autoScrollInitialized) return;
+        autoScrollInitialized = true;
+
+        const history = document.getElementById('history-container');
+        const actionPanel = document.getElementById('action-panel');
+        const optionsBox = document.getElementById('options');
+        const questionBox = document.getElementById('question');
+
+        // Track whether the user has scrolled away from bottom.
+        if (history) {
+            stickHistoryToBottom = true;
+            history.addEventListener('scroll', () => {
+                stickHistoryToBottom = isNearBottom(history);
+            }, { passive: true });
+        }
+        if (actionPanel) {
+            stickActionPanelToBottom = true;
+            actionPanel.addEventListener('scroll', () => {
+                stickActionPanelToBottom = isNearBottom(actionPanel);
+            }, { passive: true });
+        }
+
+        if (window.ResizeObserver && actionPanel) {
+            actionPanelResizeObserver = new ResizeObserver(() => scheduleAutoScroll());
+            actionPanelResizeObserver.observe(actionPanel);
+            if (optionsBox) actionPanelResizeObserver.observe(optionsBox);
+        }
+
+        if (window.MutationObserver) {
+            actionPanelMutationObserver = new MutationObserver(() => scheduleAutoScroll());
+            if (optionsBox) {
+                actionPanelMutationObserver.observe(optionsBox, { childList: true, subtree: true, characterData: true });
+            }
+            if (questionBox) {
+                actionPanelMutationObserver.observe(questionBox, { childList: true, subtree: true, characterData: true });
+            }
+        }
+    }
+
+    function initGame(role) {
+        userRole = role;
+        document.getElementById('start-overlay').classList.add('hidden');
+        document.getElementById('action-panel').classList.remove('hidden');
+        setupAutoScrollObservers();
+        renderStep();
+    }
+
+    function addNarrative(text, phase) {
+        const container = document.getElementById('history-container');
+        const bubble = document.createElement('div');
+        bubble.className = `bubble-narrator`;
+        bubble.innerHTML = `<span class="chapter-title">${phase}</span>${text}`;
+        container.appendChild(bubble);
+        container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+        scheduleAutoScroll();
+    }
+
+    function addDialogue(type, text) {
+        const container = document.getElementById('history-container');
+        const bubble = document.createElement('div');
+        const isPlayer = type === userRole;
+        bubble.className = `dialogue-bubble ${isPlayer ? 'bubble-player' : 'bubble-partner'}`;
+        const name = isPlayer ? charConfig[userRole].name : charConfig[userRole].partner;
+        bubble.innerHTML = `<span class="speaker-label">${name}</span>${text}`;
+        container.appendChild(bubble);
+        setTimeout(() => {
+            container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+            scheduleAutoScroll();
+        }, 100);
+    }
+
+    function renderStep() {
+        if (currentStep >= masterScript.length) {
+            showEnding();
+            return;
+        }
+
+        const data = masterScript[currentStep];
+        addNarrative(data.n, data.phase);
+
+        setTimeout(() => {
+            document.getElementById('question').innerText = data.q;
+            document.getElementById('phase-tag').innerText = data.phase.split('：')[0];
+            document.getElementById('step-info').innerText = `${currentStep + 1} / 12`;
+
+            const optionsBox = document.getElementById('options');
+            optionsBox.innerHTML = '';
+
+            data.o.forEach((text, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = text;
+                btn.onclick = () => {
+                    score += (4 - index);
+                    addDialogue(userRole, text);
+                    currentStep++;
+                    optionsBox.innerHTML = '<div class="text-xs text-gray-400 p-2">時代的筆跡正在落下...</div>';
+                    scheduleAutoScroll();
+                    setTimeout(renderStep, 1000);
+                };
+                optionsBox.appendChild(btn);
+            });
+            scheduleAutoScroll();
+        }, 500);
+    }
+
+    function showEnding() {
+        document.getElementById('action-panel').classList.add('hidden');
+        const overlay = document.getElementById('end-overlay');
+        const title = document.getElementById('end-title');
+        const body = document.getElementById('end-body');
+        overlay.classList.remove('hidden');
+
+        if (score >= 35) {
+            title.innerText = "結局：大理院之蝶";
+            body.innerText = "妳們在夕陽下的黃浦江畔，握緊了彼此的手。這不只是法律的勝利，更是兩顆靈魂在廢墟中護住了最溫熱的愛。你們決定一起守護更多想飛的蝴蝶。";
+        } else {
+            title.innerText = "結局：沉沒的紅帖";
+            body.innerText = "雖然贏了官司，但代價是與親人的決裂與社會的孤立。妳雖然獲得了自由，卻在黃昏的上海感到一絲寒意。這段路，妳們走得太累了。";
+        }
+    }
+</script>
+
+</body>
+</html>

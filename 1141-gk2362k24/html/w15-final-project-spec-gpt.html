@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>期末專案：RPG 遊戲設計規格</title>
+    <script src="../../sidebar_tools/sidebar.js"></script>
+    <style>
+        /* ============================================
+           CSS 變數定義（來自 style_1116.md）
+           ============================================ */
+        :root {
+            --bg-color: #F5F4F0;        /* Warm, off-white, like aged paper */
+            --text-color: #3D3A37;      /* Dark, soft brown/gray */
+            --accent-color: #9A948C;    /* Muted stone gray */
+            --header-bg: #EAEBE6;       /* Very light, muted moss */
+            --line-color: #d1d1c2;      /* For borders and lines */
+            --highlight-color: #8c867b; /* For highlights */
+            --font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+        }
+
+        /* 投影片容器 */
+        .slides-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: var(--bg-color);
+        }
+
+        /* 投影片基礎樣式 */
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5vw;
+            box-sizing: border-box;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+            transform: scale(0.98);
+            text-align: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+            font-family: var(--font-family);
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            z-index: 1;
+        }
+
+        .slide.hidden {
+            display: none !important;
+        }
+
+        .slide.scrollable {
+            justify-content: flex-start;
+        }
+
+        /* 標題層級 */
+        h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 400;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 400;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--header-bg);
+        }
+
+        h3 {
+            font-size: clamp(1.8rem, 4.5vw, 3rem);
+            font-weight: 300;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--header-bg);
+        }
+
+        h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+        }
+
+        p {
+            font-size: clamp(1.2rem, 2.5vw, 1.75rem);
+            color: var(--text-color);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        /* Emphasis text (use the same deep red used in the game theme) */
+        .em-red-bold {
+            color: #7a3a3a;
+            font-weight: 700;
+        }
+
+        .slide-subtitle {
+            color: var(--accent-color);
+            font-size: clamp(1.2rem, 3vw, 1.75rem);
+            font-weight: 400;
+            margin-top: -1rem;
+        }
+
+        /* 導航系統 */
+        .nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 98%;
+            left: 1%;
+            display: flex;
+            justify-content: space-between;
+            z-index: 1002;
+            pointer-events: none;
+        }
+
+        .nav-btn {
+            pointer-events: all;
+            background: none;
+            border: 1px solid var(--line-color);
+            color: var(--accent-color);
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.4;
+            font-family: var(--font-family);
+        }
+
+        .nav-btn:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            opacity: 1;
+        }
+
+        /* 內容佈局系統 */
+        .content-section {
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            font-family: var(--font-family);
+            width: 100%;
+            max-width: 980px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        .content-section h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .content-section p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        /* Ensure lists inside content cards align consistently */
+        .content-section > ul {
+            max-width: none;
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+        /* 列表系統 */
+        ul {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            max-width: 900px;
+            margin: 1rem auto;
+            font-family: var(--font-family);
+        }
+
+        ul li {
+            margin-bottom: 15px;
+            position: relative;
+            padding-left: 1.5em;
+            font-size: clamp(1rem, 2.5vw, 1.75rem);
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+
+        ul li::before {
+            content: '•';
+            color: var(--accent-color);
+            font-weight: bold;
+            display: inline-block;
+            position: absolute;
+            left: 0;
+            width: 1em;
+        }
+
+        /* 子要求區域樣式 */
+        .sub-requirements {
+            margin: 1rem 0 1.5rem 0;
+            margin-left: 0;
+            padding: 1rem;
+            padding-left: 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            border-left: 3px solid var(--accent-color);
+            clear: both;
+        }
+
+        .sub-requirements h4 {
+            margin: 0 0 0.8rem 0;
+            color: var(--accent-color);
+            font-size: clamp(1rem, 2vw, 1.3rem);
+            font-weight: 600;
+        }
+
+        .nested-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nested-list li {
+            margin-bottom: 0.6rem;
+            padding-left: 1.2em;
+            position: relative;
+            line-height: 1.5;
+        }
+
+        .nested-list li::before {
+            content: '•';
+            color: var(--accent-color);
+            font-weight: bold;
+            font-size: 1.2em;
+            position: absolute;
+            left: 0;
+            width: 1em;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 767px) {
+            .nav {
+                width: 95%;
+                left: 2.5%;
+            }
+
+            .nav-btn {
+                width: 44px;
+                height: 44px;
+                font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+                opacity: 0.6;
+            }
+
+            .slide.video-slide .video-container {
+                margin: 10px 0;
+                width: 90%;
+                max-width: 450px;
+            }
+
+            .content-section {
+                padding: 1rem;
+            }
+
+            /* style_1116.md: two-columns becomes single column on mobile */
+            .two-columns {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            /* style_1116.md: slide-image mobile sizing */
+            .slide-image {
+                max-width: 95%;
+                max-height: 50vh;
+            }
+
+            /* Characters: keep portrait images from dominating on small screens */
+            .character-card .slide-image {
+                max-height: 30vh;
+                border: none;
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+        .slide-image.slide-image-large {
+            max-width: 100%;
+            max-height: 70vh;
+        }
+        }
+
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .video-container {
+                width: 75%;
+                max-width: 700px;
+            }
+        }
+
+        /* ============================================
+           Two-column slide layout (text left, image right)
+           ============================================ */
+        .slide.two-column {
+            justify-content: center;
+            align-items: stretch;
+            text-align: left;
+        }
+
+        /* style_1116.md: two-columns layout */
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            align-items: center;
+        }
+
+        .two-columns > div {
+            width: 100%;
+        }
+
+        .two-columns blockquote {
+            margin: 0;
+            padding: 1rem 1.25rem;
+            border-left: 3px solid var(--accent-color);
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: clamp(1.2096rem, 2.268vw, 1.512rem);
+            line-height: 1.6;
+        }
+
+        /* ============================================
+           Characters slide (responsive cards)
+           ============================================ */
+        .characters-slide {
+            text-align: left;
+        }
+
+        .characters-slide h2 {
+            text-align: center;
+        }
+
+        .character-grid {
+            align-items: stretch;
+        }
+
+        .character-card {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            padding: 1.25rem;
+            border: 1px solid var(--line-color);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .character-card .slide-image {
+            margin: 0;
+            max-height: 38vh;
+            width: 100%;
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .character-card h4 {
+            margin-bottom: 0.4rem;
+        }
+
+        .character-en {
+            font-weight: 300;
+            color: var(--accent-color);
+        }
+
+        .character-keywords {
+            margin: 0;
+            font-size: clamp(1.05rem, 2vw, 1.35rem);
+            line-height: 1.6;
+        }
+
+        /* style_1116.md: slide image utility */
+        .slide-image {
+            max-width: 100%;
+            max-height: 60vh;
+            height: auto;
+            border: 1px solid var(--line-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            object-fit: contain;
+            margin: 1rem 0;
+            display: block;
+        }
+
+        /* Larger image variant (use when a slide is mostly an image) */
+        .slide-image.slide-image-large {
+            max-height: 78vh;
+            margin: 0.5rem 0;
+        }
+
+        .two-column-layout {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            gap: clamp(1rem, 3vw, 2.5rem);
+            align-items: center;
+        }
+
+        .two-column-layout .col {
+            flex: 1 1 0;
+            min-width: 0;
+        }
+
+        .two-column-layout .text-col p {
+            margin-bottom: 0;
+            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+            line-height: 1.7;
+        }
+
+        .two-column-layout .image-col img {
+            width: 100%;
+            height: auto;
+            max-height: 70vh;
+            object-fit: contain;
+            display: block;
+            border-radius: 10px;
+            border: 1px solid var(--line-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+        }
+
+        @media (max-width: 767px) {
+            .two-column-layout {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .two-column-layout .image-col img {
+                max-height: 45vh;
+            }
+        }
+
+        /* ============================================
+           iframe 全滿投影片樣式
+           ============================================ */
+        .slide.iframe-slide {
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .slide.iframe-slide iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* ============================================
+           遊戲專用樣式（民國律法情緣）
+           ============================================ */
+        .slide.game-slide {
+            padding: 0;
+            justify-content: flex-start;
+            overflow: hidden;
+        }
+
+        .game-wrapper {
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            margin: 0;
+            background: #f4eee0;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            font-family: 'Noto Serif TC', 'Microsoft JhengHei', serif;
+        }
+
+        .game-header {
+            background: #4a1c1c;
+            color: #d4c4a8;
+            padding: clamp(10px, 2vw, 15px);
+            text-align: center;
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            flex-shrink: 0;
+            font-weight: bold;
+        }
+
+        .game-history-container {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            padding: clamp(10px, 2vw, 15px);
+            display: flex;
+            flex-direction: column;
+            gap: clamp(8px, 1.5vw, 12px);
+            background-image: linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px);
+            background-size: 100% 1.5rem;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .game-dialogue-bubble {
+            max-width: 85%;
+            padding: clamp(8px, 1.5vw, 12px) clamp(10px, 2vw, 14px);
+            border-radius: 4px;
+            font-size: clamp(0.85rem, 2vw, 0.95rem);
+            line-height: 1.5;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        .game-bubble-narrator {
+            align-self: center;
+            background: rgba(0,0,0,0.05);
+            border: 1px dashed #888;
+            text-align: center;
+            font-style: italic;
+            color: #444;
+            width: 90%;
+            margin: clamp(6px, 1vw, 8px) 0;
+        }
+
+        .game-bubble-player {
+            align-self: flex-start;
+            background: #fff;
+            border-left: 4px solid #4a1c1c;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .game-bubble-partner {
+            align-self: flex-end;
+            background: #eef2f3;
+            border-right: 4px solid #2d4a4a;
+            text-align: right;
+            box-shadow: -2px 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .game-speaker-label {
+            font-weight: bold;
+            font-size: clamp(0.65rem, 1.5vw, 0.75rem);
+            margin-bottom: 2px;
+            display: block;
+            color: #4a1c1c;
+        }
+
+        .game-action-panel {
+            background: #fff;
+            border-top: 2px solid #4a1c1c;
+            padding: clamp(10px, 2vw, 15px);
+            flex-shrink: 0;
+            max-height: 45%;
+            overflow-y: auto;
+        }
+
+        .game-question-text {
+            font-weight: bold;
+            margin-bottom: clamp(8px, 1.5vw, 10px);
+            color: #222;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        .game-options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: clamp(6px, 1.2vw, 8px);
+        }
+
+        @media (min-width: 640px) {
+            .game-options-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .game-option-btn {
+            background: #fdfaf5;
+            border: 1px solid #d1bfa7;
+            padding: clamp(8px, 1.5vw, 12px);
+            text-align: left;
+            border-radius: 4px;
+            font-size: clamp(0.8rem, 1.8vw, 0.9rem);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .game-option-btn:hover {
+            background: #f0e6d2;
+        }
+
+        .game-option-btn:active {
+            background: #4a1c1c;
+            color: white;
+        }
+
+        .game-overlay {
+            position: absolute;
+            inset: 0;
+            background: #4a1c1c;
+            color: white;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(15px, 3vw, 25px);
+            text-align: center;
+        }
+
+        .game-overlay.hidden {
+            display: none;
+        }
+
+        .game-overlay h1 {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            margin-bottom: clamp(10px, 2vw, 15px);
+            font-weight: bold;
+        }
+
+        .game-overlay p {
+            font-size: clamp(0.85rem, 2vw, 1rem);
+            margin-bottom: clamp(15px, 3vw, 25px);
+            opacity: 0.9;
+        }
+
+        .game-overlay button {
+            background: white;
+            color: #4a1c1c;
+            padding: clamp(10px, 2vw, 15px) clamp(20px, 4vw, 30px);
+            border: none;
+            border-radius: 4px;
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .game-overlay button:hover {
+            background: #f0e6d2;
+            transform: scale(1.02);
+        }
+
+        .game-overlay button:active {
+            transform: scale(0.98);
+        }
+
+        .game-phase-tag {
+            font-size: clamp(0.7rem, 1.5vw, 0.85rem);
+            background: #e0e0e0;
+            padding: clamp(4px, 0.8vw, 6px) clamp(8px, 1.5vw, 12px);
+            border-radius: 4px;
+            color: #666;
+        }
+
+        .game-step-info {
+            font-size: clamp(0.7rem, 1.5vw, 0.85rem);
+            color: #888;
+            font-style: italic;
+        }
+
+        .ending-text {
+            font-size: 0.7em;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="slides-container">
+        <!-- Slide 1: 標題 -->
+        <section class="slide active">
+            <h1>期末專案<br>RPG 遊戲設計</h1>
+            <p class="slide-subtitle">12/23, 12/30, 01/06</p>
+        </section>
+
+        <!-- Slide 2: 專案核心目標 -->
+        <section class="slide">
+            <h2>AI 驅動的歷史互動 RPG 遊戲</h2>
+            <ul>
+                <li>角色設計</li>
+                <li>劇情與劇本</li>
+                <li>遊戲內容呈現</li>
+            </ul>
+        </section>
+
+        <!-- Slide 7: 黃金範例 -->
+        <section class="slide scrollable">
+            <h2>遊戲範例：民國律法情緣</h2>
+            <ul>
+                <li><strong>背景：</strong>民國初年，新舊法交替。</li>
+                <li><strong>核心衝突：</strong>傳統家庭觀念 vs 現代個人法治權益。</li>
+                <li><strong>變數：</strong>法治觀念值 0-100。</li>
+                <li><strong>考據：</strong>引用真實《中華民國民法》親屬篇條文。</li>
+                <li><strong>勝敗判定：</strong>法治值 < 50 且強行離婚 → 敗訴；法治值 > 80 且引用正確法條 → 勝訴。</li>
+            </ul>
+        </section>
+
+        <!-- 男女主角 -->
+        <section class="slide characters-slide">
+            <h2>範例：民國律法情緣 - 角色</h2>
+            <div class="two-columns character-grid">
+                <div class="character-card">
+                    <img class="slide-image" src="../../pic/w15/w15-female.jpg" alt="女主角 林予柔">
+                    <div class="character-text">
+                        <h4>女主角：林予柔 <span class="character-en">(Lin Yu-Rou)</span></h4>
+                        <p class="character-keywords">ISFJ: 溫潤堅韌、書卷氣。</p>
+                    </div>
+                </div>
+
+                <div class="character-card">
+                    <img class="slide-image" src="../../pic/w15/w15-male.jpg" alt="男主角 沈柏睿">
+                    <div class="character-text">
+                        <h4>男主角：沈柏睿 <span class="character-en">(Shen Bo-Rui)</span></h4>
+                        <p class="character-keywords">INTJ: 理性、冷峻、秩序、隱藏的熱忱。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 插入遊戲範例簡介和文案 -->
+        <section class="slide two-column">
+            <h2>遊戲範例：民國律法情緣</h2>
+            <div class="two-columns">
+                <div>
+                    <blockquote><em>民國上海，律師沈柏睿與林予柔在大理院挑戰包辦婚姻，用法典對抗舊時枷鎖，於冰冷律法中守護自由與真愛。</em></blockquote>
+                </div>
+                <div>
+                    <img class="slide-image" src="../../pic/w15/w15-rpg-cover.png" alt="遊戲範例封面">
+                </div>
+            </div>
+        </section>
+
+        <!-- 範例，內容簡介-->
+
+        <section class="slide">
+            <h2>遊戲範例：民國律法情緣</h2>
+            <img class="slide-image slide-image-large" src="../../pic/w15/w15-rpg-brief.jpg" alt="遊戲範例簡介">
+        </section>
+
+        <!-- 民國律法情緣遊戲範例，結局 -->
+        <section class="slide two-column">
+            <h2>遊戲範例：民國律法情緣 - 結局</h2>
+            <div class="two-columns">
+                <div>
+                    <ul>
+                        <li><strong>大理院之蝶</strong> <span class="ending-text">（好結局） 條件：總分 >= 35 分 描述：在夕陽下的黃浦江畔，兩人握緊彼此的手，不只是法律的勝利，更是兩顆靈魂在廢墟中護住了最溫熱的愛。</span></li>
+                        <br>
+                        <li><strong>沉沒的紅帖</strong> <span class="ending-text">（壞結局） 條件：總分 < 35 分 描述：雖然贏了官司，但代價是與親人的決裂與社會的孤立，在黃昏的上海感到一絲寒意。</span></li>
+                    </ul>
+                </div>
+                <div>
+                    <img class="slide-image" src="../../pic/w15/w15-rpg-ending.jpg" alt="遊戲範例結局">
+                </div>
+            </div>
+        </section>
+
+        <!-- 遊戲範例：民國律法情緣 -->
+        <section class="slide scrollable iframe-slide">
+            <iframe src="../../gen_stuff/w15-rpg-demo-no-pic.html" width="100%" height="100%"></iframe>
+        </section>
+
+        <!-- Slide 4: 四大設計支柱 -->
+        <section class="slide">
+            <h2>遊戲設計規範</h2>
+            <ul>
+                <li><strong>角色設計：</strong>至少要有 N + 1 個角色設計（N 為組員數量）</li>
+                <li><strong>故事脈絡：</strong>劇情基於歷史神話背景，不可完全架空。</li>
+                <li><strong>勝敗判定：</strong>需有明確的勝利與失敗條件，不只單一結局。</li>
+                <li><strong>工具應用：</strong>使用指定 GenAI 工具生成角色設定、文本素材、程式碼。</li>
+            </ul>
+        </section>
+
+        <!-- Slide 3: 透過專案學會什麼 -->
+        <section class="slide scrollable">
+            <h2>實作步驟提示</h2>
+            <ul>
+                <li><strong>角色設計：</strong>提示詞工程 + MBTI 讓角色具備個性與反應。</li>
+                <div class="sub-requirements">
+                    <h4>設計要求 (MBTI + Prompt)：</h4>
+                    <ul class="nested-list">
+                        <li><strong>人格設定：</strong>每個角色需設定明確的 MBTI 人格類型（如：INTJ 的軍師、ENFP 的冒險家）。</li>
+                        <li><strong>對話一致性：</strong>利用 Prompt Engineering 確保角色對話符合設定，而非機械式回答。</li>
+                        <li><strong>關係定義：</strong>需定義角色間的關係（如：敵對、盟友、師徒）。</li>
+                    </ul>
+                </div>
+                <li><strong>深度敘事與考據：</strong>NotebookLM + 歷史資料，生成符合歷史脈絡的劇本。</li>
+                <div class="sub-requirements">
+                    <h4>故事背景設定要求：</h4>
+                    <ul class="nested-list">
+                        <li><strong>台灣在地化：</strong>故事背景必須設定於「台灣」。</li>
+                    </ul>
+
+                    <h4>建議題材 (參考範例)：</h4>
+                    <ul class="nested-list">
+                        <li><strong>神話傳說：</strong>八仙過海、媽祖繞境、關公、地基主傳說</li>
+                        <li><strong>歷史戰役：</strong>鄭成功攻台、日治時期</li>
+                        <li><strong>台灣在地文化：</strong>客家文化、閩南文化、89 文化</li>
+
+                    </ul>
+
+                    <h4>技術應用 (RAG/NotebookLM)：</h4>
+                    <ul class="nested-list">
+                        <li><strong>史實驗證：</strong>嚴禁憑空杜撰史實。需利用 NotebookLM 匯入真實文獻，確保故事脈絡符合歷史邏輯（Historical Context）。</li>
+                    </ul>
+                </div>
+                <li><strong>互動介面實作：</strong>Gemini Canvas 協助撰寫程式，整合完整 RPG 互動介面。</li>
+                <div class="sub-requirements">
+                    <h4>介面要求：</h4>
+                    <ul class="nested-list">
+                        <li><strong>RPG 互動介面：</strong>需包含對話框、選項選單、角色狀態顯示 (Status Bar)。</li>
+                        <li><strong>視覺風格：</strong>需利用 CSS 呈現符合故事氛圍的視覺設計（如：復古風、水墨風、像素風）。</li>
+                    </ul>
+
+                    <h4>操作體驗：</h4>
+                    <ul class="nested-list">
+                        <li><strong>完整流程：</strong>流程需完整（開始畫面 → 遊戲過程 → 結局）。</li>
+                    </ul>
+                </div>
+            </ul>
+        </section>
+
+        <!-- MBTI 介紹 -->
+        <section class="slide">
+            <h2>MBTI 介紹</h2>
+            <p><strong>MBTI：</strong>Myers-Briggs Type Indicator，是一種人格類型理論，由心理學家 Katharine Briggs 和 Isabel Briggs Myers 根據 Carl Jung 的人格理論發展而成。</p>
+        </section>
+
+        <!-- Slide 5: 建議工具鏈 -->
+        <section class="slide">
+            <h2>建議工具庫</h2>
+            <ul>
+                <li><strong>角色設計：</strong>ChatGPT, Gemini, Grok</li>
+                <li><strong>劇情與劇本：</strong>NotebookLM</li>
+                <li><strong>遊戲製作：</strong>Gemini Canvas</li>
+            </ul>
+        </section>
+
+        <!-- Slide 6: 核心互動迴圈 -->
+        <section class="slide scrollable">
+            <h2>遊戲製作流程</h2>
+            <div class="content-section">
+                <h4>流程步驟：</h4>
+                <ul>
+                    <li>角色設計：提示詞工程 + MBTI 讓角色具備個性與反應。</li>
+                    <li>劇情與劇本：NotebookLM + 歷史資料，生成符合歷史脈絡的劇本，需要有兩個以上的結局（失敗和成功要明確）</li>
+                    <li>遊戲內容呈現：Gemini Canvas 協助撰寫程式，整合完整 RPG 互動介面（會需要明確呈現最終結局）</li>
+                </ul>
+            </div>
+        </section>
+
+
+
+        <!-- Slide 10: 三週衝刺計畫 -->
+        <section class="slide scrollable">
+            <h2>期末時程：三週衝刺</h2>
+            <div class="content-section">
+                <h4>今日(12/23)：確認隊友和主題</h4>
+                <ul>
+                    <li>分組</li>
+                    <li>主題確認：故事背景必須設定於「台灣」，有一定的文獻考據。</li>
+                </ul>
+                <h4>下週 12/30: 遊戲開發與交付</h4>
+                <ul>
+                    <li>課堂實作</li>
+                    <li>當天下課前版本凍結並交付成果</li>
+                    <li><strong>交付內容（3 項）：</strong>
+                        <ul class="nested-list">
+                            <li><strong>遊戲本體：</strong>Gemini 應用程式公開連結或單一 HTML，無需登入與安裝，直接可玩。</li>
+                            <li><strong>設計藍圖：</strong>原始 Prompt 紀錄或系統架構圖（PDF/截圖）。</li>
+                            <li><strong>設計理念：</strong>300 字短文。</li>
+                        </ul>
+                    </li>
+                </ul>
+                <h4>最後一堂 01/06: 成果與決戰</h4>
+                <ul>
+                    <li>對戰互評，結算最終成績。</li>
+                    <li><strong>互評機制：</strong>你的遊戲會由另外 3 組同學試玩挑戰；依挑戰結果（成功 O / 失敗 X）計分（詳見「得分矩陣」投影片）。</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Slide 12: 評分模型 -->
+        <section class="slide scrollable">
+            <h2>評分模型：品質與競技</h2>
+            <ul>
+                <li><strong>製作品質 60%</strong>：角色設計精細度、歷史考據與敘事深度、美術 UI、遊戲本體完整度。</li>
+                <li><strong>競技結果 40%</strong>：來自三組對手的評分，依得分矩陣計算。（詳見「得分矩陣」投影片）</li>
+            </ul>
+            <div class="content-section">
+                <p>角色設計精細度、歷史考據與敘事深度、美術 UI、遊戲本體完整度是基礎；對手的遊玩體驗和結果會決定那 40% 的得分。</p>
+            </div>
+        </section>
+
+        <!-- Slide 13: 得分矩陣 -->
+        <section class="slide scrollable">
+            <h2>得分矩陣（The Scoring Matrix）</h2>
+            <ul>
+                <li><strong>挑戰規則：</strong>你的遊戲會由另外 3 組進行試玩挑戰（其他組的同學會來挑戰你的遊戲）。</li>
+                <li><strong>計分依據：</strong>根據 3 組的挑戰結果（成功 O / 失敗 X），決定「遊戲設計分」。</li>
+                <li><strong>目標：</strong>有難度且合理的挑戰。</li>
+                <li><strong>得分對照：</strong>
+                    <ul class="nested-list">
+                        <li><strong>1 組成功（例如 OXX）：</strong>5 分（最高分）。</li>
+                        <li><strong>2 組成功（例如 OOX）：</strong>3 分（偏簡單）。</li>
+                        <li><strong>3 組成功（OOO）：</strong>2 分（太簡單、缺乏挑戰）。</li>
+                        <li><strong>0 組成功（XXX）：</strong>2 分（太難或過於刁鑽）。</li>
+                        <li><strong>無法執行 / 重大 Bug：</strong>0 分。</li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+
+
+        <!-- Slide 8: 團隊編制 -->
+        <section class="slide">
+            <h2>今日目標：分組，大主題確認</h2>
+            <ul>
+                <li><strong>自由分組：</strong>每組 1-3 人，不可超過；可單人組隊。</li>
+                <li><strong>大主題確認：</strong>故事背景必須設定於「台灣」，有一定的文獻考據。</li>
+            </ul>
+            <p class="em-red-bold">今天下課前找老師確認組員和主題。</p>
+        </section>
+
+        <!-- 導航按鈕 -->
+        <div class="nav">
+            <button id="prev" class="nav-btn">&#8249;</button>
+            <button id="next" class="nav-btn">&#8250;</button>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // 遊戲 JavaScript（民國律法情緣）
+        // ============================================
+        (function() {
+            let rpgUserRole = '';
+            let rpgCurrentStep = 0;
+            let rpgScore = 0;
+
+            const rpgCharConfig = {
+                ISFJ: { name: "林予柔", partner: "沈柏睿" },
+                INTJ: { name: "沈柏睿", partner: "林予柔" }
+            };
+
+            const rpgMasterScript = [
+                // 階段一：突發婚約 (1-4)
+                { phase: "突發婚約", n: "1921年上海，明華事務所。梧桐雨冷，一份紅帖打破了室內的靜謐。", q: "父親將婚書拍在桌上，那是周家的聘約。你此時在想？", o: ["舊時代的枷鎖，終究還是落到了我頭上。", "這份契約缺乏當事人合意，在邏輯上根本不成立。", "如果拒絕，家裡的平靜會被徹底粉碎。", "我需要一個精準的法理切入點來解除這個麻煩。"] },
+                { phase: "突發婚約", n: "沈柏睿（或予柔）走進來，目光停在那抹刺眼的紅。他冷聲道：『妳/妳真的要順從？』", q: "面對對方的質疑，妳/你的回答是？", o: ["「我不想順從，但我不知道該如何對抗父親。」", "「我有我的計畫，這只是一場邏輯上的博弈。」", "「沈律師，請不要用那種高高在上的語氣評斷我。」", "「這是一個系統性的問題，我需要數據和判例來反擊。」"] },
+                { phase: "突發婚約", n: "沈柏睿攤開大理院最新公告，手指在『意思自由』那一行重重劃過。", q: "「這是我為妳選的戰場。敢不敢在大理院告妳的父親？」", o: ["「為了自由，我願意揹負不孝的名聲。」", "「這在法律史上是個完美的標竿案件，我接了。」", "「只要你在身後支援，我便敢一試。」", "「勝率雖然只有三成，但值得冒險投入。」"] },
+                { phase: "突發婚約", n: "消息傳開，事務所外開始出現不友善的流言。父親威脅要報警查封事務所。", q: "面對外部壓力，你決定如何穩住陣腳？", o: ["安撫驚慌的同事，親自打掃門口的落葉。", "冷靜記錄對方的威脅行為，作為庭審證據。", "遞給柏睿一杯參茶，告訴他：我們不能退。", "分析對方的下一步行動，預先設定應對模組。"] },
+                // 階段二：法理深研 (5-8)
+                { phase: "律法深研", n: "深夜，你們在昏黃的燈光下翻閱著清末到現在的所有民事律草案。", q: "柏睿累得閉上眼，手裡還握著那本《現行律》。你？", o: ["輕輕為他披上毛毯，並把散落的紙張理好。", "繼續對照法條，試圖找出比他發現的更深層的漏洞。", "在紙上寫下：『謝謝你願意陪我瘋狂一次。』", "在他醒來前，把目前的法理邏輯架構圖繪製完成。"] },
+                { phase: "律法深研", n: "你們發現了『追認義務』在司法實務中的模稜兩可之處。", q: "這是一把雙面刃。柏睿問：『如果法官不採納，妳的名譽就全毀了。』", o: ["「名譽不過是舊時代的虛名，我不在乎。」", "「邏輯上的風險本來就是推動進步的代價。」", "「只要我們心之所向是一致的，結果不重要。」", "「我已經計算過最壞結果，我可以承受。」"] },
+                { phase: "律法深研", n: "周家派人送來大筆現金，試圖收買沈柏睿撤銷代理。", q: "他把支票扔進廢紙簍，看向妳/你：『妳覺得我值這個價？』", o: ["「你的人格和我們追求的真理，是無價的。」", "「這顯示對方的防線已經產生了邏輯上的動搖。」", "（微笑）「謝謝你選了我，而不是選金錢。」", "「對方的成本投入在增加，說明我們抓住了痛點。」"] },
+                { phase: "律法深研", n: "開庭前夕，林老爺在大雨中跪在事務所門口，哭訴妳/你大逆不道。", q: "看著雨中的老父，你的內心天人交戰。", o: ["走出去為他撐傘，但語氣堅定：『父親，對不起。』", "冷靜地在心中複習明日的申辯詞，不讓情緒干擾大腦。", "默默流淚，但手卻緊緊握住了柏睿的手。", "「情緒勒索是最高效但也最廉價的阻礙。」"] },
+                // 階段三：社會反撲 (9-12)
+                { phase: "社會反饋", n: "報紙開始大肆報導『新式女子狀告親父』，輿論排山倒海而來。", q: "街上的人對妳指指點點，妳感覺世界在崩塌。", o: ["低下頭走進事務所，保持內心的最後一份平靜。", "觀察輿論傾向，思考如何在法庭上轉化民意。", "對柏睿說：『只要你還相信我，我就能走下去。』", "「群眾的盲從是意料之中的數據誤差，不必理會。」"] },
+                { phase: "社會反饋", n: "沈柏睿的律師執照受到官方質疑，有人指控他唆使當事人不睦。", q: "他可能因為這場官司而失去前途。", o: ["「如果你退縮，我也能理解，我不怪你。」", "「這是典型的法律制度對改革者的反噬，我們必須硬碰硬。」", "「哪怕最後只有我一個人，我也會為你辯護。」", "「失去執照的風險已在我的預案中，繼續執行。」"] },
+                { phase: "社會反饋", n: "你在事務所門口撿到一張匿名便條，上面畫著柏睿受傷的圖案。", q: "這是不折不扣的恐嚇。", o: ["悄悄藏起來，不想讓柏睿承受更多心理壓力。", "立刻報警並備案，同時分析恐嚇者的社會特徵。", "握著便條找到柏睿：『我們離開上海吧？（雖然心有不甘）』", "「對方的恐懼已轉化為暴力衝動，說明我們快贏了。」"] },
+                { phase: "社會反饋", n: "林老爺病倒了，醫生說是氣急攻心。", q: "親情與正義的最後抉擇擺在眼前。", o: ["去醫院照顧他，但在病床前重申：『我追求的是正確的事。』", "分析這是否為對方的拖延戰術，理性對待病情。", "對柏睿露出脆弱的一面：『我真的錯了嗎？』", "「生理上的衰老與病痛不應成為法律正義的絆腳石。」"] },
+                // 階段四：法庭交鋒 (13-16)
+                { phase: "法庭交鋒", n: "大理院正式開庭。法官是一位留著長鬚、神色嚴肅的老法學家。", q: "對方律師開始引用《禮記》，稱這是一場倫理的浩劫。", o: ["深吸一口氣，在筆記本上寫下『尊嚴』二字。", "迅速寫下反駁對方的邏輯結構：傳統 vs. 現行法。", "看著柏睿挺拔的背影，心跳加速但神情冷靜。", "「對方的論點基於過時的封建數據，毫無殺傷力。」"] },
+                { phase: "法庭交鋒", n: "法官突然轉頭問妳/你：『林予柔，妳難道不感念父母養育之恩嗎？』", q: "這是針對靈魂的拷問。", o: ["「感念與自立並無衝突，我渴望成為獨立的人。」", "「養育之恩與婚姻契約在法律本質上是兩個範疇。」", "「正因為感念，我才不願帶著怨恨進入一段假婚姻。」", "「這是一個典型的訴諸情感謬誤，我不予置評。」"] },
+                { phase: "法庭交鋒", n: "柏睿站起身，開始了他那著名的『自由之意志』辯論，全場屏息。", q: "他提到了他對法律的信仰，也提到了妳/你。", o: ["眼中含淚，覺得他是這個灰暗世界唯一的亮點。", "分析他的辯論節奏，隨時準備提供補充案卷。", "在桌下輕輕觸碰他的指尖，給予支持。", "「他的論述邏輯閉環極佳，勝率提升至 70%。」"] },
+                { phase: "法庭交鋒", n: "法庭休息時間。沈柏睿在長廊盡頭點了一支煙。", q: "他看著窗外，語氣難得溫柔：『怕嗎？』", o: ["「有你在，我就沒怕過。」", "「比起恐懼，我更期待最終的邏輯結論。」", "「如果輸了，我會陪你一起承擔所有後果。」", "「恐懼是多餘的情感負擔，我已將其剔除。」"] },
+                // 階段五：命運結局 (17-20)
+                { phase: "終極審判", n: "法官宣布即將進入最後判決。林老爺也被抬進了旁聽席。", q: "空氣凝固了。柏睿最後一次問妳/你：『若結果不如預期？』", o: ["「我已經贏回了靈魂，結果只是形式。」", "「我會繼續上訴，直到邏輯得到公正的認可。」", "「只要我們的心在一起，去哪裡都是自由。」", "「失敗的數據將成為下一次對抗的基石。」"] },
+                { phase: "終極審判", n: "『判決如下：婚姻契約非經當事人雙方合意，不生效力。』", q: "全場嘩然。妳/你贏了。", o: ["掩面而泣，那是積壓了二十年的眼淚。", "冷靜地將判決書收進公事包，準備推廣此判例。", "衝上去抱住柏睿，不顧世俗的眼光。", "「預測結果與現實達成一致，系統運行成功。」"] },
+                { phase: "終極審判", n: "走出大理院，陽光刺眼。父親雖然憤怒，但似乎也接受了事實。", q: "沈柏睿伸出手，對妳/你說：『接下來呢？』", o: ["「我們一起把事務所辦得更好，守護更多人。」", "「我打算去大學深造法學，建構更完備的邏輯。」", "「我想跟你走，去哪裡都好。」", "「數據顯示，我們的合作才剛剛開始。」"] },
+                { phase: "終極審判", n: "夕陽下的黃浦江。風吹起妳/你的衣角，這段契約法理之爭終於落幕。", q: "20回合後的妳/你，對這段情緣的最終定義是？", o: ["是一份溫柔的守護，讓我有了重生的勇氣。", "是一場完美的博弈，讓我們看見了理性的光芒。", "是跨越法典與教條，兩顆靈魂的深刻契約。", "是這段混沌時空中，唯一正確的選擇路徑。"] }
+            ];
+
+            window.initRPGGame = function(role) {
+                rpgUserRole = role;
+                document.getElementById('game-start-overlay').classList.add('hidden');
+                document.getElementById('game-action-panel').classList.remove('hidden');
+                rpgAddDialogue('NARRATOR', `妳/你已扮演「${rpgCharConfig[role].name}」，故事正式開始。`);
+                rpgRenderStep();
+            };
+
+            window.resetRPGGame = function() {
+                rpgUserRole = '';
+                rpgCurrentStep = 0;
+                rpgScore = 0;
+                document.getElementById('game-start-overlay').classList.remove('hidden');
+                document.getElementById('game-end-overlay').classList.add('hidden');
+                document.getElementById('game-action-panel').classList.add('hidden');
+                document.getElementById('game-history-container').innerHTML = '';
+            };
+
+            function rpgAddDialogue(type, text) {
+                const container = document.getElementById('game-history-container');
+                const bubble = document.createElement('div');
+
+                if (type === 'NARRATOR') {
+                    bubble.className = 'game-dialogue-bubble game-bubble-narrator';
+                    bubble.innerText = text;
+                } else {
+                    const isPlayer = type === rpgUserRole;
+                    bubble.className = `game-dialogue-bubble ${isPlayer ? 'game-bubble-player' : 'game-bubble-partner'}`;
+                    const name = isPlayer ? rpgCharConfig[rpgUserRole].name : rpgCharConfig[rpgUserRole].partner;
+                    bubble.innerHTML = `<span class="game-speaker-label">${name}</span>${text}`;
+                }
+
+                container.appendChild(bubble);
+                setTimeout(() => {
+                    container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+                }, 100);
+            }
+
+            function rpgRenderStep() {
+                if (rpgCurrentStep >= rpgMasterScript.length) {
+                    rpgShowEnding();
+                    return;
+                }
+
+                const data = rpgMasterScript[rpgCurrentStep];
+                rpgAddDialogue('NARRATOR', data.n);
+
+                document.getElementById('game-question').innerText = data.q;
+                document.getElementById('game-phase-tag').innerText = `階段：${data.phase}`;
+                document.getElementById('game-step-info').innerText = `${rpgCurrentStep + 1} / 20`;
+
+                const optionsBox = document.getElementById('game-options');
+                optionsBox.innerHTML = '';
+
+                data.o.forEach((text, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'game-option-btn';
+                    btn.innerText = text;
+                    btn.onclick = function() {
+                        rpgScore += (4 - index);
+                        rpgAddDialogue(rpgUserRole, text);
+                        rpgCurrentStep++;
+                        optionsBox.innerHTML = '<div style="font-size: 0.75rem; color: #999; padding: 8px;">時代的車輪緩緩向前...</div>';
+                        setTimeout(rpgRenderStep, 800);
+                    };
+                    optionsBox.appendChild(btn);
+                });
+            }
+
+            function rpgShowEnding() {
+                document.getElementById('game-action-panel').classList.add('hidden');
+                const overlay = document.getElementById('game-end-overlay');
+                const title = document.getElementById('game-end-title');
+                const body = document.getElementById('game-end-body');
+                overlay.classList.remove('hidden');
+
+                if (rpgScore >= 60) {
+                    title.innerText = "【結局：法理與愛的雙重勝訴】";
+                    body.innerText = "妳/你與伴侶在大理院贏得的一小步，是民國法治的一大步。妳們不僅贏回了自由，更在那疊泛黃的卷宗中，發現了彼此靈魂的不可替代性。";
+                } else {
+                    title.innerText = "【結局：滬上殘影的嘆息】";
+                    body.innerText = "雖然贏了官司，但代價是與親人的疏遠與時代的孤寂。妳/你站在大理院門口，雖然自由了，卻感覺心中空了一塊。這是一場勝訴，也是一場與舊自我的訣別。";
+                }
+            }
+        })();
+
+        // ============================================
+        // 投影片導航 JavaScript
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = Array.from(document.querySelectorAll('.slide:not(.hidden)'));
+            const totalSlides = slides.length;
+            let currentSlide = 0;
+
+            function showSlide(index) {
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === index);
+                });
+            }
+
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            function prevSlide() {
+                currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            document.getElementById('next').addEventListener('click', nextSlide);
+            document.getElementById('prev').addEventListener('click', prevSlide);
+
+            function isInInteractiveArea(element) {
+                // 檢查是否在遊戲區域內
+                const gameWrapper = document.querySelector('.game-wrapper');
+                if (gameWrapper && (gameWrapper.contains(element) || element.closest('.game-wrapper'))) {
+                    return true;
+                }
+                // 檢查是否在 iframe 區域內
+                const iframeSlide = document.querySelector('.slide.iframe-slide');
+                if (iframeSlide && iframeSlide.classList.contains('active')) {
+                    const iframe = iframeSlide.querySelector('iframe');
+                    if (iframe && (iframe.contains(element) || element === iframe)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            function isCurrentSlideInteractive() {
+                const activeSlide = document.querySelector('.slide.active');
+                if (!activeSlide) return false;
+                return activeSlide.classList.contains('iframe-slide') || activeSlide.classList.contains('game-slide');
+            }
+
+            document.addEventListener('keydown', (e) => {
+                // 如果當前投影片是互動式投影片（iframe 或遊戲），不觸發投影片導航
+                if (isCurrentSlideInteractive()) return;
+
+                // 如果焦點在互動區域內，不觸發投影片導航
+                if (isInInteractiveArea(e.target)) return;
+
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    e.preventDefault();
+                    nextSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    prevSlide();
+                }
+            });
+
+            let touchStartX = 0;
+            let touchEndX = 0;
+            let touchStartElement = null;
+
+            document.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+                touchStartElement = e.target;
+            });
+
+            document.addEventListener('touchend', (e) => {
+                // 如果當前投影片是互動式投影片，不觸發投影片導航
+                if (isCurrentSlideInteractive()) {
+                    touchStartElement = null;
+                    return;
+                }
+
+                // 如果觸控開始或結束在互動區域內，不觸發投影片導航
+                if (isInInteractiveArea(e.target) || (touchStartElement && isInInteractiveArea(touchStartElement))) {
+                    touchStartElement = null;
+                    return;
+                }
+
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+                touchStartElement = null;
+            });
+
+            function handleSwipe() {
+                const swipeThreshold = 50;
+                const diff = touchStartX - touchEndX;
+
+                if (Math.abs(diff) > swipeThreshold) {
+                    if (diff > 0) {
+                        nextSlide();
+                    } else {
+                        prevSlide();
+                    }
+                }
+            }
+
+            showSlide(0);
+        });
+    </script>
+</body>
+</html>
