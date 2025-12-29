@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>期末專案：成果繳交說明</title>
+    <script src="../../sidebar_tools/sidebar.js"></script>
+    <style>
+        /* ============================================
+           CSS 變數定義（來自 style_1116.md）
+           ============================================ */
+        :root {
+            --bg-color: #F5F4F0;        /* Warm, off-white, like aged paper */
+            --text-color: #3D3A37;      /* Dark, soft brown/gray */
+            --accent-color: #9A948C;    /* Muted stone gray */
+            --header-bg: #EAEBE6;       /* Very light, muted moss */
+            --line-color: #d1d1c2;      /* For borders and lines */
+            --highlight-color: #8c867b; /* For highlights */
+            --font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+        }
+
+        /* 投影片容器 */
+        .slides-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: var(--bg-color);
+        }
+
+        /* 投影片基礎樣式 */
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5vw;
+            box-sizing: border-box;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+            transform: scale(0.98);
+            text-align: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+            font-family: var(--font-family);
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            z-index: 1;
+        }
+
+        .slide.hidden {
+            display: none !important;
+        }
+
+        .slide.scrollable {
+            justify-content: flex-start;
+        }
+
+        /* 標題層級 */
+        h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 400;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 400;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--header-bg);
+        }
+
+        h3 {
+            font-size: clamp(1.8rem, 4.5vw, 3rem);
+            font-weight: 300;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--header-bg);
+        }
+
+        h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+        }
+
+        p {
+            font-size: clamp(1.2rem, 2.5vw, 1.75rem);
+            color: var(--text-color);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .slide-subtitle {
+            color: var(--accent-color);
+            font-size: clamp(1.2rem, 3vw, 1.75rem);
+            font-weight: 400;
+            margin-top: -1rem;
+        }
+
+        /* 導航系統 */
+        .nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 98%;
+            left: 1%;
+            display: flex;
+            justify-content: space-between;
+            z-index: 1002;
+            pointer-events: none;
+        }
+
+        .nav-btn {
+            pointer-events: all;
+            background: none;
+            border: 1px solid var(--line-color);
+            color: var(--accent-color);
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.4;
+            font-family: var(--font-family);
+        }
+
+        .nav-btn:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            opacity: 1;
+        }
+
+        /* 側邊欄導航系統 */
+        .sidebar-toggle {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            background: var(--text-color);
+            border-radius: 4px;
+            padding: 6px;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        .sidebar-toggle span {
+            display: block;
+            width: 18px;
+            height: 2px;
+            background: #ffffff;
+            border-radius: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-menu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 280px;
+            height: 100vh;
+            background: var(--bg-color);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            transition: left 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+            font-family: var(--font-family);
+        }
+
+        .sidebar-menu.active {
+            left: 0;
+        }
+
+        .sidebar-header {
+            background: var(--text-color);
+            color: #ffffff;
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 1px solid var(--line-color);
+        }
+
+        .sidebar-header h3 {
+            margin: 0;
+            font-size: clamp(1rem, 2vw, 1.1rem);
+            font-weight: 400;
+            font-family: var(--font-family);
+            border: none;
+            padding: 0;
+        }
+
+        .sidebar-content {
+            padding: 1rem 0;
+        }
+
+        .sidebar-item {
+            display: block;
+            padding: 0.8rem 1.5rem;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid var(--line-color);
+            font-family: var(--font-family);
+        }
+
+        .sidebar-item:hover {
+            background: rgba(154, 148, 140, 0.1);
+            color: var(--text-color);
+            transform: translateX(5px);
+        }
+
+        .sidebar-text {
+            font-size: clamp(0.85rem, 1.5vw, 0.9rem);
+            font-weight: 400;
+            font-family: var(--font-family);
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* 內容佈局系統 */
+        .content-section {
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--line-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            font-family: var(--font-family);
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        .content-section h4 {
+            font-size: clamp(1.6rem, 3vw, 2rem);
+            font-weight: 400;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .content-section p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+        }
+
+        /* 列表系統 */
+        ul {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            max-width: 800px;
+            margin: 1rem 0;
+            font-family: var(--font-family);
+        }
+
+        ul li {
+            margin-bottom: 15px;
+            position: relative;
+            padding-left: 1.5em;
+            font-size: clamp(1rem, 2.5vw, 1.75rem);
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+
+        ul li::before {
+            content: '- ';
+            color: var(--accent-color);
+            font-weight: bold;
+            display: inline-block;
+            position: absolute;
+            left: 0;
+        }
+
+        /* 連結樣式 */
+        a {
+            color: var(--accent-color);
+            text-decoration: none;
+            border-bottom: 1px solid var(--accent-color);
+            transition: color 0.3s ease, border-color 0.3s ease;
+        }
+
+        a:hover {
+            color: var(--text-color);
+            border-bottom-color: var(--text-color);
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 767px) {
+            .nav {
+                width: 95%;
+                left: 2.5%;
+            }
+
+            .nav-btn {
+                width: 44px;
+                height: 44px;
+                font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+                opacity: 0.6;
+            }
+
+            .content-section {
+                padding: 1rem;
+                max-width: 100%;
+            }
+
+            .sidebar-toggle {
+                top: 0.5rem;
+                left: 0.5rem;
+                width: 28px;
+                height: 28px;
+                padding: 5px;
+            }
+
+            .sidebar-toggle span {
+                width: 16px;
+                height: 2px;
+            }
+
+            .sidebar-menu {
+                width: 260px;
+            }
+
+            .sidebar-item {
+                padding: 0.7rem 1.2rem;
+            }
+
+            .sidebar-text {
+                font-size: clamp(0.75rem, 1.2vw, 0.85rem);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 側邊欄切換按鈕 -->
+    <div class="sidebar-toggle" id="sidebarToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <!-- 側邊欄遮罩層 -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- 側邊欄選單 -->
+    <div class="sidebar-menu" id="sidebarMenu">
+        <div class="sidebar-header">
+            <h3>投影片導航</h3>
+        </div>
+        <div class="sidebar-content">
+            <a href="#" class="sidebar-item" data-slide="0">
+                <span class="sidebar-text">投影片 1：標題</span>
+            </a>
+            <a href="#" class="sidebar-item" data-slide="1">
+                <span class="sidebar-text">投影片 2：成果繳交說明</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- 投影片容器 -->
+    <div class="slides-container">
+        <!-- 投影片 1：標題 -->
+        <div class="slide active">
+            <h1>RPG 遊戲設計 (續)</h1>
+            <p class="slide-subtitle">12/23, 12/30, 01/06</p>
+        </div>
+
+        <!-- 投影片 2：成果繳交說明 -->
+        <div class="slide">
+            <div class="content-section">
+                <h2>成果繳交</h2>
+                <p style="margin-bottom: 1.5rem;">
+                    <a href="https://forms.gle/ADPoxuEsefwNUEJD6" target="_blank" style="color: #7A8FA3; border-bottom-color: #7A8FA3;">Google Form 連結</a>
+                </p>
+                <p style="margin-bottom: 1.5rem; color: #7a3a3a; font-weight: 600;">每組有一人繳交即可，今日繳交。</p>
+                <h4>繳交內容：</h4>
+                <ul>
+                    <li>主題</li>
+                    <li>角色介紹（設計理念）：說明角色們的個性、背景資訊</li>
+                    <li>劇本故事（架構）：請說明背景脈絡，故事內容</li>
+                    <li>勝敗條件：遊戲的勝敗條件為何</li>
+                    <li>遊戲本體：請提供遊戲的公開連結，可以直接點開即玩</li>
+                </ul>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- 導航按鈕 -->
+    <div class="nav">
+        <button class="nav-btn" id="prev">‹</button>
+        <button class="nav-btn" id="next">›</button>
+    </div>
+
+    <script>
+        // ============================================
+        // 側邊欄 JavaScript
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebarMenu = document.getElementById('sidebarMenu');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const sidebarItems = document.querySelectorAll('.sidebar-item');
+
+            function toggleSidebar() {
+                sidebarMenu.classList.toggle('active');
+                sidebarOverlay.classList.toggle('active');
+            }
+
+            sidebarToggle.addEventListener('click', toggleSidebar);
+            sidebarOverlay.addEventListener('click', toggleSidebar);
+
+            sidebarItems.forEach((item, index) => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const slideIndex = parseInt(item.getAttribute('data-slide'));
+                    showSlide(slideIndex);
+                    toggleSidebar();
+                });
+            });
+        });
+
+        // ============================================
+        // 投影片導航 JavaScript
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = Array.from(document.querySelectorAll('.slide:not(.hidden)'));
+            const totalSlides = slides.length;
+            let currentSlide = 0;
+
+            function showSlide(index) {
+                if (index < 0 || index >= totalSlides) return;
+                currentSlide = index;
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === index);
+                });
+            }
+
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            function prevSlide() {
+                currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            document.getElementById('next').addEventListener('click', nextSlide);
+            document.getElementById('prev').addEventListener('click', prevSlide);
+
+            // 鍵盤導航
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    e.preventDefault();
+                    nextSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    prevSlide();
+                }
+            });
+
+            // 觸控滑動導航
+            let touchStartX = 0;
+            let touchEndX = 0;
+
+            document.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            });
+
+            document.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            });
+
+            function handleSwipe() {
+                const swipeThreshold = 50;
+                const diff = touchStartX - touchEndX;
+
+                if (Math.abs(diff) > swipeThreshold) {
+                    if (diff > 0) {
+                        nextSlide();
+                    } else {
+                        prevSlide();
+                    }
+                }
+            }
+
+            // 初始化顯示第一張投影片
+            showSlide(0);
+        });
+    </script>
+</body>
+</html>
+
